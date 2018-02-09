@@ -1,0 +1,97 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+      "side": "mobvats:blocks/vat_head",
+      "facing": "mobvats:blocks/vat_face",
+      "particle": "#side",
+      "down": "#side",
+      "up": "#side",
+      "north": "#side",
+      "south": "#side",
+      "west": "#side",
+      "east": "#side"
+    },
+    "model": "cube"
+  },
+  "variants": {
+    "tier": {
+      "legacy": {
+      },
+      "basic": {
+      }
+    },
+    "hfacing": {
+      "north": {
+        "textures": {
+          "north": "#facing"
+        }
+      },
+      "south": {
+        "textures": {
+          "south": "#facing"
+        }
+      },
+      "west": {
+        "textures": {
+          "west": "#facing"
+        }
+      },
+      "east": {
+        "textures": {
+          "east": "#facing"
+        }
+      },
+      "up": {
+        "textures": {
+          "up": "#facing"
+        }
+      },
+      "down": {
+        "textures": {
+          "down": "#facing"
+        }
+      }
+    },
+    "afstate": {
+      "disassembled": {
+      },
+      "assemblednorth": {
+        "textures": {
+          "north": "#facing"
+        }
+      },
+      "assembledsouth": {
+        "textures": {
+          "south": "#facing"
+        }
+      },
+      "assembledwest": {
+        "textures": {
+          "west": "#facing"
+        }
+      },
+      "assembledeast": {
+        "textures": {
+          "east": "#facing"
+        }
+      },
+      "assembledup": {
+        "textures": {
+          "up": "#facing"
+        }
+      },
+      "assembleddown": {
+        "textures": {
+          "down": "#facing"
+        }
+      }
+    },
+    "inventory": {
+      "transform": "forge:default-item",
+      "textures": {
+        "north": "#facing"
+      }
+    }
+  }
+}

@@ -2,7 +2,7 @@
   "forge_marker": 1,
   "defaults": {
     "textures": {
-      "all": "tutorial:blocks/vat_flesh"
+      "all": "mobvats:blocks/vat_flesh"
     }
   },
   "variants": {

@@ -17,8 +17,8 @@ public enum PartType implements IMultiblockPartType {
     VatHead("vatHead", 5),
     VatFlesh("vatFlesh", 6),
     VatPowerPort("vatPowerPort", 7),
-    VatInputPort("vatInputPort", 8),
-    VatOutputPort("vatOutputPort", 9),
+    VatItemInputPort("vatItemInputPort", 8),
+    VatItemOutputPort("vatItemOutputPort", 9),
     VatCreativeInputPort("", 0);
 
     public final String oreDictionaryName;
@@ -33,6 +33,7 @@ public enum PartType implements IMultiblockPartType {
     @Nullable
     public TileEntity createTileEntity(@Nonnull World var1, @Nonnull IBlockState var2)
     {
+
         return null;
     }
 

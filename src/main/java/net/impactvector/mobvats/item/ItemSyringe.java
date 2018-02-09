@@ -59,7 +59,7 @@ public class ItemSyringe extends ItemBase {
 //            return false;
 //        }
 //
-//        ItemVialEssence.setMobName(vialStack, mobVatsName, displayName, EntityHelper.getExperienceValue((EntityLiving)target));
+//        ItemEssence.setMobName(vialStack, mobVatsName, displayName, EntityHelper.getExperienceValue((EntityLiving)target));
 //        ((EntityPlayer) attacker).addChatComponentMessage(
 //                new TextComponentString(String.format(
 //                        StringHelper.localize(Lang.CHAT_PRISM_PROGRAM), displayName, mobVatsName)));

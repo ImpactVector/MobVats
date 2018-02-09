@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "tutorial:items/item_essence"
+    "layer0": "mobvats:items/item_essence"
   }
 }

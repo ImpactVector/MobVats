@@ -1,24 +1,23 @@
 package net.impactvector.mobvats.block;
 
-import it.zerono.mods.zerocore.lib.block.ModBlock;
-import net.minecraft.block.Block;
+import it.zerono.mods.zerocore.lib.block.BlockMultiblockPart;
+import net.impactvector.mobvats.MobVats;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.impactvector.mobvats.MobVats;
 
-public class BlockBase extends ModBlock {
+public class PartBase extends BlockMultiblockPart {
 
     protected String name;
 
-    public BlockBase(String name, Material material) {
-        super(name, material);
+    public PartBase(PartType type, String name, Material material) {
+        super(type, name, material);
 
         this.name = name;
 
-        setUnlocalizedName(name);
-        //setRegistryName(name);
+        //setUnlocalizedName(name);
+        //setRegistryName(name); //does this in the super class
         setCreativeTab(MobVats.getTab());
     }
 
@@ -31,9 +30,8 @@ public class BlockBase extends ModBlock {
     }
 
     @Override
-    public BlockBase setCreativeTab(CreativeTabs tab) {
+    public PartBase setCreativeTab(CreativeTabs tab) {
         super.setCreativeTab(tab);
         return this;
     }
-
 }

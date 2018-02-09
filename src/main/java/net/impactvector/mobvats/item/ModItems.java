@@ -7,7 +7,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModItems {
     public static ItemBase itemSyringe = new ItemSyringe("item_syringe");
-    public static ItemBase itemEssence = new ItemSyringe("item_essence");
+    public static ItemBase itemEssence = new ItemEssence("item_essence");
 
     public static void register(IForgeRegistry<Item> registry) {
         registry.registerAll(

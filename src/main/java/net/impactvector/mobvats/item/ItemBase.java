@@ -1,17 +1,18 @@
 package net.impactvector.mobvats.item;
 
+import it.zerono.mods.zerocore.lib.item.ModItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.impactvector.mobvats.MobVats;
 
-public class ItemBase extends Item {
+public class ItemBase extends ModItem {
 
     protected String name;
 
     public ItemBase(String name) {
+        super(name);
         this.name = name;
         setUnlocalizedName(name);
-        setRegistryName(name);
         setCreativeTab(MobVats.getTab());
     }
 
