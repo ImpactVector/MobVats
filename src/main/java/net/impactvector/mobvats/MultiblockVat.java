@@ -4,15 +4,18 @@ import it.zerono.mods.zerocore.api.multiblock.IMultiblockPart;
 import it.zerono.mods.zerocore.api.multiblock.MultiblockControllerBase;
 import it.zerono.mods.zerocore.api.multiblock.rectangular.RectangularMultiblockControllerBase;
 import it.zerono.mods.zerocore.api.multiblock.validation.IMultiblockValidator;
+import it.zerono.mods.zerocore.lib.IDebugMessages;
+import it.zerono.mods.zerocore.lib.IDebuggable;
 import it.zerono.mods.zerocore.lib.block.ModTileEntity;
 import net.impactvector.mobvats.block.*;
+import net.impactvector.mobvats.interfaces.IActivateable;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class MultiblockVat extends RectangularMultiblockControllerBase {
+public class MultiblockVat extends RectangularMultiblockControllerBase implements IActivateable, IDebuggable {
 
 
     public MultiblockVat(World world) {
@@ -146,6 +149,21 @@ public class MultiblockVat extends RectangularMultiblockControllerBase {
 
     @Override
     protected void syncDataTo(NBTTagCompound nbtTagCompound, ModTileEntity.SyncReason syncReason) {
+
+    }
+
+    @Override
+    public void getDebugMessages(IDebugMessages iDebugMessages) {
+
+    }
+
+    @Override
+    public boolean getActive() {
+        return false;
+    }
+
+    @Override
+    public void setActive(boolean active) {
 
     }
 }

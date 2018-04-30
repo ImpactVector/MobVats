@@ -24,6 +24,14 @@ public abstract class TileEntityVatPartBase extends RectangularMultiblockTileEnt
         return false;
     }
 
+    protected void setBlockLocationErrorMessage(IMultiblockValidator validatorCallback) {
+
+        BlockPos position = this.getPos();
+
+        validatorCallback.setLastError("multiblock.validation.vat.invalid_" + this.getBlockType().getUnlocalizedName() +"_location",
+                position.getX(), position.getY(), position.getZ());
+    }
+
     public boolean isGoodForSides(IMultiblockValidator validatorCallback) {
         return true;
     }

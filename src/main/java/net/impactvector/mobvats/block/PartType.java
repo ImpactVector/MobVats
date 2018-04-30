@@ -2,7 +2,7 @@ package net.impactvector.mobvats.block;
 
 import com.ibm.icu.util.Output;
 import it.zerono.mods.zerocore.lib.block.IMultiblockPartType;
-import net.impactvector.mobvats.tileentity.TileEntityVatPart;
+import net.impactvector.mobvats.tileentity.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IStringSerializable;
@@ -20,8 +20,8 @@ public enum PartType implements IMultiblockPartType {
     VatFlesh("vatFlesh", 6),
     VatPowerPort("vatPowerPort", 7),
     VatItemPort("vatItemPort", 8),
-    VatFluidPort("vatFluidPort", 8),
-    VatDrain("vatDrain", 9);
+    VatFluidPort("vatFluidPort", 9),
+    VatDrain("vatDrain", 10);
 
     public final String oreDictionaryName;
     public final int meta;
@@ -36,19 +36,22 @@ public enum PartType implements IMultiblockPartType {
     public TileEntity createTileEntity(@Nonnull World var1, @Nonnull IBlockState var2)
     {
         switch (this) {
-
-        default:
-//            return null;
-            return new TileEntityVatPart();
-//
-//        case Power:
-//            return new MightyFurnacePowerTileEntity();
-//
-//        case Input:
-//            return new MightyFurnaceIOPortTileEntity(true);
-//
-//        case Output:
-//            return new MightyFurnaceIOPortTileEntity(false);
+            case VatController:
+                return new TileEntityVatController();
+            case VatDrain:
+                return new TileEntityVatDrain();
+            case VatHarness:
+                return new TileEntityVatHarness();
+            case VatHead:
+                return new TileEntityVatHead();
+            case VatFlesh:
+                return new TileEntityVatHomunculusPart();
+            case VatItemPort:
+                return new TileEntityVatItemPort();
+            case VatFluidPort:
+                return new TileEntityVatFluidPort();
+            default:
+                return new TileEntityVatPart();
         }
     }
 
