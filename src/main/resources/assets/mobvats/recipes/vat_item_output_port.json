@@ -2,10 +2,12 @@
   "type": "crafting_shapeless",
   "ingredients": [
     {
-      "item": "mobvats:vat_item_input_port"
+      "item": "mobvats:vat_io_port",
+      "data": 0
     }
   ],
   "result": {
-    "item": "mobvats:vat_item_output_port"
+    "item": "mobvats:vat_io_port",
+    "data": 1
   }
 }

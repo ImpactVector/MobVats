@@ -2,8 +2,10 @@ package net.impactvector.mobvats.block;
 
 import com.ibm.icu.util.Output;
 import it.zerono.mods.zerocore.lib.block.IMultiblockPartType;
+import net.impactvector.mobvats.tileentity.TileEntityVatPart;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
@@ -17,9 +19,9 @@ public enum PartType implements IMultiblockPartType {
     VatHead("vatHead", 5),
     VatFlesh("vatFlesh", 6),
     VatPowerPort("vatPowerPort", 7),
-    VatItemInputPort("vatItemInputPort", 8),
-    VatItemOutputPort("vatItemOutputPort", 9),
-    VatCreativeInputPort("", 0);
+    VatItemPort("vatItemPort", 8),
+    VatFluidPort("vatFluidPort", 8),
+    VatDrain("vatDrain", 9);
 
     public final String oreDictionaryName;
     public final int meta;
@@ -33,8 +35,21 @@ public enum PartType implements IMultiblockPartType {
     @Nullable
     public TileEntity createTileEntity(@Nonnull World var1, @Nonnull IBlockState var2)
     {
+        switch (this) {
 
-        return null;
+        default:
+//            return null;
+            return new TileEntityVatPart();
+//
+//        case Power:
+//            return new MightyFurnacePowerTileEntity();
+//
+//        case Input:
+//            return new MightyFurnaceIOPortTileEntity(true);
+//
+//        case Output:
+//            return new MightyFurnaceIOPortTileEntity(false);
+        }
     }
 
     public int toMeta(){
@@ -50,4 +65,5 @@ public enum PartType implements IMultiblockPartType {
 
         return this.toString();
     }
+    private PartType _myType;
 }

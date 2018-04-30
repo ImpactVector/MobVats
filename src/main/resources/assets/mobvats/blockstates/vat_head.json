@@ -15,12 +15,6 @@
     "model": "cube"
   },
   "variants": {
-    "tier": {
-      "legacy": {
-      },
-      "basic": {
-      }
-    },
     "hfacing": {
       "north": {
         "textures": {
@@ -48,40 +42,6 @@
         }
       },
       "down": {
-        "textures": {
-          "down": "#facing"
-        }
-      }
-    },
-    "afstate": {
-      "disassembled": {
-      },
-      "assemblednorth": {
-        "textures": {
-          "north": "#facing"
-        }
-      },
-      "assembledsouth": {
-        "textures": {
-          "south": "#facing"
-        }
-      },
-      "assembledwest": {
-        "textures": {
-          "west": "#facing"
-        }
-      },
-      "assembledeast": {
-        "textures": {
-          "east": "#facing"
-        }
-      },
-      "assembledup": {
-        "textures": {
-          "up": "#facing"
-        }
-      },
-      "assembleddown": {
         "textures": {
           "down": "#facing"
         }

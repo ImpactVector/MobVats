@@ -8,6 +8,10 @@ import net.impactvector.mobvats.block.ModBlocks;
 import net.minecraft.util.math.BlockPos;
 
 public abstract class TileEntityVatPartBase extends RectangularMultiblockTileEntityBase {
+
+    public TileEntityVatPartBase() {
+    }
+
     @Override
     public boolean isGoodForFrame(IMultiblockValidator validatorCallback) {
 
@@ -35,10 +39,6 @@ public abstract class TileEntityVatPartBase extends RectangularMultiblockTileEnt
     public boolean isGoodForInterior(IMultiblockValidator validatorCallback) {
         validatorCallback.setLastError("multiblock.validation.vat.invalid_part_for_interior", new Object[]{this.getWorldPosition()});
         return false;
-    }
-
-
-    public TileEntityVatPartBase() {
     }
 
     public MultiblockVat getReactorController() { return (MultiblockVat)this.getMultiblockController(); }

@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "mobvats:blocks/vat_head",
+    "down": "mobvats:blocks/vat_head",
+    "up": "mobvats:blocks/vat_head",
+    "east": "mobvats:blocks/vat_head",
+    "west": "mobvats:blocks/vat_head",
+    "north": "mobvats:blocks/vat_face",
+    "south": "mobvats:blocks/vat_head"
+  }
+}

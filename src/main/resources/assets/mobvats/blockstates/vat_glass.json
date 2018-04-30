@@ -1,0 +1,84 @@
+{
+  "variants": {
+    "facings=none": { "model": "mobvats:vat_glass_c0" },
+
+    "facings=face_u": { "model": "mobvats:vat_glass_c1" },
+    "facings=face_d": { "model": "mobvats:vat_glass_c1", "x": 180 },
+    "facings=face_n": { "model": "mobvats:vat_glass_c1", "x": 90 },
+    "facings=face_s": { "model": "mobvats:vat_glass_c1", "x": -90 },
+    "facings=face_w": { "model": "mobvats:vat_glass_c1", "x": 90, "y": -90 },
+    "facings=face_e": { "model": "mobvats:vat_glass_c1", "x": 90, "y": 90 },
+
+    "facings=angle_eu": { "model": "mobvats:vat_glass_c2angle" },
+    "facings=angle_uw": { "model": "mobvats:vat_glass_c2angle", "y": 180 },
+    "facings=angle_de": { "model": "mobvats:vat_glass_c2angle", "x": 180 },
+    "facings=angle_dw": { "model": "mobvats:vat_glass_c2angle", "x": 180, "y": 180 },
+    "facings=angle_nu": { "model": "mobvats:vat_glass_c2angle", "y": -90 },
+    "facings=angle_su": { "model": "mobvats:vat_glass_c2angle", "y": 90 },
+    "facings=angle_dn": { "model": "mobvats:vat_glass_c2angle", "x": 180, "y": -90 },
+    "facings=angle_ds": { "model": "mobvats:vat_glass_c2angle", "x": 180, "y": 90 },
+    "facings=angle_en": { "model": "mobvats:vat_glass_c2angle", "x": 90 },
+    "facings=angle_es": { "model": "mobvats:vat_glass_c2angle", "x": -90 },
+    "facings=angle_nw": { "model": "mobvats:vat_glass_c2angle", "x": 90, "y": -90 },
+    "facings=angle_sw": { "model": "mobvats:vat_glass_c2angle", "x": -90, "y": 90 },
+
+    "facings=opposite_du": { "model": "mobvats:vat_glass_c2" },
+    "facings=opposite_ew": { "model": "mobvats:vat_glass_c2", "x": -90, "y": 90  },
+    "facings=opposite_ns": { "model": "mobvats:vat_glass_c2", "x": -90 },
+
+    "facings=cshape_duw": { "model": "mobvats:vat_glass_c3T1" },
+    "facings=cshape_dsu": { "model": "mobvats:vat_glass_c3T1", "y": -90 },
+    "facings=cshape_deu": { "model": "mobvats:vat_glass_c3T1", "y": -180 },
+    "facings=cshape_dnu": { "model": "mobvats:vat_glass_c3T1", "y": 90 },
+    "facings=cshape_nsw": { "model": "mobvats:vat_glass_c3T1", "x": -90 },
+    "facings=cshape_ens": { "model": "mobvats:vat_glass_c3T1", "x": -90, "y": 180 },
+
+    "facings=cshape_euw": { "model": "mobvats:vat_glass_c3T2" },
+    "facings=cshape_esw": { "model": "mobvats:vat_glass_c3T2", "x": -90 },
+    "facings=cshape_dew": { "model": "mobvats:vat_glass_c3T2", "x": 180 },
+    "facings=cshape_enw": { "model": "mobvats:vat_glass_c3T2", "x": 90 },
+    "facings=cshape_nsu": { "model": "mobvats:vat_glass_c3T2", "y": 90 },
+    "facings=cshape_dns": { "model": "mobvats:vat_glass_c3T2", "x": 180, "y": 90 },
+
+    "facings=corner_esu": { "model": "mobvats:vat_glass_c3angle" },
+    "facings=corner_suw": { "model": "mobvats:vat_glass_c3angle", "y": 90 },
+    "facings=corner_enu": { "model": "mobvats:vat_glass_c3angle", "x": 90 },
+    "facings=corner_den": { "model": "mobvats:vat_glass_c3angle", "x": 180 },
+    "facings=corner_des": { "model": "mobvats:vat_glass_c3angle", "x": 270 },
+
+    "facings=corner_dsw": { "model": "mobvats:vat_glass_c3angle", "x": 180, "y": -180 },
+    "facings=corner_dnw": { "model": "mobvats:vat_glass_c3angle", "x": -90, "y": -180 },
+    "facings=corner_nuw": { "model": "mobvats:vat_glass_c3angle", "x": 90, "y": -90 },
+
+    "facings=pipe_deuw": { "model": "mobvats:vat_glass_c4X" },
+    "facings=pipe_ensw": { "model": "mobvats:vat_glass_c4X", "x": 90 },
+    "facings=pipe_dnsu": { "model": "mobvats:vat_glass_c4X", "y": 90 },
+
+    "facings=misc_dnuw": { "model": "mobvats:vat_glass_c4angle" },
+    "facings=misc_dnsw": { "model": "mobvats:vat_glass_c4angle", "x": 90 },
+    "facings=misc_nsuw": { "model": "mobvats:vat_glass_c4angle", "x": -90 },
+    "facings=misc_dsuw": { "model": "mobvats:vat_glass_c4angle", "y": -90 },
+    "facings=misc_denu": { "model": "mobvats:vat_glass_c4angle", "y": 90 },
+    "facings=misc_desu": { "model": "mobvats:vat_glass_c4angle", "y": 180 },
+    "facings=misc_ensu": { "model": "mobvats:vat_glass_c4angle", "x": -90, "y": 180 },
+    "facings=misc_dens": { "model": "mobvats:vat_glass_c4angle", "x": 90, "y": 180 },
+    "facings=misc_esuw": { "model": "mobvats:vat_glass_c4angle", "x": -90, "y": -90 },
+    "facings=misc_desw": { "model": "mobvats:vat_glass_c4angle", "x": -270, "y": -90 },
+    "facings=misc_enuw": { "model": "mobvats:vat_glass_c4angle", "x": -90, "y": 90 },
+    "facings=misc_denw": { "model": "mobvats:vat_glass_c4angle", "x": -270, "y": -270 },
+
+    "facings=pipeend_densw": { "model": "mobvats:vat_glass_c5-6" },
+    "facings=pipeend_desuw": { "model": "mobvats:vat_glass_c5-6" },
+    "facings=pipeend_dnsuw": { "model": "mobvats:vat_glass_c5-6" },
+    "facings=pipeend_densu": { "model": "mobvats:vat_glass_c5-6" },
+    "facings=pipeend_denuw": { "model": "mobvats:vat_glass_c5-6" },
+    "facings=pipeend_ensuw": { "model": "mobvats:vat_glass_c5-6" },
+
+    "facings=all": { "model": "mobvats:vat_glass_c5-6" },
+
+    "inventory": {
+      "transform": "forge:default-block",
+      "model": "mobvats:vat_glass_c0"
+    }
+  }
+}

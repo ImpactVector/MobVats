@@ -5,12 +5,10 @@
       "item": "mobvats:vat_casing"
     },
     {
-      "type": "forge:ore_dict",
-      "ore": "blockChest"
+      "item": "minecraft:hopper"
     }
   ],
   "result": {
-    "item": "mobvats:vat_io_port",
-    "data": 0
+    "item": "mobvats:vat_drain"
   }
 }
