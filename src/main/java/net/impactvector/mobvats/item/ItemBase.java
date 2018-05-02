@@ -4,6 +4,8 @@ import it.zerono.mods.zerocore.lib.item.ModItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.impactvector.mobvats.MobVats;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemBase extends ModItem {
 
@@ -24,6 +26,12 @@ public class ItemBase extends ModItem {
     public ItemBase setCreativeTab(CreativeTabs tab) {
         super.setCreativeTab(tab);
         return this;
+    }
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void onRegisterModels()
+    {
+        this.registerItemModel();
     }
 
 }

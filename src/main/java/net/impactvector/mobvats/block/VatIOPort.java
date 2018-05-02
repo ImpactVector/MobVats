@@ -13,7 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class VatIOPort extends PartBase {
+public class VatIOPort extends MachinePartBase {
     public VatIOPort(String name, PartType type) {
         super(type, name, Material.IRON);
     }

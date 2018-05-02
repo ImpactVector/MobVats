@@ -2,6 +2,7 @@ package net.impactvector.mobvats.block;
 
 import it.zerono.mods.zerocore.lib.block.BlockMultiblockPart;
 import it.zerono.mods.zerocore.lib.block.properties.Orientation;
+import net.impactvector.mobvats.helpers.MachinePartState;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;

@@ -19,8 +19,4 @@ public class TileEntityVatHomunculusPart extends TileEntityVatPart {
         this.setBlockLocationErrorMessage(validatorCallback);
         return false;
     }
-    @Override
-    public boolean isGoodForInterior(IMultiblockValidator validatorCallback) {
-        return true;
-    }
 }

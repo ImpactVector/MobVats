@@ -45,7 +45,7 @@ public enum PartType implements IMultiblockPartType {
             case VatHead:
                 return new TileEntityVatHead();
             case VatFlesh:
-                return new TileEntityVatHomunculusPart();
+                return new TileEntityVatFlesh();
             case VatItemPort:
                 return new TileEntityVatItemPort();
             case VatFluidPort:

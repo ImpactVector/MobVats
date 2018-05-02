@@ -13,7 +13,7 @@ import net.minecraft.world.IBlockAccess;
 
 import javax.annotation.Nonnull;
 
-public class VatController extends PartBase {
+public class VatController extends MachinePartBase {
     public VatController(String name){
         super(PartType.VatController, name, Material.IRON);
     }

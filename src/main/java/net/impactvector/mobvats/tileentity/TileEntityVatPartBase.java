@@ -1,10 +1,13 @@
 package net.impactvector.mobvats.tileentity;
 
 import it.zerono.mods.zerocore.api.multiblock.MultiblockControllerBase;
+import it.zerono.mods.zerocore.api.multiblock.rectangular.PartPosition;
 import it.zerono.mods.zerocore.api.multiblock.rectangular.RectangularMultiblockTileEntityBase;
 import it.zerono.mods.zerocore.api.multiblock.validation.IMultiblockValidator;
+import it.zerono.mods.zerocore.lib.BlockFacings;
+import it.zerono.mods.zerocore.lib.world.WorldHelper;
 import net.impactvector.mobvats.MultiblockVat;
-import net.impactvector.mobvats.block.ModBlocks;
+import net.impactvector.mobvats.init.ModBlocks;
 import net.minecraft.util.math.BlockPos;
 
 public abstract class TileEntityVatPartBase extends RectangularMultiblockTileEntityBase {
@@ -49,7 +52,7 @@ public abstract class TileEntityVatPartBase extends RectangularMultiblockTileEnt
         return false;
     }
 
-    public MultiblockVat getReactorController() { return (MultiblockVat)this.getMultiblockController(); }
+    public MultiblockVat getVatController() { return (MultiblockVat)this.getMultiblockController(); }
 
     @Override
     public MultiblockControllerBase createNewMultiblock() {
@@ -58,4 +61,24 @@ public abstract class TileEntityVatPartBase extends RectangularMultiblockTileEnt
 
     @Override
     public Class<? extends MultiblockControllerBase> getMultiblockControllerType() { return MultiblockVat.class; }
+
+    @Override
+    public void onPostMachineBroken() {
+        super.onPostMachineBroken();
+
+        // Re-render this block on the client
+        if(this.world.isRemote) {
+            WorldHelper.notifyBlockUpdate(this.world, this.getPos(), null, null);
+        }
+    }
+
+    @Override
+    public void onPreMachineAssembled(MultiblockControllerBase controller) {
+        super.onPreMachineAssembled(controller);
+
+        // Re-render this block on the client
+        if(this.world.isRemote) {
+            WorldHelper.notifyBlockUpdate(this.world, this.getPos(), null, null);
+        }
+    }
 }

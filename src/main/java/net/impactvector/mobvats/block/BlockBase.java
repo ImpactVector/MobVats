@@ -7,6 +7,8 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.impactvector.mobvats.MobVats;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockBase extends ModBlock {
 
@@ -26,8 +28,11 @@ public class BlockBase extends ModBlock {
         MobVats.getProxy().registerItemRenderer(itemBlock, 0, name);
     }
 
-    public Item createItemBlock() {
-        return new ItemBlock(this);
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void onRegisterModels()
+    {
+        this.registerItemModel(Item.getItemFromBlock(this));
     }
 
     @Override

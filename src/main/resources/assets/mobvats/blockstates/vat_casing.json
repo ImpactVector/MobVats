@@ -2,11 +2,11 @@
   "forge_marker":1,
   "defaults":{
     "textures":{
-      "plate":"mobvats:blocks/reactor/legacy/casing.plate",
-      "face":"mobvats:blocks/reactor/legacy/casing.face",
-      "eastwest":"mobvats:blocks/reactor/legacy/casing.eastwest",
-      "updown":"mobvats:blocks/reactor/legacy/casing.updown",
-      "corner":"mobvats:blocks/reactor/legacy/casing.corner",
+      "plate":"mobvats:blocks/casing.plate",
+      "face":"mobvats:blocks/casing.face",
+      "eastwest":"mobvats:blocks/casing.eastwest",
+      "updown":"mobvats:blocks/casing.updown",
+      "corner":"mobvats:blocks/casing.corner",
       "side":"#plate",
       "particle":"#side",
       "down":"#side",
@@ -19,26 +19,6 @@
     "model":"cube"
   },
   "variants":{
-    "tier":{
-      "legacy":{
-        "textures":{
-          "plate":"mobvats:blocks/reactor/legacy/casing.plate",
-          "face":"mobvats:blocks/reactor/legacy/casing.face",
-          "eastwest":"mobvats:blocks/reactor/legacy/casing.eastwest",
-          "updown":"mobvats:blocks/reactor/legacy/casing.updown",
-          "corner":"mobvats:blocks/reactor/legacy/casing.corner"
-        }
-      },
-      "basic":{
-        "textures":{
-          "plate":"mobvats:blocks/reactor/basic/casing.plate",
-          "face":"mobvats:blocks/reactor/basic/casing.face",
-          "eastwest":"mobvats:blocks/reactor/basic/casing.eastwest",
-          "updown":"mobvats:blocks/reactor/basic/casing.updown",
-          "corner":"mobvats:blocks/reactor/basic/casing.corner"
-        }
-      }
-    },
     "casing":{
       "single":{
         "textures":{

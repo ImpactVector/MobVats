@@ -1,5 +1,5 @@
 {
-  "type": "crafting_shapeless",
+  "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
       "item": "mobvats:vat_casing"
@@ -10,7 +10,7 @@
     }
   ],
   "result": {
-    "item": "mobvats:vat_io_port",
+    "item": "mobvats:vat_item_port",
     "data": 0
   }
 }
