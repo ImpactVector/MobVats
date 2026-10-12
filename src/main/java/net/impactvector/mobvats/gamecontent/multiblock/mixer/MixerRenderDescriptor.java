@@ -5,13 +5,15 @@ import java.util.List;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-/** Immutable mesh in Impeller-bottom coordinates, compiled from the assembled physical polygon. */
+/** Immutable visual mesh in Impeller-bottom coordinates; physical polygon and capacity remain authoritative. */
 public record MixerRenderDescriptor(MixerAssembly assembly, AABB tankBounds, Vec3 shaftTop,
         Vec3 shaftBottom, double armY, double armReach, List<Face> walls,
         List<Face> interior, List<Face> bottom, List<Face> rim, List<Vec3> liquidBoundary) {
     public static final double ARM_WIDTH = MixerVesselGeometry.ARM_WIDTH;
     public static final double WALL_THICKNESS = 1.0 / 32;
     public static final double HEADROOM = 1.0 / 8;
+    /** Presentation only: expose the upper frame without changing installed mixing depth. */
+    public static final double RIM_Y = -.625;
     public record Face(List<Vec3> vertices, Vec3 normal) {
         public Face { vertices = List.copyOf(vertices); }
         public AABB bounds() {
@@ -26,7 +28,7 @@ public record MixerRenderDescriptor(MixerAssembly assembly, AABB tankBounds, Vec
         rim=List.copyOf(rim);liquidBoundary=List.copyOf(liquidBoundary);
     }
     public static MixerRenderDescriptor from(MixerAssembly assembly) {
-        var vessel=assembly.vessel();var outer=vessel.vertices();
+        var vessel=assembly.vessel();var outer=vessel.vertices().stream().map(p->at(p,RIM_Y)).toList();
         var inner=inset(outer,vessel.faceRadius(),WALL_THICKNESS);
         var liquid=inset(outer,vessel.faceRadius(),WALL_THICKNESS+1.0/1024);
         var walls=new ArrayList<Face>();var interior=new ArrayList<Face>();var rim=new ArrayList<Face>();
@@ -40,12 +42,12 @@ public record MixerRenderDescriptor(MixerAssembly assembly, AABB tankBounds, Vec
         }
         var bottom=new ArrayList<Face>();bottom.addAll(fan(inner,insideY,true));bottom.addAll(fan(outer,bottomY,false));
         double r=vessel.faceRadius();
-        return new MixerRenderDescriptor(assembly,new AABB(-r,bottomY,-r,r,0,r),Vec3.ZERO,
+        return new MixerRenderDescriptor(assembly,new AABB(-r,bottomY,-r,r,RIM_Y,r),Vec3.ZERO,
             new Vec3(0,insideY,0),-.5,Math.max(0,r-MixerVesselGeometry.ARM_CLEARANCE-WALL_THICKNESS),
             walls,interior,bottom,rim,liquid);
     }
     private static List<Vec3> inset(List<Vec3> vertices,double apothem,double distance) {
-        return vertices.stream().map(p->p.scale((apothem-distance)/apothem)).toList();
+        return vertices.stream().map(p->new Vec3(p.x*(apothem-distance)/apothem,p.y,p.z*(apothem-distance)/apothem)).toList();
     }
     private static Vec3 at(Vec3 p,double y){return new Vec3(p.x,y,p.z);}
     private static List<Face> fan(List<Vec3> boundary,double y,boolean up) {
@@ -69,6 +71,9 @@ public record MixerRenderDescriptor(MixerAssembly assembly, AABB tankBounds, Vec
     }
     public List<Face> liquidSurface(int layer) {
         if(layer<=assembly.floorInsetPixels() || layer>assembly.shaftLength()*16-2)return List.of();
-        return fan(liquidBoundary,-assembly.shaftLength()+layer/16.0,true);
+        // Preserve the existing volume/quantization cache, remapping only its displayed Y range.
+        double fraction=(layer-assembly.floorInsetPixels())/(double)(assembly.shaftLength()*16-2-assembly.floorInsetPixels());
+        double floor=shaftBottom.y;
+        return fan(liquidBoundary,floor+fraction*(RIM_Y-HEADROOM-floor),true);
     }
 }

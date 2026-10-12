@@ -77,12 +77,24 @@ for(let finish of ['t1','t2','t3'])for(let id of ['mixer_shaft','mixer_impeller'
  let inventory=r.insertCell();for(let size of [32,16])inventory.append(canvas([machineryEntry(id,finish)],size,size,{yaw:-Math.PI/4,pitch:Math.PI/6,scale:size/16*.625}));
  let entries=[machineryEntry('mixer_impeller',finish)];if(id==='mixer_shaft')entries.push(machineryEntry(id,finish,'north',[0,-1,0]));else if(id!=='mixer_impeller')entries.push(machineryEntry(id,finish,'north',[1,0,0]));cell(r,entries,280);
 }
-let mixerAssemblies=table('Formed Mixer: production polygon, Shaft and horizontal paddles (3-block depth)',['Finish','3 × 3','5 × 5','9 × 9']);
-for(let finish of ['t1','t2','t3']){let r=mixerAssemblies.insertRow();r.insertCell().textContent=finish;
+let ports=table('Directional procedural ports: construction and exterior mount',['Part / cladding','Front','Rear']);
+for(let id of ['item_port','fluid_port'])for(let cladding of ['none','vat_t1_casing','vat_t1_glass','mixer_t1_casing','mixer_t1_glass'])for(let direction of ['inward','outward'])for(let assembled of [false,true]){
+ let r=ports.insertRow();r.insertCell().textContent=id+' / '+cladding+' / '+direction+' / '+(assembled?'formed':'construction');
+ let source=models['ports/'+id+'_'+cladding+'_'+direction];
+ let entries=[{position:[0,0,0],model:assembled?{...source,elements:source.elements.filter(e=>!Object.values(e.faces).some(f=>['#frame','#trim','#accent'].includes(f.texture)))}:source}];
+ if(assembled&&cladding!=='none'){
+  let family=cladding.startsWith('mixer')?'mixer':'vat';
+  entries.push({position:[0,0,0],model:pumpPanel(family,cladding.endsWith('glass')?'glass':'casing','t1')});
+ }
+ for(let yaw of [-.35,Math.PI-.35])r.insertCell().append(canvas(entries,240,220,{yaw,pitch:.15,scale:10}));
+}
+let mixerAssemblies=table('Formed Mixer: rigid frame agitator, lowered rim and full working liquid (3-block depth)',['Finish / rotation / fill','3 × 3','5 × 5','9 × 9']);
+for(let finish of ['t1','t2','t3'])for(let angle of [0,Math.PI/4])for(let fill of [0,.5,1]){let r=mixerAssemblies.insertRow();r.insertCell().textContent=finish+' / '+Math.round(angle*180/Math.PI)+'° / '+fill*100+'%';
  for(let diameter of [3,5,9]){
   const base='mobvats:block/procedural/'+finish+'/',textures={vessel:base+'mixer_surface',shaft:base+'mixer_shaft',paddle:base+'mixer_paddle'};
-  const elements=mixerExamples['mixer_'+diameter].map(e=>({points:e.points,faces:{mesh:{texture:'#'+e.material,uv:e.uv||[0,0,16,16]}}}));
-  let entries=[{position:[0,0,0],model:{textures,elements}},machineryEntry('mixer_impeller',finish),machineryEntry('mixer_fe_drive',finish,'north',[1,0,0])];
+  const elements=mixerExamples['mixer_'+diameter].map(e=>({points:e.points.map(p=>{if(e.material==='vessel')return p;let x=p[0]-8,z=p[2]-8;return [8+x*Math.cos(angle)-z*Math.sin(angle),p[1],8+x*Math.sin(angle)+z*Math.cos(angle)];}),faces:{mesh:{texture:'#'+e.material,uv:e.uv||[0,0,16,16]}}}));
+  if(fill)for(let e of mixerExamples['liquid_'+diameter]){let points=e.points.map(p=>[p[0],-47.5+fill*(p[1]+47.5),p[2]]);points.push(points[2]);elements.push({points,faces:{mesh:{texture:'#liquid'}}});}
+  let entries=[{position:[0,0,0],model:{textures,elements,previewFluidColor:'#263e48'}},machineryEntry('mixer_impeller',finish),machineryEntry('mixer_fe_drive',finish,'north',[1,0,0])];
   r.insertCell().append(canvas(entries,340,320,{center:[8,-16,8],scale:diameter===3?3.8:diameter===5?3.6:2.1,pitch:.3}));
  }
 }

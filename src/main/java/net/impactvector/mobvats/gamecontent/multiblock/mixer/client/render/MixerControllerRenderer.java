@@ -43,7 +43,7 @@ public final class MixerControllerRenderer implements BlockEntityRenderer<Abstra
         for(int color:mesh.wallColors())if(((color>>8)&255)<=((color>>16)&255) || ((color>>8)&255)<=(color&255))
             throw new AssertionError("Mixer wall material is no longer copper-green");
         for(var surface:MixerTankRenderer.liquid(descriptor,16).quads()) {
-            if(surface.normal().y!=1 || surface.a().y!= -1 || surface.a().subtract(surface.b()).length()==0)
+            if(surface.normal().y!=1 || surface.a().y>=MixerRenderDescriptor.RIM_Y || surface.a().subtract(surface.b()).length()==0)
                 throw new AssertionError("Mixer liquid mesh has invalid height, winding or area");
         }
         for(int i=0;i<mesh.walls().quads().size();i++) {
@@ -62,8 +62,21 @@ public final class MixerControllerRenderer implements BlockEntityRenderer<Abstra
     }
     public static List<CableRenderer.Mesh> bakePaddles(MixerRenderDescriptor descriptor){
         double reach=descriptor.armReach(),y=descriptor.armY();
-        return reach>0?List.of(rod(new Vec3(-reach,y,0),new Vec3(reach,y,0),MixerRenderDescriptor.ARM_WIDTH),
-            rod(new Vec3(0,y,-reach),new Vec3(0,y,reach),MixerRenderDescriptor.ARM_WIDTH)):List.of();
+        if(reach<=0)return List.of();
+        double width=MixerRenderDescriptor.ARM_WIDTH;
+        double lower=descriptor.shaftBottom().y+width/2+1.0/128;
+        var frame=new ArrayList<CableRenderer.Mesh>();
+        // Two intersecting rigid anchor frames, driven by the existing shaft transform.
+        // Small reduced vessels retain one frame instead of crowding the shaft.
+        for(int axis=0;axis<(reach>.5?2:1);axis++) {
+            Vec3 left=axis==0?new Vec3(-reach,y,0):new Vec3(0,y,-reach);
+            Vec3 right=axis==0?new Vec3(reach,y,0):new Vec3(0,y,reach);
+            Vec3 lowLeft=new Vec3(left.x,lower,left.z),lowRight=new Vec3(right.x,lower,right.z);
+            frame.add(rod(left,right,width));
+            frame.add(rod(left,lowLeft,width));frame.add(rod(right,lowRight,width));
+            frame.add(rod(lowLeft,lowRight,width));
+        }
+        return List.copyOf(frame);
     }
     public void render(AbstractMixerEntity part,float partial,PoseStack pose,MultiBufferSource buffers,int light,int overlay){
         if(!part.isMachineAssembled()){cache.remove(part);return;}

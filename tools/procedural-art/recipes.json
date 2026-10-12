@@ -15,6 +15,10 @@
       {"primitive": "panel", "bounds": [0, 0, 15, 15], "channel": "base"},
       {"primitive": "bevel", "bounds": [0, 0, 15, 15]},
       {"primitive": "socket", "insets": [3, 5]},
+      {"primitive": "fastener", "at": [2, 2]},
+      {"primitive": "fastener", "at": [13, 2]},
+      {"primitive": "fastener", "at": [2, 13]},
+      {"primitive": "fastener", "at": [13, 13]},
       {"primitive": "fixed_panel", "bounds": [6, 6, 9, 9], "color": "center"}
     ], "ports": {"resources": ["fluid", "item"], "directions": ["none", "inward", "outward"]}}
   ]

@@ -82,7 +82,7 @@ public final class MixerRenderingGameTests {
         var a=d.assembly();double r=a.rotorRadius();
         h.assertTrue(a.shaftLength()==depth && d.shaftTop().equals(Vec3.ZERO)
             && d.shaftBottom().equals(new Vec3(0,a.vesselBottom()+MixerRenderDescriptor.WALL_THICKNESS,0)),"Rendered shaft differs from placed Shaft blocks");
-        h.assertTrue(d.tankBounds().equals(new AABB(-r,a.vesselBottom(),-r,r,0,r)),"Tank did not use cached radius and reached depth");
+        h.assertTrue(d.tankBounds().equals(new AABB(-r,a.vesselBottom(),-r,r,MixerRenderDescriptor.RIM_Y,r)),"Tank did not use cached radius and reached depth");
         h.assertTrue(d.armY()==-.5 && d.armReach()>0 && d.armReach()<=r,"Arms are not at the first usable level");
         h.assertTrue(d.walls().stream().allMatch(p->p.bounds().minY>=-depth && p.bounds().maxY<=0),"Tank included machinery or unreached depth");
         int side=2*a.rotorRadiusPixels();long count=0;
@@ -192,11 +192,11 @@ public final class MixerRenderingGameTests {
                 }
                 for(int i=0;i<n;i++) {
                     int j=(i+1)%n;var wall=d.walls().get(i);var rim=d.rim().get(i);
-                    h.assertTrue(wall.vertices().size()==4 && wall.vertices().get(1).equals(polygon.vertices().get(i))
-                        && wall.vertices().get(2).equals(polygon.vertices().get(j)),"Wall introduced an independent polygon");
+                    h.assertTrue(wall.vertices().size()==4 && wall.vertices().get(1).equals(new Vec3(polygon.vertices().get(i).x,MixerRenderDescriptor.RIM_Y,polygon.vertices().get(i).z))
+                        && wall.vertices().get(2).equals(new Vec3(polygon.vertices().get(j).x,MixerRenderDescriptor.RIM_Y,polygon.vertices().get(j).z)),"Wall introduced an independent polygon");
                     h.assertTrue(rim.vertices().get(3).equals(d.rim().get(j).vertices().get(0))
                         && rim.vertices().get(2).equals(d.rim().get(j).vertices().get(1)),"Rim discontinuity");
-                    h.assertTrue(wall.vertices().get(0).y==a.vesselBottom() && wall.vertices().get(1).y==0,"Wall lost reached depth");
+                    h.assertTrue(wall.vertices().get(0).y==a.vesselBottom() && wall.vertices().get(1).y==MixerRenderDescriptor.RIM_Y,"Wall lost reached depth");
                 }
                 for(int i=0;i<4;i++) {
                     int edge=Math.floorMod(i*n/4-1,n);var wall=d.walls().get(edge);

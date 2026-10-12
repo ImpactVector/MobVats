@@ -42,6 +42,33 @@ public final class FixtureModelTest {
         });
         var model=new FixtureModel(casing,casing,List.of(core),List.of(core,frame),true,false);
         var random=RandomSource.create();
+        for(String id:List.of("item_port","fluid_port")) {
+            var plate=FixtureModel.withPoints(seed,new Vector3f[]{new Vector3f(.125f,.125f,0f),new Vector3f(.125f,.875f,0f),new Vector3f(.875f,.875f,0f),new Vector3f(.875f,.125f,0f)});
+            var port=new FixtureModel(casing,casing,List.of(plate),List.of(plate,frame),id).withCladding(net.impactvector.mobvats.gamecontent.multiblock.conduit.CladdingMaterial.NONE,null);
+            var opening=new java.util.concurrent.atomic.AtomicReference<Direction>();
+            var cutout=(BakedModel)Proxy.newProxyInstance(BakedModel.class.getClassLoader(),new Class<?>[]{BakedModel.class},(p,m,args)->{
+                if(m.getName().equals("getQuads")) {
+                    opening.set(((net.neoforged.neoforge.client.model.data.ModelData)args[3]).get(net.impactvector.mobvats.gamecontent.multiblock.vat.client.model.VatCasingModel.OPENING));
+                    return List.of(skin);
+                }
+                throw new AssertionError(m.getName());
+            });
+            var clad=new FixtureModel(casing,cutout,List.of(plate),List.of(plate,frame),id);
+            for(Direction face:Direction.values()) {
+                var quads=port.getQuads(null,null,random,FixtureModel.snapshotData(true,face,0,new VatCasingState(1<<face.ordinal(),0)),null);
+                require(quads.size()==1,"Port duplicated faceplate or construction shell");
+                require(Arrays.equals(quads.getFirst().getVertices(),FixtureModel.orient(plate,face).getVertices()),"Port faceplate does not follow exterior");
+                for(int v=0;v<4;v++) {
+                    float p=Float.intBitsToFloat(quads.getFirst().getVertices()[v*8+face.getAxis().ordinal()]);
+                    require(Math.abs(p-(face.getAxisDirection()==Direction.AxisDirection.POSITIVE?1:0))<1e-6,"Port connector is not flush with exterior");
+                }
+                require(port.getQuads(null,null,random,FixtureModel.snapshotData(false,Direction.NORTH,0,VatCasingState.UNFORMED),null).equals(List.of(plate,frame)),"Unformed port lost construction model");
+                var shell=new VatCasingState(1<<face.ordinal(),0);
+                require(clad.getQuads(null,null,random,FixtureModel.snapshotData(true,face,0,shell),null).size()==2 && opening.get()==face,"Clad port is missing its oriented shell cutout");
+                for(var patch:net.impactvector.mobvats.gamecontent.multiblock.vat.VatCasingGeometry.build(shell,face))
+                    require(patch.normal()!=face || patch.u1()<=3 || patch.u0()>=13 || patch.v1()<=3 || patch.v0()>=13,"Shell overlaps flush connector face");
+            }
+        }
         for(boolean fabulous:new boolean[]{false,true})require(model.getRenderPasses(null,fabulous).equals(List.of(model)),"Item render pass bypasses machinery mesh");
         require(model.applyTransform(net.minecraft.world.item.ItemDisplayContext.GUI,new com.mojang.blaze3d.vertex.PoseStack(),false)==model,"GUI transform discards machinery mesh");
         require(model.getQuads(null,null,random).equals(List.of(core,frame)),"Inventory lost or duplicated geometry");

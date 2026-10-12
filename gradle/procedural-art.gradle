@@ -959,9 +959,14 @@ class MobProceduralArt {
                     ['none','vat_t1_casing','vat_t1_glass','mixer_t1_casing','mixer_t1_glass'].each { installed ->
                         def family=installed.startsWith('mixer')?'mixer':'vat'
                         def base='mobvats:block/procedural/t1/'
+                        def neutral=binding.resourceLocation.replace('/t1/','/master/')
+                        def connector=cuboid([5,5,0],[11,11,2.75],'metal')
+                        connector.faces.north.texture='#socket'
+                        def plate=cuboid([2,2,0.5],[14,14,1],'metal')
+                        plate.faces.north.texture='#faceplate'
                         def body=[render_type:'minecraft:solid',ambientocclusion:false,
-                            textures:[particle:binding.resourceLocation,socket:binding.resourceLocation,frame:base+family+'_frame',trim:base+family+'_trim',accent:base+family+'_accent'],
-                            elements:[cuboid([5,5,5],[11,11,11],'socket')]+(installed == 'none' ? [] : MobProceduralArt.frame(geometry, family, installed.endsWith('glass')))]
+                            textures:[particle:neutral,socket:neutral,metal:'mobvats:block/procedural/master/socket_clean',mount:base+'casing_clean',faceplate:installed=='none'?neutral:binding.resourceLocation,frame:base+family+'_frame',trim:base+family+'_trim',accent:base+family+'_accent'],
+                            elements:[connector,plate]+(installed == 'none' ? [] : [cuboid([1,1,0.875],[15,15,2],'mount')]+MobProceduralArt.frame(geometry, family, installed.endsWith('glass')))]
                         String path="assets/mobvats/models/block/mechanical/${consumer}_${installed}_${binding.portOutput?'outward':'inward'}.json"
                         productionPaths.add(path.toString());json(new File(output,path),body)
                         if(installed=='none'&&!binding.portOutput){productionPaths.add(basePath.toString());json(new File(output,basePath),body)}
@@ -1006,6 +1011,9 @@ class MobProceduralArt {
         ['t1','t2','t3'].each { finish ->
             def dir=new File(output,"assets/mobvats/models/block/procedural/${finish}")
             dir.eachFile { file -> if(file.name.endsWith('.json'))models[finish+'/'+file.name[0..-6]]=new JsonSlurper().parse(file) }
+        }
+        new File(output,'assets/mobvats/models/block/mechanical').eachFile { file ->
+            if(file.name.startsWith('item_port_')||file.name.startsWith('fluid_port_'))models['ports/'+file.name[0..-6]]=new JsonSlurper().parse(file)
         }
         // Vanilla generated-item pixels, UVs, depth and inherited hand scale.
         // Use the resolved local Minecraft resources, never placeholder silhouettes.
@@ -1223,6 +1231,23 @@ tasks.register('testProceduralArt') {
             }
         }
         assert new File(first,'META-INF/mobvats-procedural-art.json').bytes == new File(second,'META-INF/mobvats-procedural-art.json').bytes
+        ['item_port','fluid_port'].each { id ->
+            ['inward','outward'].each { direction ->
+                ['none','vat_t1_casing','vat_t1_glass','mixer_t1_casing','mixer_t1_glass'].each { cladding ->
+                    def model=new JsonSlurper().parse(new File(first,"assets/mobvats/models/block/mechanical/${id}_${cladding}_${direction}.json"))
+                    assert model.textures.socket=="mobvats:block/procedural/master/socket_${id=='item_port'?'item':'fluid'}_${direction}"
+                    def core=model.elements.find { it.faces.north.texture=='#socket' }
+                    def plates=model.elements.findAll { it.faces.north.texture=='#faceplate' }
+                    assert core.from[2]<plates.first().from[2] && core.to[2]<=3 : 'Neutral connector concealed or projects through interior shell'
+                    assert core.from[2]==0 && model.elements.every { e -> (0..2).every { axis -> e.from[axis]>=0 && e.to[axis]<=16 } } : 'Port protrudes into attached pipe cell'
+                    assert plates.size()==1 : 'Missing or duplicate faceplate'
+                    assert model.elements.count { it.faces.north.texture=='#mount' }==(cladding=='none'?0:1) : 'Missing or duplicate cladding collar'
+                    assert plates.every { it.from[2]>0 && it.to[2]<=2 && it.from[0]>0 && it.to[0]<16 } : 'Full-block or unrecessed faceplate'
+                    assert plates.first().to[0]-plates.first().from[0]>=12 : 'Procedural exterior plate lost readable socket footprint'
+                    assert model.textures.faceplate.startsWith(cladding=='none'?'mobvats:block/procedural/master/':'mobvats:block/procedural/t1/')
+                }
+            }
+        }
         ['master','t1','t2','t3'].each { finish -> assert !new File(first,"assets/mobvats/models/block/procedural/${finish}/buffer_mount.json").exists() : 'Obsolete mounting model generated' }
         int expected=config.recipes.sum { recipe ->
             (1 + (recipe.weathering?.seeds?.size() ?: 0) +

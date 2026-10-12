@@ -39,7 +39,7 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
     private BakedModel shell;
     private CladdingMaterial material=CladdingMaterial.VAT_T1_CASING;
     private final boolean pump,sink;
-    private boolean installed,controller,actor,toolPort,feeder;
+    private boolean installed,controller,actor,toolPort,feeder,port;
     private final Set<BakedQuad> constructionInlet=new HashSet<>();
     private final Map<Snapshot,List<BakedQuad>> meshes=new ConcurrentHashMap<>();
     FixtureModel(BakedModel original,BakedModel shell,List<BakedQuad> core,List<BakedQuad> construction,boolean pump,boolean sink) {
@@ -52,6 +52,7 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
     FixtureModel(BakedModel original,BakedModel shell,List<BakedQuad> core,List<BakedQuad> construction,String id) {
         this(original,shell,core,construction,false,false);
         installed=INSTALLED.contains(id);controller=id.endsWith("_controller");
+        port=id.equals("item_port")||id.equals("fluid_port");
         actor=actor(id);toolPort=id.equals("tool_port");
         feeder=id.equals("feed_port");
         if(feeder){constructionInlet.addAll(construction);constructionInlet.removeAll(core);}
@@ -63,6 +64,7 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
     FixtureModel(BakedModel original,BakedModel casing,String id,List<Vector3f[]> auger,BakedModel extension) {
         super(original);pump=id.endsWith("_pump");sink=id.endsWith("_void");
         installed=INSTALLED.contains(id);controller=id.endsWith("_controller");
+        port=id.equals("item_port")||id.equals("fluid_port");
         actor=actor(id);toolPort=id.equals("tool_port");
         feeder=id.equals("feed_port");
         shell=new VatCasingModel(original,casing);
@@ -139,14 +141,14 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
         return withPoints(quad,points);
     }
     @Override public ModelData getModelData(BlockAndTintGetter world,BlockPos pos,BlockState state,ModelData data) {
-        boolean formed=false;var casing=VatCasingState.UNFORMED;
+        boolean formed=false;var casing=VatCasingState.UNFORMED;var glass=VatGlassState.UNFORMED;
         var entity=world.getBlockEntity(pos);
         if(entity instanceof AbstractVatEntity part) {
             var c=part.getMultiblockController().filter(MultiblockVat::isAssembled).orElse(null);
-            if(c!=null) {formed=true;var b=c.getBoundingBox();casing=VatCasingState.from(pos,b.getMin(),b.getMax());}
+            if(c!=null) {formed=true;var b=c.getBoundingBox();casing=VatCasingState.from(pos,b.getMin(),b.getMax());glass=VatGlassState.from(pos,b.getMin(),b.getMax());}
         } else if(entity instanceof AbstractMixerEntity part) {
             var c=part.getMultiblockController().filter(net.impactvector.mobvats.gamecontent.multiblock.mixer.MultiblockMixer::isAssembled).orElse(null);
-            if(c!=null) {formed=true;var b=c.getBoundingBox();casing=VatCasingState.from(pos,b.getMin(),b.getMax());}
+            if(c!=null) {formed=true;var b=c.getBoundingBox();casing=VatCasingState.from(pos,b.getMin(),b.getMax());glass=VatGlassState.mixer(pos,b.getMin(),b.getMax());}
         }
         Direction facing=Direction.NORTH;int covered=0;
         if(actor&&!feeder&&formed&&!casing.formed()&&entity instanceof AbstractVatEntity part) {
@@ -176,7 +178,7 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
             if(formed&&entity instanceof AbstractVatEntity part)
                 inlet=net.impactvector.mobvats.gamecontent.multiblock.vat.client.model.FeederArt.inlet(part.getMultiblockController().orElseThrow().conduitGeometry(),pos).orElse(inlet);
         }
-        return data.derive().with(STATE,new Snapshot(formed,facing,covered,casing,inlet)).with(VatCasingState.PROPERTY,casing).build();
+        return data.derive().with(STATE,new Snapshot(formed,facing,covered,casing,inlet)).with(VatCasingState.PROPERTY,casing).with(VatGlassState.PROPERTY,glass).build();
     }
     private List<BakedQuad> body(Snapshot snapshot) {
         return meshes.computeIfAbsent(snapshot,s->{
@@ -196,7 +198,7 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
                 // Interior service origins are the block center instead of the wall's
                 // 3.16px origin. Translate decorative machinery only, before rotation.
                 var mounted=actor&&s.formed&&!s.shell.formed()?interiorMount(q):q;
-                var oriented=pump||controller||actor?orient(mounted,s.facing):mounted;
+                var oriented=pump||controller||actor||port?orient(mounted,s.facing):mounted;
                 if(!hidden(oriented,s.covered))quads.add(oriented);
             }
             if(exterior)for(var q:sleeve)quads.add(orient(q,s.facing));
@@ -249,7 +251,7 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
         var result=new ArrayList<BakedQuad>();
         if(layer==null||layer==RenderType.solid())result.addAll(body(snapshot));
         if(!installed&&material!=CladdingMaterial.NONE&&snapshot.formed&&snapshot.shell.formed()&&(layer==null||layer==(material.cladding()==ConduitCladding.GLASS?RenderType.translucent():RenderType.solid()))) {
-            var skinData=pump?data.derive().with(VatCasingModel.OPENING,snapshot.facing).build():data;
+            var skinData=pump||port?data.derive().with(VatCasingModel.OPENING,snapshot.facing).build():data;
             result.addAll(shell.getQuads(state,null,random,skinData,layer));
         }
         return result;

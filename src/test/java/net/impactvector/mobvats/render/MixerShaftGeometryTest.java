@@ -32,7 +32,27 @@ public final class MixerShaftGeometryTest {
                     double radial=Math.sqrt(p.x*p.x+p.z*p.z);
                     if(radial>d.assembly().vessel().faceRadius()-MixerRenderDescriptor.WALL_THICKNESS)
                         throw new AssertionError("Paddle intersects a wall during rotation");
+                    if(p.y<d.shaftBottom().y || p.y>0)throw new AssertionError("Frame leaves installed depth");
+                    for(int degrees=0;degrees<360;degrees+=5) {
+                        double angle=Math.toRadians(degrees),scale=a.vessel().faceRadius()/(a.vessel().faceRadius()-MixerRenderDescriptor.WALL_THICKNESS);
+                        if(!a.vessel().contains((p.x*Math.cos(angle)-p.z*Math.sin(angle))*scale,
+                            (p.x*Math.sin(angle)+p.z*Math.cos(angle))*scale))throw new AssertionError("Frame swept corner leaves polygon");
+                    }
                 }
+                double full=d.liquidSurface(d.liquidLayer(Integer.MAX_VALUE)).getFirst().vertices().getFirst().y;
+                double previous=d.shaftBottom().y;
+                for(int layer=inset+1;layer<=depth*16-2;layer++) {
+                    double height=d.liquidSurface(layer).getFirst().vertices().getFirst().y;
+                    if(height<=previous || height>full)throw new AssertionError("Liquid fill no longer rises proportionally inside visual vessel");
+                    previous=height;
+                }
+                if(!(d.shaftBottom().y<full && full<d.tankBounds().maxY && d.tankBounds().maxY<d.armY()-MixerRenderDescriptor.ARM_WIDTH/2))
+                    throw new AssertionError("Full liquid/rim conceal upper frame or leave no working depth");
+                var frame=MixerControllerRenderer.bakePaddles(d);
+                if(frame.stream().flatMap(m->m.quads().stream()).noneMatch(q->q.a().y<full))
+                    throw new AssertionError("Full working liquid does not reach lower frame");
+                if(frame.size()<4 || frame.stream().noneMatch(m->m.quads().stream().anyMatch(q->Math.abs(q.a().y-q.c().y)>.1)))
+                    throw new AssertionError("Frame has no downward members");
             }
         if(args.length>0) {
             var examples=new java.util.LinkedHashMap<String,Object>();
@@ -40,9 +60,18 @@ public final class MixerShaftGeometryTest {
                 var d=MixerRenderDescriptor.from(new MixerAssembly(BlockPos.ZERO,3,diameter,0));
                 var parts=new java.util.ArrayList<Object>();
                 for(var face:d.walls())parts.add(Map.of("points",face.vertices().stream().map(MixerShaftGeometryTest::pixel).toList(),"material","vessel"));
+                for(var face:d.interior())parts.add(Map.of("points",face.vertices().stream().map(MixerShaftGeometryTest::pixel).toList(),"material","vessel"));
+                for(var face:d.rim())parts.add(Map.of("points",face.vertices().stream().map(MixerShaftGeometryTest::pixel).toList(),"material","vessel"));
+                for(var face:d.bottom()) {
+                    var points=new java.util.ArrayList<>(face.vertices().stream().map(MixerShaftGeometryTest::pixel).toList());
+                    points.add(points.getLast());
+                    parts.add(Map.of("points",points,"material","vessel"));
+                }
                 for(var q:MixerControllerRenderer.bakeShaft(d).quads())parts.add(quad(q,"shaft"));
                 for(var paddle:MixerControllerRenderer.bakePaddles(d))for(var q:paddle.quads())parts.add(quad(q,"paddle"));
                 examples.put("mixer_"+diameter,parts);
+                examples.put("liquid_"+diameter,d.liquidSurface(d.liquidLayer(Integer.MAX_VALUE)).stream()
+                    .map(f->Map.of("points",f.vertices().stream().map(MixerShaftGeometryTest::pixel).toList(),"material","liquid")).toList());
             }
             var path=java.nio.file.Path.of(args[0]);java.nio.file.Files.createDirectories(path.getParent());
             java.nio.file.Files.writeString(path,new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(examples));
