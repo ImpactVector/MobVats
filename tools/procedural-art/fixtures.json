@@ -1,0 +1,12 @@
+{
+  "bodyWidth": 10,
+  "auger": { "turns": 1.75, "segments": 28, "innerRadius": 0.8, "outerRadius": 3.2, "start": 4.5, "length": 7, "thickness": 0.25 },
+  "variants": [
+    { "id": "fill_valve", "kind": "valve", "direction": "outward", "resource": "fluid", "families": ["vat"] },
+    { "id": "drain_valve", "kind": "valve", "direction": "inward", "resource": "fluid", "families": ["vat"] },
+    { "id": "pull_pump", "kind": "pump", "direction": "inward", "resource": "fluid", "families": ["vat", "mixer"] },
+    { "id": "push_pump", "kind": "pump", "direction": "outward", "resource": "fluid", "families": ["vat", "mixer"] },
+    { "id": "fluid_void", "kind": "void", "direction": "none", "resource": "fluid", "families": ["vat", "mixer"] },
+    { "id": "item_void", "kind": "void", "direction": "none", "resource": "item", "families": ["vat"] }
+  ]
+}

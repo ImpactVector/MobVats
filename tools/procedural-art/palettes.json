@@ -1,0 +1,10 @@
+{
+  "channels": ["highlight", "light", "base", "shadow", "deep"],
+  "grayscale": ["#D2D2D2", "#ADADAD", "#858585", "#626262", "#3E3E3E"],
+  "tiers": {
+    "t1": {"label": "Copper / verdigris", "metal": ["#B5CBBB", "#83AF99", "#5F8F78", "#416653", "#293F35"], "wear": "#A86D4B"},
+    "t2": {"label": "Iron", "metal": ["#D2D7DC", "#ADB5BD", "#858C94", "#626972", "#3E444C"], "wear": "#ADB5BD"},
+    "t3": {"label": "Bloody Iron", "metal": ["#BB9694", "#916C6C", "#704B4E", "#503337", "#302024"], "wear": "#916C6C"}
+  },
+  "fixed": {"fluid": "#168BFA", "item": "#E3BC45", "status": "#BC4949", "center": "#25282B"}
+}

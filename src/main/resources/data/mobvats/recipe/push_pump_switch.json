@@ -1,0 +1,12 @@
+{
+  "type": "mobvats:boundary_switch",
+  "ingredients": [
+    {
+      "item": "mobvats:pull_pump"
+    }
+  ],
+  "result": {
+    "id": "mobvats:push_pump",
+    "count": 1
+  }
+}

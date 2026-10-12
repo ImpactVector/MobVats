@@ -1,0 +1,53 @@
+# Gradle build output and local caches
+.gradle/
+.cache/
+build/
+
+# IntelliJ IDEA project files, compiler output, and local diagnostics
+.idea/
+*.iml
+*.ipr
+*.iws
+/out/
+*.hprof
+idea.log*
+
+# Minecraft development runs (worlds, logs, configs, screenshots, and assets)
+/run/
+/run-*/
+/logs/
+/crash-reports/
+/saves/
+/world/
+/world_nether/
+/world_the_end/
+/screenshots/
+/backups/
+/config/
+/defaultconfigs/
+/mods/
+/resourcepacks/
+/shaderpacks/
+/server-resource-packs/
+/assets/
+/natives/
+/options*.txt
+/servers.dat*
+/server.properties
+/eula.txt
+/usercache.json
+/usernamecache.json
+/ops.json
+/whitelist.json
+/banned-ips.json
+/banned-players.json
+/realms_persistence.json
+/hs_err_pid*.log
+/replay_pid*.log
+
+# Other local editor settings
+.vscode/
+
+# Python resource and diagnostic tooling
+__pycache__/
+*.pyc

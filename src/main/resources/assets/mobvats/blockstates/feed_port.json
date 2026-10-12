@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "cladding_material=none,port_output=false": {
+      "model": "mobvats:block/feed_port"
+    },
+    "cladding_material=none,port_output=true": {
+      "model": "mobvats:block/feed_port"
+    },
+    "cladding_material=vat_t1_casing,port_output=false": {
+      "model": "mobvats:block/feed_port"
+    },
+    "cladding_material=vat_t1_casing,port_output=true": {
+      "model": "mobvats:block/feed_port"
+    },
+    "cladding_material=vat_t1_glass,port_output=false": {
+      "model": "mobvats:block/feed_port"
+    },
+    "cladding_material=vat_t1_glass,port_output=true": {
+      "model": "mobvats:block/feed_port"
+    },
+    "cladding_material=mixer_t1_casing,port_output=false": {
+      "model": "mobvats:block/feed_port"
+    },
+    "cladding_material=mixer_t1_casing,port_output=true": {
+      "model": "mobvats:block/feed_port"
+    },
+    "cladding_material=mixer_t1_glass,port_output=false": {
+      "model": "mobvats:block/feed_port"
+    },
+    "cladding_material=mixer_t1_glass,port_output=true": {
+      "model": "mobvats:block/feed_port"
+    }
+  }
+}

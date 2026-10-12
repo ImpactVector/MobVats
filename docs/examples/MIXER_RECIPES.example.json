@@ -1,0 +1,160 @@
+{
+  "recipes": {
+    "example:component_base": {
+      "fluids": [
+        {
+          "selector": "#minecraft:water",
+          "amount": 1000
+        }
+      ],
+      "items": [
+        {
+          "selector": "minecraft:wheat",
+          "amount": 8
+        }
+      ],
+      "output": "mobvats:component_fluid",
+      "output_amount": 1000,
+      "batch_ticks": 80
+    },
+    "example:enriched_culture": {
+      "fluids": [
+        {
+          "selector": "mobvats:component_fluid",
+          "amount": 500
+        },
+        {
+          "selector": "mobvats:experience",
+          "amount": 250
+        }
+      ],
+      "output": "mobvats:culture_slurry",
+      "output_amount": 1000,
+      "batch_ticks": 120
+    },
+    "example:ordinary_output": {
+      "items": [
+        {
+          "selector": "minecraft:diamond",
+          "amount": 1
+        }
+      ],
+      "fluids": [
+        {
+          "selector": "minecraft:lava",
+          "amount": 1000
+        }
+      ],
+      "output": "mobvats:meat",
+      "output_amount": 250,
+      "batch_ticks": 100
+    },
+    "mobvats:filter_general": {
+      "items": [
+        {
+          "selector": "minecraft:charcoal",
+          "record_in_composition": false,
+          "amount": 1
+        }
+      ],
+      "transform": {
+        "remove": [
+          {
+            "kind": "FLUID",
+            "selector": "mobvats:waste"
+          }
+        ],
+        "source_input": 0,
+        "restore_ordinary": true,
+        "excluded": [
+          {
+            "selector": "minecraft:lava",
+            "kind": "FLUID",
+            "amount": 1
+          }
+        ]
+      },
+      "batch_ticks": 100,
+      "output_amount": 1000,
+      "output": "mobvats:culture_slurry",
+      "fluids": [
+        {
+          "amount": 1000,
+          "selector": [
+            {
+              "fluid": "mobvats:culture_slurry"
+            },
+            {
+              "fluid": "mobvats:component_fluid"
+            }
+          ]
+        }
+      ]
+    },
+    "mobvats:filter_lava": {
+      "items": [
+        {
+          "selector": "minecraft:sand",
+          "record_in_composition": false,
+          "amount": 1
+        }
+      ],
+      "transform": {
+        "remove": [
+          {
+            "kind": "FLUID",
+            "selector": "mobvats:waste"
+          }
+        ],
+        "source_input": 0,
+        "restore_ordinary": true,
+        "required": [
+          {
+            "selector": "minecraft:lava",
+            "kind": "FLUID",
+            "amount": 1
+          }
+        ]
+      },
+      "batch_ticks": 100,
+      "output_amount": 1000,
+      "output": "mobvats:culture_slurry",
+      "fluids": [
+        {
+          "amount": 1000,
+          "selector": [
+            {
+              "fluid": "mobvats:culture_slurry"
+            },
+            {
+              "fluid": "mobvats:component_fluid"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "names": [
+    {
+      "family": "mobvats:culture_slurry",
+      "composition": [
+        {
+          "kind": "FLUID",
+          "selector": "#minecraft:water",
+          "amount": 1000
+        },
+        {
+          "kind": "FLUID",
+          "selector": "mobvats:experience",
+          "amount": 250
+        },
+        {
+          "kind": "ITEM",
+          "selector": "minecraft:wheat",
+          "amount": 8
+        }
+      ],
+      "display_name": "Example Enriched Culture Medium"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"type":"minecraft:crafting_shaped","pattern":["III","RCR","III"],"key":{"I":{"item":"minecraft:copper_ingot"},"R":{"item":"minecraft:redstone"},"C":{"item":"mobvats:mixer_casing"}},"result":{"id":"mobvats:mixer_fe_drive","count":1}}

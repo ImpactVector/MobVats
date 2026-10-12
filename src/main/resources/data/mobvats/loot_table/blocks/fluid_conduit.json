@@ -1,0 +1,130 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "conditions": [
+                {
+                  "block": "mobvats:fluid_conduit",
+                  "properties": {
+                    "mode": "trunk"
+                  },
+                  "condition": "minecraft:block_state_property"
+                }
+              ],
+              "type": "minecraft:item",
+              "name": "mobvats:fluid_conduit"
+            },
+            {
+              "conditions": [
+                {
+                  "block": "mobvats:fluid_conduit",
+                  "properties": {
+                    "mode": "tap"
+                  },
+                  "condition": "minecraft:block_state_property"
+                }
+              ],
+              "type": "minecraft:item",
+              "name": "mobvats:fluid_conduit_tap"
+            }
+          ]
+        }
+      ],
+      "rolls": 1
+    },
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        },
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "mobvats:fluid_conduit",
+          "properties": {
+            "cladding_material": "vat_t1_casing"
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "mobvats:vat_casing"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        },
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "mobvats:fluid_conduit",
+          "properties": {
+            "cladding_material": "vat_t1_glass"
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "mobvats:vat_glass"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        },
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "mobvats:fluid_conduit",
+          "properties": {
+            "cladding_material": "mixer_t1_casing"
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "mobvats:mixer_casing"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        },
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "mobvats:fluid_conduit",
+          "properties": {
+            "cladding_material": "mixer_t1_glass"
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "mobvats:mixer_glass"
+        }
+      ]
+    }
+  ]
+}

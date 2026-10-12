@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "mobvats:block/vat_head", "y": 0 },
+    "facing=east": { "model": "mobvats:block/vat_head", "y": 90 },
+    "facing=south": { "model": "mobvats:block/vat_head", "y": 180 },
+    "facing=west": { "model": "mobvats:block/vat_head", "y": 270 }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "mobvats:boundary_switch",
+  "ingredients": [
+    {
+      "item": "mobvats:fluid_void"
+    }
+  ],
+  "result": {
+    "id": "mobvats:item_void",
+    "count": 1
+  }
+}

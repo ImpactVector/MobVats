@@ -1,0 +1,223 @@
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+import java.security.MessageDigest
+import java.util.zip.ZipFile
+import org.gradle.api.tasks.*
+
+/** Fail closed; no opt-out property and no up-to-date success cache. */
+abstract class VerifyNoAiPlaceholderArt extends DefaultTask {
+    @InputFile abstract RegularFileProperty getManifest()
+    @InputFiles abstract ConfigurableFileCollection getPlaceholderSources()
+    @InputFiles abstract ConfigurableFileCollection getShippedFiles()
+
+    @TaskAction void validateArt() {
+        validateFiles(manifest.get().asFile, placeholderSources.files, shippedFiles.files)
+        logger.lifecycle('No active AI placeholder art or shipped placeholder references/fingerprints found.')
+    }
+
+    static void validateFiles(File manifestFile, Set<File> sources, Set<File> shipped) {
+        def problems = []
+        if (!manifestFile.isFile()) throw new GradleException('HARD PUBLIC RELEASE BLOCKER: docs/history/2026-10-12-ai-placeholder-retirement.md is missing.')
+        def ledger = manifestFile.text
+        if (!ledger.startsWith('# DEVELOPMENT-ONLY AI PLACEHOLDER ASSETS') ||
+                !ledger.contains('HARD PUBLIC RELEASE BLOCKER:')) {
+            problems << 'Missing or invalid placeholder-art manifest header.'
+        }
+        def rows = ledger.readLines().findAll {
+            it.startsWith('|') && !it.startsWith('| ---') && !it.startsWith('| Source placeholder |')
+        }
+        if (rows.empty) problems << 'Manifest asset ledger is missing; preserve historical rows after replacement/removal.'
+        rows.each { row ->
+            def columns = row.split(/\|/).collect { it.trim() }
+            if (columns.size() != 8 || !(columns[5] in ['AI_PLACEHOLDER', 'REPLACED', 'REMOVED'])) {
+                problems << "Invalid asset ledger row: ${row}"
+            } else if (columns[5] == 'AI_PLACEHOLDER') {
+                problems << "Active AI_PLACEHOLDER: ${columns[1]}"
+            }
+        }
+        // Retain source hashes in historical ledger rows to detect renamed copies.
+        def hashes = (ledger =~ /\b[0-9a-f]{64}\b/).collect { it }.toSet()
+        if (hashes.empty) problems << 'Placeholder fingerprint history is missing.'
+        def sourcePngs = sources.findAll { it.name.endsWith('.png') }
+        sourcePngs.each { file ->
+            hashes << MessageDigest.getInstance('SHA-256').digest(file.bytes).encodeHex().toString()
+            problems << "Development AI source still present: ${file.name}"
+        }
+        def inspect = { String path, byte[] bytes ->
+            def text = new String(bytes, java.nio.charset.StandardCharsets.ISO_8859_1)
+            if (path.contains('ai_placeholder') || path.contains('ai-placeholder') ||
+                    text.contains('ai_placeholder') || text.contains('dev/ai-placeholder-art') ||
+                    text.contains('AI_PLACEHOLDER')) {
+                problems << "Shipped placeholder path/reference: ${path}"
+            }
+            if (path.endsWith('.png') && hashes.contains(MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString())) {
+                problems << "Shipped AI texture fingerprint: ${path}"
+            }
+        }
+        shipped.findAll { it.isFile() }.each { file ->
+            if (file.name.endsWith('.jar') || file.name.endsWith('.zip')) {
+                new ZipFile(file).withCloseable { zip ->
+                    zip.entries().each { entry ->
+                        if (!entry.directory) zip.getInputStream(entry).withCloseable { inspect("${file.name}!/${entry.name}", it.readAllBytes()) }
+                    }
+                }
+            } else {
+                inspect(file.path.replace('\\', '/'), file.bytes)
+            }
+        }
+        if (!problems.empty) throw new GradleException('HARD PUBLIC RELEASE BLOCKER: development-only AI placeholder art remains.\n' +
+                problems.unique().collect { ' - ' + it }.join('\n') +
+                '\nExplicitly replace/remove every placeholder and its references, update the manifest, clean stale build outputs, and rerun verifyNoAiPlaceholderArt. Do not publish or bypass this guard.')
+    }
+}
+
+abstract class VerifyAiPlaceholderDevResources extends DefaultTask {
+    @InputFile abstract RegularFileProperty getArchive()
+    @InputDirectory abstract DirectoryProperty getSources()
+    @InputDirectory abstract DirectoryProperty getBaseResources()
+
+    @TaskAction void verifyResources() {
+        def mapping = ['mixer_impeller','mixer_shaft','creative_drive','mixer_combustion_drive','mixer_fe_drive']
+        new ZipFile(archive.get().asFile).withCloseable { zip ->
+            def read = { String path ->
+                def entry = zip.getEntry(path)
+                if (entry == null) throw new GradleException("Missing packaged procedural resource: ${path}")
+                zip.getInputStream(entry).withCloseable { it.readAllBytes() }
+            }
+            def json = { String path -> new JsonSlurper().parse(read(path)) }
+            zip.entries().each { entry ->
+                if (entry.name.contains('ai_placeholder')) throw new GradleException('Packaged placeholder: '+entry.name)
+            }
+            mapping.each { block ->
+                if (json("assets/mobvats/models/block/${block}.json").parent != "mobvats:block/procedural/t1/${block}" ||
+                    json("assets/mobvats/models/item/${block}.json").parent != "mobvats:block/${block}" ||
+                    !json("assets/mobvats/blockstates/${block}.json").variants.values().every { it.model == "mobvats:block/${block}" })
+                    throw new GradleException("Unresolved procedural model/blockstate/item binding: ${block}")
+                ['t1','t2','t3'].each { tier ->
+                    def model=json("assets/mobvats/models/block/procedural/${tier}/${block}.json")
+                    model.textures.values().each { id ->
+                        def image=javax.imageio.ImageIO.read(new ByteArrayInputStream(read('assets/'+id.replace(':','/textures/')+'.png')))
+                        if(image == null || image.width != 16 || image.height != 16) throw new GradleException('Invalid material: '+id)
+                    }
+                }
+            }
+            // All pre-existing PNGs, including the user's casing artwork, must be byte-identical.
+            def originalRoot = baseResources.get().asFile.toPath()
+            java.nio.file.Files.walk(originalRoot).withCloseable { paths ->
+                paths.filter { it.toString().endsWith('.png') }.forEach { png ->
+                    def path = originalRoot.relativize(png).toString().replace('\\', '/')
+                    if (!Arrays.equals(read(path), java.nio.file.Files.readAllBytes(png)))
+                        throw new GradleException("Existing human-authored artwork changed in development JAR: ${path}")
+                }
+            }
+            def renderer = new String(read('net/impactvector/mobvats/gamecontent/multiblock/mixer/client/render/MixerControllerRenderer.class'),
+                    java.nio.charset.StandardCharsets.ISO_8859_1)
+            ['mixer_shaft', 'mixer_paddle'].each { part ->
+                if (!renderer.contains("textures/block/procedural/t1/${part}.png"))
+                    throw new GradleException("Missing procedural formed rotor texture binding: ${part}")
+            }
+        }
+        logger.lifecycle('Verified procedural machinery, inventory/blockstate bindings, formed rotor materials, absence of packaged placeholders, and unchanged base PNGs.')
+    }
+}
+
+abstract class TestAiPlaceholderGuard extends DefaultTask {
+    @InputFile abstract RegularFileProperty getManifest()
+    @InputDirectory abstract DirectoryProperty getSources()
+    @OutputDirectory abstract DirectoryProperty getFixtures()
+
+    @TaskAction void testGuard() {
+        def dir = fixtures.get().asFile
+        dir.mkdirs()
+        def original = manifest.get().asFile
+        def historical = new File(dir, 'historical.md')
+        // Fixture only: never edit/reclassify the real ledger or real sources.
+        historical.text = original.text.replace('| AI_PLACEHOLDER |', '| REMOVED |')
+        def expectBlocked = { String reason, File ledger, Set<File> sources, Set<File> shipped ->
+            try {
+                VerifyNoAiPlaceholderArt.validateFiles(ledger, sources, shipped)
+            } catch (GradleException failure) {
+                if (!failure.message.contains(reason)) throw failure
+                return
+            }
+            throw new GradleException("Guard regression: expected rejection for ${reason}")
+        }
+        def active = new File(dir, 'active.md')
+        active.text = historical.text.replace('| REPLACED |', '| AI_PLACEHOLDER |')
+        expectBlocked('Active AI_PLACEHOLDER:', active, [] as Set, [] as Set)
+        def source = new File(dir, 'synthetic-source.png')
+        source.bytes = [1,2,3,4,5,6,7,8] as byte[]
+        def fixtureHash = MessageDigest.getInstance('SHA-256').digest(source.bytes).encodeHex().toString()
+        historical.text = historical.text.replaceFirst(/[0-9a-f]{64}/, fixtureHash)
+        expectBlocked('Development AI source still present:', historical, [source] as Set, [] as Set)
+        def renamed = new File(dir, 'renamed-final-art.png')
+        renamed.bytes = source.bytes
+        expectBlocked('Shipped AI texture fingerprint:', historical, [] as Set, [renamed] as Set)
+        def reference = new File(dir, 'model.json')
+        reference.text = '{"textures":{"all":"mobvats:blocks/ai_placeholder/mixer_controller"}}'
+        expectBlocked('Shipped placeholder path/reference:', historical, [] as Set, [reference] as Set)
+        def malformed = new File(dir, 'invalid.md')
+        malformed.text = '# Empty ledger'
+        expectBlocked('Missing or invalid placeholder-art manifest header.', malformed, [] as Set, [] as Set)
+        VerifyNoAiPlaceholderArt.validateFiles(historical, [] as Set, [] as Set)
+        logger.lifecycle('Guard regression passed: active manifest, retained source, renamed PNG, dangling reference, malformed manifest, and clean historical ledger.')
+    }
+}
+
+def devArt = layout.projectDirectory.dir('dev/ai-placeholder-art')
+def verifyDevArt = tasks.register('verifyAiPlaceholderDevResources', VerifyAiPlaceholderDevResources) {
+    group = 'verification'
+    description = 'Verify procedural machinery replacements, absence of packaged placeholders, and preservation without launching a client.'
+    archive.set(tasks.named('jar', Jar).flatMap { it.archiveFile })
+    sources.set(devArt)
+    baseResources.set(layout.projectDirectory.dir('src/main/resources'))
+}
+def testGuard = tasks.register('testAiPlaceholderGuard', TestAiPlaceholderGuard) {
+    group = 'verification'
+    description = 'Check release guard rejection paths against disposable isolated fixtures.'
+    manifest.set(layout.projectDirectory.file('docs/history/2026-10-12-ai-placeholder-retirement.md'))
+    sources.set(devArt)
+    fixtures.set(layout.buildDirectory.dir('tmp/art-guard-regression'))
+}
+tasks.named('check').configure { dependsOn verifyDevArt, testGuard }
+def guard = tasks.register('verifyNoAiPlaceholderArt', VerifyNoAiPlaceholderArt) {
+    group = 'verification'
+    description = 'HARD public release blocker: manifest, sources, resource references and texture fingerprints.'
+    manifest.set(layout.projectDirectory.file('docs/history/2026-10-12-ai-placeholder-retirement.md'))
+    placeholderSources.from(fileTree(devArt))
+    // Include current resources, processed output, compiled renderer constants and stale artifacts.
+    shippedFiles.from(sourceSets.main.resources, fileTree('src/main/java'),
+            fileTree(layout.buildDirectory.dir('resources')), fileTree(layout.buildDirectory.dir('classes')),
+            fileTree(layout.buildDirectory.dir('libs')) { include '*.jar', '*.zip' })
+    outputs.upToDateWhen { false }
+    // When validation accompanies a build, inspect completed artifacts. This
+    // orders existing producers without making standalone validation rebuild.
+    mustRunAfter tasks.named('jar'), tasks.named('compileJava'), tasks.named('compileTestJava'), tasks.named('processResources'), tasks.named('processTestResources')
+}
+// Capture file inputs, not a Task object, in the public action (configuration-cache safe).
+def publicManifest = layout.projectDirectory.file('docs/history/2026-10-12-ai-placeholder-retirement.md')
+def publicSources = fileTree(devArt)
+def publicFiles = files(sourceSets.main.resources, fileTree('src/main/java'),
+        fileTree(layout.buildDirectory.dir('resources')), fileTree(layout.buildDirectory.dir('classes')),
+        fileTree(layout.buildDirectory.dir('libs')) { include '*.jar', '*.zip' })
+
+// Covers current/future public publishing plugins and conventionally named custom tasks.
+// Every future distribution task with another name MUST explicitly depend on the guard.
+allprojects { target ->
+    target.tasks.configureEach { candidate ->
+        def name = candidate.name.toLowerCase(java.util.Locale.ROOT)
+        def group = (candidate.group ?: '').toLowerCase(java.util.Locale.ROOT)
+        if (candidate.name != 'verifyNoAiPlaceholderArt' &&
+                (name =~ /publish|release|upload|distribut|deploy|curseforge|modrinth|public/ || group =~ /publish|release|upload|distribut|deploy|public/)) {
+            candidate.dependsOn(guard)
+            candidate.notCompatibleWithConfigurationCache('Public distribution requires a fresh, non-bypassable placeholder-art check.')
+            // Revalidate immediately before the public action, including when someone uses -x.
+            candidate.doFirst { VerifyNoAiPlaceholderArt.validateFiles(publicManifest.asFile, publicSources.files, publicFiles.files) }
+        }
+    }
+}
+tasks.register('publicReleaseValidation') {
+    group = 'MobVats release'
+    description = 'Simulate a public-release entry point without publishing or uploading anything.'
+    dependsOn guard
+}

@@ -1,0 +1,21 @@
+{
+  "size": 16,
+  "finishes": ["t1", "t2", "t3"],
+  "recipes": [
+    {"id": "casing", "layers": [
+      {"primitive": "panel", "bounds": [0, 0, 15, 15], "channel": "base"},
+      {"primitive": "recessed_border", "bounds": [1, 1, 14, 14]},
+      {"primitive": "material_variation"},
+      {"primitive": "fastener", "at": [3, 3]},
+      {"primitive": "fastener", "at": [12, 3]},
+      {"primitive": "fastener", "at": [3, 12]},
+      {"primitive": "fastener", "at": [12, 12]}
+    ], "weathering": {"profile": "light", "seeds": [17, 43, 89]}},
+    {"id": "socket", "layers": [
+      {"primitive": "panel", "bounds": [0, 0, 15, 15], "channel": "base"},
+      {"primitive": "bevel", "bounds": [0, 0, 15, 15]},
+      {"primitive": "socket", "insets": [3, 5]},
+      {"primitive": "fixed_panel", "bounds": [6, 6, 9, 9], "color": "center"}
+    ], "ports": {"resources": ["fluid", "item"], "directions": ["none", "inward", "outward"]}}
+  ]
+}

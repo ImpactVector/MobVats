@@ -1,0 +1,80 @@
+{
+  "mixer": {
+    "shaftWidth": 6,
+    "indicators": {"creative": "#9AEFC7", "combustion": "#FF8A32", "fe": "#49D9ED"},
+    "bindings": [
+      {"block": "mixer_shaft", "kind": "shaft"},
+      {"block": "mixer_impeller", "kind": "impeller"},
+      {"block": "creative_drive", "kind": "creative"},
+      {"block": "mixer_combustion_drive", "kind": "combustion"},
+      {"block": "mixer_fe_drive", "kind": "fe"}
+    ]
+  },
+  "background": "#071C12",
+  "phosphor": "#65F28B",
+  "anchorPlane": 13,
+  "sumpRimHeight": 3,
+  "feeder": {"bodyWidth": 10, "spindleDiameter": 3, "endPlateDepth": 1, "turns": 5},
+  "vise": {"width": 7, "height": 5, "depth": 5, "jawGap": 0.45, "gripX": -0.1875, "gripY": -0.1875, "bucketGripX": -0.1875, "bucketGripY": 0.1875, "swordGripX": -0.3125, "swordGripY": -0.3125, "reverseGripX": 0.5, "reverseGripY": 0},
+  "glyphs": {
+    "skull": [
+      "................",
+      "................",
+      ".....######.....",
+      "....########....",
+      "...##########...",
+      "...##..##..##...",
+      "...##..##..##...",
+      "...##########...",
+      "....###..###....",
+      ".....######.....",
+      ".....#.##.#.....",
+      ".....######.....",
+      "................",
+      "................",
+      "................",
+      "................"
+    ],
+    "rotor": [
+      "................",
+      "................",
+      ".......###......",
+      ".......####.....",
+      ".......####.....",
+      ".......###......",
+      ".......##.......",
+      "......####......",
+      "..##########....",
+      "..#####..####...",
+      "...###....####..",
+      "...........###..",
+      "............##..",
+      "................",
+      "................",
+      "................"
+    ]
+  },
+  "bindings": [
+    {"block": "feed_port", "kind": "feeder"},
+    {"block": "blender", "kind": "blender"},
+    {"block": "tool_port", "kind": "tool"},
+    {
+      "block": "vat_controller",
+      "kind": "controller",
+      "glyph": "skull"
+    },
+    {
+      "block": "mixer_controller",
+      "kind": "controller",
+      "glyph": "rotor"
+    },
+    {
+      "block": "vat_harness",
+      "kind": "harness"
+    },
+    {
+      "block": "vat_drain",
+      "kind": "sump"
+    }
+  ]
+}

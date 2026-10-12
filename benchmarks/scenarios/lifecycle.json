@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "counts": [1, 4, 16, 32],
+  "default_repetitions": 5,
+  "default_warmup_ticks": 200,
+  "default_measure_ticks": 400,
+  "stable_ticks": 20,
+  "fixtures": {
+    "mixer_min": {"implementation":"mobvats","dimensions":[3,3,3],"specimens":0},
+    "mixer_5x5": {"implementation":"mobvats","dimensions":[5,3,5],"specimens":0},
+    "vat_min": {"implementation":"mobvats","dimensions":[3,4,3],"specimens":1},
+    "vat_multi": {"implementation":"mobvats","dimensions":[5,4,5],"specimens":4},
+    "connected_pair": {"implementation":"mobvats","dimensions":[10,4,5],"machines_per_unit":2,"resources":"empty connected fluid buffers; active Vat output to passive Mixer input"},
+    "fluidizer": {"implementation":"xr2","dimensions":[3,3,3],"parts":"controller, solid injector, output port, power port, ordinary casing"},
+    "reprocessor": {"implementation":"xr2","dimensions":[3,7,3],"parts":"controller, top waste injector, side fluid injector/output/power, bottom collector, ordinary casing"},
+    "reactor": {"implementation":"xr2","dimensions":[3,3,3],"variant":"basic","parts":"controller, top control rod, interior fuel rod, ordinary casing","fuel":"none"}
+  },
+  "scenarios": {
+    "initial_assembly":"preloaded chunks; placement through stable ordinary ZeroCore assembly",
+    "structural_disassembly":"remove a casing corner through observed unassembled controllers",
+    "structural_reassembly":"replace original corner state through stable assembly",
+    "warm_chunk_unload":"remove force ticket through unload event, absent full chunk and removed old controller entity",
+    "warm_chunk_reload":"force/load chunk through valid stable assembly and derived state readiness",
+    "cold_restore":"copy known saved world/config for each fresh-process repetition; acquire saved chunks after server started through stable assembly",
+    "idle":"ordinary server ticks while assembled/inactive, empty input/storage, no pending structural queues",
+    "activation_deactivation":"ordinary synchronous public activation/deactivation callbacks without productive intervening ticks",
+    "shutdown_to_server_stopped":"halt through server save/unload completion event",
+    "jvm_start_to_server_started":"JVM uptime through server-start event and benchmark initialization; broader than world load",
+    "server_stopped_to_gradle_exit":"external process completion interval, includes JFR export and Gradle overhead"
+  }
+}

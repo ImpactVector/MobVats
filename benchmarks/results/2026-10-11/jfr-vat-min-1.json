@@ -1,0 +1,666 @@
+[
+  {
+    "scenario": "jvm_start_to_server_started",
+    "repetition": 1,
+    "start": 1791745043.403773,
+    "duration": 0.0017667,
+    "allocation_count": 0,
+    "cpu_count": 0,
+    "cpu_top": [],
+    "sampled_allocation_weight_top": []
+  },
+  {
+    "scenario": "initial_assembly",
+    "repetition": 1,
+    "start": 1791745051.646079,
+    "duration": 0.9986067,
+    "allocation_count": 0,
+    "cpu_count": 2,
+    "cpu_top": [
+      [
+        "sun.util.calendar.BaseCalendar.getCalendarDateFromFixedDate <- it.zerono.mods.zerocore.lib.multiblock.AbstractMultiblockController.onMachineAssembled",
+        1
+      ],
+      [
+        "net.minecraft.util.profiling.jfr.JfrProfiler.onServerTick <- vanilla/framework/runner",
+        1
+      ]
+    ],
+    "sampled_allocation_weight_top": []
+  },
+  {
+    "scenario": "idle",
+    "repetition": 1,
+    "start": 1791745057.645821,
+    "duration": 10.0005747,
+    "allocation_count": 0,
+    "cpu_count": 9,
+    "cpu_top": [
+      [
+        "net.minecraft.util.debugchart.DebugSampleSubscriptionTracker.handleUnsubscriptions <- vanilla/framework/runner",
+        4
+      ],
+      [
+        "net.minecraft.server.MinecraftServer.runServer <- vanilla/framework/runner",
+        3
+      ],
+      [
+        "net.minecraft.util.profiling.jfr.JfrProfiler.onServerTick <- vanilla/framework/runner",
+        1
+      ],
+      [
+        "java.lang.invoke.LambdaForm$DMH.0x00000232410d9400.newInvokeSpecial <- vanilla/framework/runner",
+        1
+      ]
+    ],
+    "sampled_allocation_weight_top": []
+  },
+  {
+    "scenario": "activation_deactivation",
+    "repetition": 1,
+    "start": 1791745067.648021,
+    "duration": 0.0005016,
+    "allocation_count": 0,
+    "cpu_count": 0,
+    "cpu_top": [],
+    "sampled_allocation_weight_top": []
+  },
+  {
+    "scenario": "structural_disassembly",
+    "repetition": 1,
+    "start": 1791745067.649633,
+    "duration": 0.0496665,
+    "allocation_count": 4,
+    "cpu_count": 0,
+    "cpu_top": [],
+    "sampled_allocation_weight_top": [
+      [
+        "java.util.ArrayList.grow <- vanilla/framework/runner",
+        3993736
+      ],
+      [
+        "net.minecraft.world.level.chunk.PalettedContainer.pack <- vanilla/framework/runner",
+        1549120
+      ]
+    ]
+  },
+  {
+    "scenario": "structural_reassembly",
+    "repetition": 1,
+    "start": 1791745067.700995,
+    "duration": 1.94415,
+    "allocation_count": 0,
+    "cpu_count": 1,
+    "cpu_top": [
+      [
+        "net.minecraft.server.MinecraftServer.runServer <- vanilla/framework/runner",
+        1
+      ]
+    ],
+    "sampled_allocation_weight_top": []
+  },
+  {
+    "scenario": "warm_chunk_unload",
+    "repetition": 1,
+    "start": 1791745069.646393,
+    "duration": 0.1980209,
+    "allocation_count": 173,
+    "cpu_count": 2,
+    "cpu_top": [
+      [
+        "java.util.Arrays.fill <- vanilla/framework/runner",
+        2
+      ]
+    ],
+    "sampled_allocation_weight_top": [
+      [
+        "net.minecraft.world.level.chunk.PalettedContainer.pack <- vanilla/framework/runner",
+        43767576
+      ],
+      [
+        "com.mojang.serialization.Encoder.empty <- vanilla/framework/runner",
+        17805936
+      ],
+      [
+        "jdk.internal.misc.Unsafe.allocateInstance <- vanilla/framework/runner",
+        5377112
+      ],
+      [
+        "com.mojang.serialization.codecs.RecordCodecBuilder$Instance.lambda$ap2$4 <- vanilla/framework/runner",
+        4713280
+      ],
+      [
+        "com.mojang.serialization.CompressorHolder.<init> <- vanilla/framework/runner",
+        3600304
+      ],
+      [
+        "com.mojang.serialization.DataResult.success <- vanilla/framework/runner",
+        3142176
+      ],
+      [
+        "java.util.HashMap.resize <- vanilla/framework/runner",
+        2569320
+      ],
+      [
+        "com.google.common.collect.ImmutableList.builder <- vanilla/framework/runner",
+        2094840
+      ],
+      [
+        "jdk.internal.misc.Unsafe.allocateUninitializedArray <- vanilla/framework/runner",
+        2094432
+      ],
+      [
+        "java.util.HashMap.newNode <- vanilla/framework/runner",
+        1554696
+      ]
+    ]
+  },
+  {
+    "scenario": "warm_chunk_reload",
+    "repetition": 1,
+    "start": 1791745069.845587,
+    "duration": 1.799312,
+    "allocation_count": 524,
+    "cpu_count": 86,
+    "cpu_top": [
+      [
+        "java.util.concurrent.CompletableFuture.postComplete <- vanilla/framework/runner",
+        42
+      ],
+      [
+        "java.util.concurrent.ConcurrentLinkedQueue.offer <- vanilla/framework/runner",
+        18
+      ],
+      [
+        "java.util.concurrent.CompletableFuture$UniRun.tryFire <- vanilla/framework/runner",
+        11
+      ],
+      [
+        "net.minecraft.server.level.ChunkHolder.isReadyForSaving <- vanilla/framework/runner",
+        10
+      ],
+      [
+        "net.minecraft.server.level.ChunkMap$$Lambda.0x00000232410d59d8.execute <- vanilla/framework/runner",
+        4
+      ],
+      [
+        "java.util.concurrent.ConcurrentLinkedQueue.size <- vanilla/framework/runner",
+        1
+      ]
+    ],
+    "sampled_allocation_weight_top": [
+      [
+        "java.util.concurrent.CompletableFuture.uniRunNow <- vanilla/framework/runner",
+        2014609952
+      ],
+      [
+        "java.util.concurrent.CompletableFuture.uniWhenCompleteStage <- vanilla/framework/runner",
+        1848016496
+      ],
+      [
+        "java.nio.HeapByteBuffer.<init> <- vanilla/framework/runner",
+        261493888
+      ],
+      [
+        "java.util.concurrent.ConcurrentLinkedQueue.offer <- vanilla/framework/runner",
+        55511504
+      ],
+      [
+        "java.lang.invoke.DirectMethodHandle.allocateInstance <- vanilla/framework/runner",
+        43773128
+      ],
+      [
+        "jdk.internal.misc.Unsafe.allocateInstance <- vanilla/framework/runner",
+        12044856
+      ],
+      [
+        "com.mojang.datafixers.util.Pair.of <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "com.mojang.serialization.Decoder.unit <- vanilla/framework/runner",
+        523696
+      ],
+      [
+        "net.minecraft.util.StaticCache2D.<init> <- vanilla/framework/runner",
+        522112
+      ],
+      [
+        "java.util.concurrent.CompletableFuture.newIncompleteFuture <- vanilla/framework/runner",
+        329272
+      ]
+    ]
+  },
+  {
+    "scenario": "initial_assembly",
+    "repetition": 2,
+    "start": 1791745072.644977,
+    "duration": 1.0000042,
+    "allocation_count": 0,
+    "cpu_count": 0,
+    "cpu_top": [],
+    "sampled_allocation_weight_top": []
+  },
+  {
+    "scenario": "idle",
+    "repetition": 2,
+    "start": 1791745078.64625,
+    "duration": 9.999161,
+    "allocation_count": 4,
+    "cpu_count": 4,
+    "cpu_top": [
+      [
+        "net.minecraft.server.level.ChunkHolder.getTickingChunk <- vanilla/framework/runner",
+        2
+      ],
+      [
+        "java.lang.invoke.Invokers$Holder.linkToTargetMethod <- vanilla/framework/runner",
+        1
+      ],
+      [
+        "net.minecraft.server.MinecraftServer.runServer <- vanilla/framework/runner",
+        1
+      ]
+    ],
+    "sampled_allocation_weight_top": [
+      [
+        "net.minecraft.world.level.chunk.PalettedContainer.pack <- vanilla/framework/runner",
+        107887936
+      ],
+      [
+        "it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap$MapEntrySet.fastIterator <- vanilla/framework/runner",
+        213568
+      ]
+    ]
+  },
+  {
+    "scenario": "activation_deactivation",
+    "repetition": 2,
+    "start": 1791745088.646498,
+    "duration": 0.0001535,
+    "allocation_count": 0,
+    "cpu_count": 0,
+    "cpu_top": [],
+    "sampled_allocation_weight_top": []
+  },
+  {
+    "scenario": "structural_disassembly",
+    "repetition": 2,
+    "start": 1791745088.647167,
+    "duration": 0.048039,
+    "allocation_count": 0,
+    "cpu_count": 0,
+    "cpu_top": [],
+    "sampled_allocation_weight_top": []
+  },
+  {
+    "scenario": "structural_reassembly",
+    "repetition": 2,
+    "start": 1791745088.696074,
+    "duration": 1.949169,
+    "allocation_count": 0,
+    "cpu_count": 0,
+    "cpu_top": [],
+    "sampled_allocation_weight_top": []
+  },
+  {
+    "scenario": "warm_chunk_unload",
+    "repetition": 2,
+    "start": 1791745090.646399,
+    "duration": 0.1587956,
+    "allocation_count": 40,
+    "cpu_count": 1,
+    "cpu_top": [
+      [
+        "net.minecraft.server.MinecraftServer.tickChildren <- vanilla/framework/runner",
+        1
+      ]
+    ],
+    "sampled_allocation_weight_top": [
+      [
+        "net.minecraft.world.level.chunk.PalettedContainer.pack <- vanilla/framework/runner",
+        19544496
+      ],
+      [
+        "com.mojang.serialization.codecs.RecordCodecBuilder$Instance.lambda$ap2$4 <- vanilla/framework/runner",
+        3663712
+      ],
+      [
+        "com.google.common.collect.Maps.newHashMap <- vanilla/framework/runner",
+        3012480
+      ],
+      [
+        "java.util.ArrayList.grow <- vanilla/framework/runner",
+        2057480
+      ],
+      [
+        "java.util.HashMap.resize <- vanilla/framework/runner",
+        2002552
+      ],
+      [
+        "net.minecraft.nbt.NbtOps$HomogenousListCollector.<init> <- vanilla/framework/runner",
+        1560712
+      ],
+      [
+        "net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap.<init> <- vanilla/framework/runner",
+        1047416
+      ],
+      [
+        "java.lang.invoke.DirectMethodHandle.allocateInstance <- vanilla/framework/runner",
+        1047416
+      ],
+      [
+        "java.util.HashMap.newNode <- vanilla/framework/runner",
+        1047408
+      ],
+      [
+        "net.minecraft.nbt.NbtOps$NbtRecordBuilder.initBuilder <- vanilla/framework/runner",
+        523704
+      ]
+    ]
+  },
+  {
+    "scenario": "warm_chunk_reload",
+    "repetition": 2,
+    "start": 1791745090.806102,
+    "duration": 1.8393616,
+    "allocation_count": 25,
+    "cpu_count": 0,
+    "cpu_top": [],
+    "sampled_allocation_weight_top": [
+      [
+        "net.minecraft.util.SimpleBitStorage.<init> <- vanilla/framework/runner",
+        9533624
+      ],
+      [
+        "net.minecraft.world.level.chunk.PalettedContainer.pack <- vanilla/framework/runner",
+        3914424
+      ],
+      [
+        "java.util.Arrays.copyOf <- vanilla/framework/runner",
+        1047336
+      ],
+      [
+        "net.minecraft.server.level.ChunkHolder.<init> <- vanilla/framework/runner",
+        1042336
+      ],
+      [
+        "com.mojang.serialization.DataResult$Success.map <- vanilla/framework/runner",
+        1014280
+      ],
+      [
+        "net.minecraft.world.level.chunk.PalettedContainer.<init> <- vanilla/framework/runner",
+        988480
+      ],
+      [
+        "it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet.rehash <- vanilla/framework/runner",
+        713216
+      ],
+      [
+        "com.mojang.datafixers.util.Pair.of <- vanilla/framework/runner",
+        668344
+      ],
+      [
+        "net.minecraft.util.ExtraCodecs$1.apply <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "net.minecraft.util.ThreadingDetector.<init> <- vanilla/framework/runner",
+        523712
+      ]
+    ]
+  },
+  {
+    "scenario": "initial_assembly",
+    "repetition": 3,
+    "start": 1791745093.645845,
+    "duration": 1.0005026,
+    "allocation_count": 2,
+    "cpu_count": 0,
+    "cpu_top": [],
+    "sampled_allocation_weight_top": [
+      [
+        "java.util.stream.SortedOps$OfRef.opWrapSink <- net.impactvector.mobvats.gamecontent.multiblock.vat.VatTopologyCompiler.compile",
+        1571088
+      ],
+      [
+        "it.zerono.mods.zerocore.lib.multiblock.AbstractMultiblockController.updateMultiblockEntity <- it.zerono.mods.zerocore.lib.multiblock.AbstractMultiblockController.updateMultiblockEntity",
+        65696
+      ]
+    ]
+  },
+  {
+    "scenario": "idle",
+    "repetition": 3,
+    "start": 1791745099.645867,
+    "duration": 10.0005173,
+    "allocation_count": 3,
+    "cpu_count": 4,
+    "cpu_top": [
+      [
+        "java.lang.Class.cast <- vanilla/framework/runner",
+        2
+      ],
+      [
+        "java.util.Collections$UnmodifiableCollection.forEach <- vanilla/framework/runner",
+        1
+      ],
+      [
+        "net.minecraft.server.MinecraftServer.runServer <- vanilla/framework/runner",
+        1
+      ]
+    ],
+    "sampled_allocation_weight_top": [
+      [
+        "net.minecraft.world.level.chunk.PalettedContainer.pack <- vanilla/framework/runner",
+        3483944
+      ]
+    ]
+  },
+  {
+    "scenario": "activation_deactivation",
+    "repetition": 3,
+    "start": 1791745109.647722,
+    "duration": 0.0003732,
+    "allocation_count": 0,
+    "cpu_count": 0,
+    "cpu_top": [],
+    "sampled_allocation_weight_top": []
+  },
+  {
+    "scenario": "structural_disassembly",
+    "repetition": 3,
+    "start": 1791745109.648846,
+    "duration": 0.0469871,
+    "allocation_count": 0,
+    "cpu_count": 0,
+    "cpu_top": [],
+    "sampled_allocation_weight_top": []
+  },
+  {
+    "scenario": "structural_reassembly",
+    "repetition": 3,
+    "start": 1791745109.696783,
+    "duration": 1.9490784,
+    "allocation_count": 4,
+    "cpu_count": 0,
+    "cpu_top": [],
+    "sampled_allocation_weight_top": [
+      [
+        "net.minecraft.world.level.chunk.PalettedContainer.pack <- vanilla/framework/runner",
+        4698040
+      ]
+    ]
+  },
+  {
+    "scenario": "warm_chunk_unload",
+    "repetition": 3,
+    "start": 1791745111.646796,
+    "duration": 0.1530837,
+    "allocation_count": 26,
+    "cpu_count": 0,
+    "cpu_top": [],
+    "sampled_allocation_weight_top": [
+      [
+        "net.minecraft.world.level.chunk.PalettedContainer.pack <- vanilla/framework/runner",
+        4885176
+      ],
+      [
+        "java.lang.Object.clone <- vanilla/framework/runner",
+        1042456
+      ],
+      [
+        "net.minecraft.world.level.chunk.HashMapPalette.getEntries <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap.<init> <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "com.google.common.collect.Iterators.filter <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "com.mojang.serialization.DataResult.success <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "net.minecraft.nbt.StringTag.valueOf <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "com.mojang.serialization.CompressorHolder.<init> <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "com.mojang.serialization.Codec.of <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "java.lang.AbstractStringBuilder.<init> <- vanilla/framework/runner",
+        523712
+      ]
+    ]
+  },
+  {
+    "scenario": "warm_chunk_reload",
+    "repetition": 3,
+    "start": 1791745111.800967,
+    "duration": 1.8454559,
+    "allocation_count": 42,
+    "cpu_count": 3,
+    "cpu_top": [
+      [
+        "net.minecraft.world.level.chunk.ChunkAccess.getSection <- vanilla/framework/runner",
+        1
+      ],
+      [
+        "net.minecraft.server.MinecraftServer.runServer <- vanilla/framework/runner",
+        1
+      ],
+      [
+        "java.util.Arrays.fill <- vanilla/framework/runner",
+        1
+      ]
+    ],
+    "sampled_allocation_weight_top": [
+      [
+        "net.minecraft.world.level.chunk.PalettedContainer.pack <- vanilla/framework/runner",
+        12799280
+      ],
+      [
+        "java.util.Optional.ofNullable <- vanilla/framework/runner",
+        1047408
+      ],
+      [
+        "java.util.Arrays.copyOfRangeByte <- vanilla/framework/runner",
+        1047400
+      ],
+      [
+        "net.minecraft.nbt.NbtOps.getMap <- vanilla/framework/runner",
+        676544
+      ],
+      [
+        "java.util.Optional.of <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "java.util.concurrent.locks.ReentrantLock.<init> <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "java.lang.invoke.DirectMethodHandle.allocateInstance <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "net.minecraft.world.level.chunk.PalettedContainer$Strategy$1.getConfiguration <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "java.util.concurrent.atomic.AtomicReferenceArray.<init> <- vanilla/framework/runner",
+        523704
+      ],
+      [
+        "net.minecraft.util.ThreadingDetector.<init> <- vanilla/framework/runner",
+        523704
+      ]
+    ]
+  },
+  {
+    "scenario": "shutdown",
+    "repetition": 3,
+    "start": 1791745113.647996,
+    "duration": 0.101445,
+    "allocation_count": 30,
+    "cpu_count": 1,
+    "cpu_top": [
+      [
+        "it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap.get <- vanilla/framework/runner",
+        1
+      ]
+    ],
+    "sampled_allocation_weight_top": [
+      [
+        "net.minecraft.world.level.chunk.PalettedContainer.pack <- vanilla/framework/runner",
+        5030800
+      ],
+      [
+        "com.mojang.serialization.DataResult.success <- vanilla/framework/runner",
+        1571128
+      ],
+      [
+        "jdk.internal.org.objectweb.asm.SymbolTable.addConstantUtf8 <- vanilla/framework/runner",
+        1214632
+      ],
+      [
+        "java.util.HashMap.newNode <- vanilla/framework/runner",
+        1031000
+      ],
+      [
+        "net.minecraft.resources.RegistryOps.create <- vanilla/framework/runner",
+        540112
+      ],
+      [
+        "com.mojang.serialization.DataResult$Success.setLifecycle <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "com.mojang.serialization.Encoder.empty <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "jdk.internal.org.objectweb.asm.ByteVector.<init> <- vanilla/framework/runner",
+        523712
+      ],
+      [
+        "java.util.Optional.ofNullable <- vanilla/framework/runner",
+        523704
+      ],
+      [
+        "com.mojang.serialization.Codec.mapResult <- vanilla/framework/runner",
+        523704
+      ]
+    ]
+  }
+]

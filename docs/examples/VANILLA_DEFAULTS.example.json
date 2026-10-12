@@ -1,0 +1,3453 @@
+{
+  "minecraft:allay": {
+    "entity": "minecraft:allay",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:armadillo": {
+    "entity": "minecraft:armadillo",
+    "feed": {
+      "items": [
+        "#minecraft:armadillo_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:axolotl": {
+    "entity": "minecraft:axolotl",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:bat": {
+    "entity": "minecraft:bat",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:bee": {
+    "entity": "minecraft:bee",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:blaze": {
+    "entity": "minecraft:blaze",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:bogged": {
+    "entity": "minecraft:bogged",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:breeze": {
+    "entity": "minecraft:breeze",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:camel": {
+    "entity": "minecraft:camel",
+    "feed": {
+      "items": [
+        "#minecraft:camel_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:cat": {
+    "entity": "minecraft:cat",
+    "feed": {
+      "items": [
+        "#minecraft:cat_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:cave_spider": {
+    "entity": "minecraft:cave_spider",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:chicken": {
+    "entity": "minecraft:chicken",
+    "feed": {
+      "items": [
+        "#minecraft:chicken_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [
+      {
+        "id": "mobvats:egg",
+        "duration_ticks": 9000,
+        "requires_stage": "ADULT",
+        "actor_use": "",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "item",
+            "item": "minecraft:egg",
+            "count": 1,
+            "amount": 0
+          }
+        ]
+      }
+    ],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:cod": {
+    "entity": "minecraft:cod",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:cow": {
+    "entity": "minecraft:cow",
+    "feed": {
+      "items": [
+        "#minecraft:cow_food",
+        "minecraft:wheat"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:milk",
+        "buffer": "mobvats:milk",
+        "fluid": "minecraft:milk",
+        "amount": 1000,
+        "interval_ticks": 1200,
+        "requires_stage": "ADULT",
+        "actor_use": "",
+        "accelerated": true,
+        "metric": "milkMb",
+        "container": {
+          "input": "minecraft:bucket",
+          "output": "minecraft:milk_bucket",
+          "amount": 1000,
+          "actor_use": "cowMilk",
+          "acquisition_priority": 20
+        }
+      },
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:creeper": {
+    "entity": "minecraft:creeper",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:dolphin": {
+    "entity": "minecraft:dolphin",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:donkey": {
+    "entity": "minecraft:donkey",
+    "feed": {
+      "items": [
+        "#minecraft:horse_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:drowned": {
+    "entity": "minecraft:drowned",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:elder_guardian": {
+    "entity": "minecraft:elder_guardian",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": false,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "boss progression unavailable"
+    }
+  },
+  "minecraft:ender_dragon": {
+    "entity": "minecraft:ender_dragon",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": false,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "boss progression unavailable"
+    }
+  },
+  "minecraft:enderman": {
+    "entity": "minecraft:enderman",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:endermite": {
+    "entity": "minecraft:endermite",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:evoker": {
+    "entity": "minecraft:evoker",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:fox": {
+    "entity": "minecraft:fox",
+    "feed": {
+      "items": [
+        "#minecraft:fox_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:frog": {
+    "entity": "minecraft:frog",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:ghast": {
+    "entity": "minecraft:ghast",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:giant": {
+    "entity": "minecraft:giant",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:glow_squid": {
+    "entity": "minecraft:glow_squid",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:goat": {
+    "entity": "minecraft:goat",
+    "feed": {
+      "items": [
+        "#minecraft:goat_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:milk",
+        "buffer": "mobvats:milk",
+        "fluid": "minecraft:milk",
+        "amount": 1000,
+        "interval_ticks": 1200,
+        "requires_stage": "ADULT",
+        "actor_use": "",
+        "accelerated": true,
+        "metric": "milkMb",
+        "container": {
+          "input": "minecraft:bucket",
+          "output": "minecraft:milk_bucket",
+          "amount": 1000,
+          "actor_use": "cowMilk",
+          "acquisition_priority": 20
+        }
+      },
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:guardian": {
+    "entity": "minecraft:guardian",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:hoglin": {
+    "entity": "minecraft:hoglin",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:horse": {
+    "entity": "minecraft:horse",
+    "feed": {
+      "items": [
+        "#minecraft:horse_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:husk": {
+    "entity": "minecraft:husk",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:illusioner": {
+    "entity": "minecraft:illusioner",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:iron_golem": {
+    "entity": "minecraft:iron_golem",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:llama": {
+    "entity": "minecraft:llama",
+    "feed": {
+      "items": [
+        "#minecraft:llama_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:magma_cube": {
+    "entity": "minecraft:magma_cube",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:mooshroom": {
+    "entity": "minecraft:mooshroom",
+    "feed": {
+      "items": [
+        "#minecraft:cow_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:milk",
+        "buffer": "mobvats:milk",
+        "fluid": "minecraft:milk",
+        "amount": 1000,
+        "interval_ticks": 1200,
+        "requires_stage": "ADULT",
+        "actor_use": "",
+        "accelerated": true,
+        "metric": "milkMb",
+        "container": {
+          "input": "minecraft:bucket",
+          "output": "minecraft:milk_bucket",
+          "amount": 1000,
+          "actor_use": "cowMilk",
+          "acquisition_priority": 20
+        }
+      },
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:mule": {
+    "entity": "minecraft:mule",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:ocelot": {
+    "entity": "minecraft:ocelot",
+    "feed": {
+      "items": [
+        "#minecraft:ocelot_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:panda": {
+    "entity": "minecraft:panda",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:parrot": {
+    "entity": "minecraft:parrot",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:phantom": {
+    "entity": "minecraft:phantom",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:pig": {
+    "entity": "minecraft:pig",
+    "feed": {
+      "items": [
+        "#minecraft:pig_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:piglin": {
+    "entity": "minecraft:piglin",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:piglin_brute": {
+    "entity": "minecraft:piglin_brute",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:pillager": {
+    "entity": "minecraft:pillager",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:polar_bear": {
+    "entity": "minecraft:polar_bear",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:pufferfish": {
+    "entity": "minecraft:pufferfish",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:rabbit": {
+    "entity": "minecraft:rabbit",
+    "feed": {
+      "items": [
+        "#minecraft:rabbit_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:ravager": {
+    "entity": "minecraft:ravager",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:salmon": {
+    "entity": "minecraft:salmon",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:sheep": {
+    "entity": "minecraft:sheep",
+    "feed": {
+      "items": [
+        "#minecraft:sheep_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:shulker": {
+    "entity": "minecraft:shulker",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:silverfish": {
+    "entity": "minecraft:silverfish",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:skeleton": {
+    "entity": "minecraft:skeleton",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:skeleton_horse": {
+    "entity": "minecraft:skeleton_horse",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:slime": {
+    "entity": "minecraft:slime",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:sniffer": {
+    "entity": "minecraft:sniffer",
+    "feed": {
+      "items": [
+        "#minecraft:sniffer_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 48000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:snow_golem": {
+    "entity": "minecraft:snow_golem",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:spider": {
+    "entity": "minecraft:spider",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:squid": {
+    "entity": "minecraft:squid",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:stray": {
+    "entity": "minecraft:stray",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:strider": {
+    "entity": "minecraft:strider",
+    "feed": {
+      "items": [
+        "#minecraft:strider_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:tadpole": {
+    "entity": "minecraft:tadpole",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:trader_llama": {
+    "entity": "minecraft:trader_llama",
+    "feed": {
+      "items": [
+        "#minecraft:llama_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:tropical_fish": {
+    "entity": "minecraft:tropical_fish",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:turtle": {
+    "entity": "minecraft:turtle",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:vex": {
+    "entity": "minecraft:vex",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:villager": {
+    "entity": "minecraft:villager",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:vindicator": {
+    "entity": "minecraft:vindicator",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:wandering_trader": {
+    "entity": "minecraft:wandering_trader",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "representation only; special reproduction/interactions not implemented"
+    }
+  },
+  "minecraft:warden": {
+    "entity": "minecraft:warden",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": false,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "boss progression unavailable"
+    }
+  },
+  "minecraft:witch": {
+    "entity": "minecraft:witch",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:wither": {
+    "entity": "minecraft:wither",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": false,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "boss progression unavailable"
+    }
+  },
+  "minecraft:wither_skeleton": {
+    "entity": "minecraft:wither_skeleton",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:wolf": {
+    "entity": "minecraft:wolf",
+    "feed": {
+      "items": [
+        "#minecraft:wolf_food"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "simulacrum": {},
+    "buffers": {
+      "mobvats:culture_slurry": {
+        "fluids": [
+          "mobvats:culture_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:feeding_slurry": {
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:meat": {
+        "fluids": [
+          "mobvats:meat"
+        ],
+        "capacity": 4000,
+        "input": false
+      },
+      "mobvats:milk": {
+        "fluids": [
+          "minecraft:milk"
+        ],
+        "capacity": 4000,
+        "input": true
+      },
+      "mobvats:waste": {
+        "fluids": [
+          "mobvats:waste"
+        ],
+        "capacity": 4000,
+        "input": false
+      }
+    },
+    "processes": [],
+    "capture": {
+      "enabled": true,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "passive lifecycle; special interactions not implemented"
+    }
+  },
+  "minecraft:zoglin": {
+    "entity": "minecraft:zoglin",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:zombie": {
+    "entity": "minecraft:zombie",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:zombie_horse": {
+    "entity": "minecraft:zombie_horse",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:zombie_villager": {
+    "entity": "minecraft:zombie_villager",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  },
+  "minecraft:zombified_piglin": {
+    "entity": "minecraft:zombified_piglin",
+    "juvenile_growth_ticks": 0,
+    "secondary_outputs": [],
+    "simulacrum": {},
+    "buffers": {},
+    "processes": [],
+    "capture": {
+      "enabled": false,
+      "tool": "mobvats:syringe",
+      "cost": {
+        "items": [
+          "minecraft:glass_bottle"
+        ],
+        "count": 1
+      },
+      "health_cost": 0,
+      "requires_alive": true,
+      "allow_hostile": true,
+      "allow_boss": true,
+      "adult_only": true,
+      "encoding_enabled": true,
+      "status": "hostile progression unavailable"
+    }
+  }
+}

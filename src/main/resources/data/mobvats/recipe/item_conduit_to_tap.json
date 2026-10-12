@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "mobvats:item_conduit"
+    }
+  ],
+  "result": {
+    "id": "mobvats:item_conduit_tap",
+    "count": 1
+  }
+}

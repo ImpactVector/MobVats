@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "cladding_material=none,mode=trunk": {
+      "model": "mobvats:block/item_conduit_trunk"
+    },
+    "cladding_material=none,mode=tap": {
+      "model": "mobvats:block/item_conduit_tap"
+    },
+    "cladding_material=vat_t1_casing,mode=trunk": {
+      "model": "mobvats:block/casing_item_conduit_trunk"
+    },
+    "cladding_material=vat_t1_casing,mode=tap": {
+      "model": "mobvats:block/casing_item_conduit_tap"
+    },
+    "cladding_material=vat_t1_glass,mode=trunk": {
+      "model": "mobvats:block/glass_item_conduit_trunk"
+    },
+    "cladding_material=vat_t1_glass,mode=tap": {
+      "model": "mobvats:block/glass_item_conduit_tap"
+    },
+    "cladding_material=mixer_t1_casing,mode=trunk": {
+      "model": "mobvats:block/mixer_casing_item_conduit_trunk"
+    },
+    "cladding_material=mixer_t1_casing,mode=tap": {
+      "model": "mobvats:block/mixer_casing_item_conduit_tap"
+    },
+    "cladding_material=mixer_t1_glass,mode=trunk": {
+      "model": "mobvats:block/mixer_glass_item_conduit_trunk"
+    },
+    "cladding_material=mixer_t1_glass,mode=tap": {
+      "model": "mobvats:block/mixer_glass_item_conduit_tap"
+    }
+  }
+}

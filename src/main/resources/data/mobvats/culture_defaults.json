@@ -1,0 +1,131 @@
+{
+  "default": "overworld",
+  "profiles": {
+    "overworld": [
+      {
+        "medium": "mobvats:culture_slurry",
+        "required": [
+          {
+            "kind": "FLUID",
+            "selector": "#c:water",
+            "amount": 1000
+          },
+          {
+            "kind": "FLUID",
+            "selector": "mobvats:experience",
+            "amount": 250
+          }
+        ],
+        "frequency": 5,
+        "dirty_frequency": 2.75
+      },
+      {
+        "medium": "#c:water",
+        "frequency": 1,
+        "dirty_frequency": 0.75
+      }
+    ],
+    "nether": [
+      {
+        "medium": "mobvats:culture_slurry",
+        "required": [
+          {
+            "kind": "FLUID",
+            "selector": "minecraft:lava",
+            "amount": 1000
+          },
+          {
+            "kind": "FLUID",
+            "selector": "mobvats:experience",
+            "amount": 250
+          }
+        ],
+        "frequency": 5,
+        "dirty_frequency": 2.75
+      },
+      {
+        "medium": "minecraft:lava",
+        "frequency": 1,
+        "dirty_frequency": 0.75
+      }
+    ],
+    "end": [
+      {
+        "medium": "mobvats:culture_slurry",
+        "required": [
+          {
+            "kind": "ITEM",
+            "selector": "minecraft:chorus_fruit",
+            "amount": 1
+          },
+          {
+            "kind": "FLUID",
+            "selector": "mobvats:experience",
+            "amount": 250
+          }
+        ],
+        "frequency": 5,
+        "dirty_frequency": 2.75
+      },
+      {
+        "medium": "mobvats:component_fluid",
+        "required": [
+          {
+            "kind": "ITEM",
+            "selector": "minecraft:chorus_fruit",
+            "amount": 1
+          }
+        ],
+        "frequency": 1,
+        "dirty_frequency": 0.75
+      }
+    ]
+  },
+  "mobs": {
+    "minecraft:enderman": "overworld"
+  },
+  "groups": [
+    {
+      "profile": "nether",
+      "mobs": [
+        "minecraft:blaze",
+        "minecraft:ghast",
+        "minecraft:magma_cube",
+        "minecraft:piglin",
+        "minecraft:piglin_brute",
+        "minecraft:zombified_piglin",
+        "minecraft:hoglin",
+        "minecraft:zoglin",
+        "minecraft:wither_skeleton",
+        "minecraft:strider"
+      ]
+    },
+    {
+      "profile": "end",
+      "mobs": [
+        "minecraft:ender_dragon",
+        "minecraft:endermite",
+        "minecraft:shulker",
+        "minecraft:enderman"
+      ]
+    }
+  ],
+  "fouling": {
+    "waste_formula_mb": 100,
+    "actions": {
+      "mobvats:waste": {
+        "fouling_mb": 50
+      },
+      "mobvats:milk": {
+        "fouling_mb": 50
+      },
+      "mobvats:shear_regrowth": {
+        "fouling_mb": 50
+      },
+      "mobvats:growth": {
+        "fouling_mb": 50
+      }
+    },
+    "default_mb": 50
+  }
+}

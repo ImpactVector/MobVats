@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "render_type": "minecraft:translucent",
+  "textures": {
+    "all": "mobvats:blocks/tank_surface",
+    "particle": "mobvats:blocks/tank_rim"
+  }
+}

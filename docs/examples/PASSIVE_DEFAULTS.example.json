@@ -1,0 +1,98 @@
+{
+  "minecraft:cow": {
+    "entity": "minecraft:cow",
+    "feed": {
+      "items": [
+        "#minecraft:cow_food",
+        "minecraft:wheat"
+      ],
+      "count": 1
+    },
+    "juvenile_growth_ticks": 24000,
+    "secondary_outputs": [
+      {
+        "process": "mobvats:milk",
+        "buffer": "mobvats:milk",
+        "fluid": "minecraft:milk",
+        "amount": 1000,
+        "interval_ticks": 1200,
+        "requires_stage": "ADULT",
+        "actor_use": "",
+        "accelerated": true,
+        "metric": "milkMb",
+        "container": {
+          "input": "minecraft:bucket",
+          "output": "minecraft:milk_bucket",
+          "amount": 1000,
+          "actor_use": "cowMilk",
+          "acquisition_priority": 20
+        }
+      },
+      {
+        "process": "mobvats:waste",
+        "buffer": "mobvats:waste",
+        "fluid": "mobvats:waste",
+        "amount": 250,
+        "interval_ticks": 1200,
+        "requires_stage": "ANY",
+        "actor_use": "cowDrain",
+        "accelerated": false,
+        "metric": "wasteMb"
+      }
+    ],
+    "harvest": {
+      "sword": "mobvats:vanilla_entity_death_loot",
+      "blender": "mobvats:meat",
+      "blender_amount": 1000,
+      "blender_xp": 0,
+      "actor_use": "cowHarvest",
+      "acquisition_priority": 10
+    },
+    "culture_slurry": {
+      "supported": true,
+      "cost": 10
+    },
+    "feeding_slurry": {
+      "supported": true,
+      "cost": 250
+    },
+    "buffers": {
+      "mobvats:milk": {
+        "capacity": 4000,
+        "input": true,
+        "fluids": [
+          "minecraft:milk"
+        ]
+      },
+      "mobvats:meat": {
+        "capacity": 4000,
+        "input": false,
+        "fluids": [
+          "mobvats:meat"
+        ]
+      },
+      "mobvats:waste": {
+        "capacity": 4000,
+        "input": false,
+        "fluids": [
+          "mobvats:waste"
+        ]
+      },
+      "mobvats:culture_slurry": {
+        "capacity": 4000,
+        "input": true,
+        "fluids": [
+          "mobvats:culture_slurry"
+        ]
+      },
+      "mobvats:feeding_slurry": {
+        "capacity": 4000,
+        "input": true,
+        "fluids": [
+          "mobvats:feeding_slurry"
+        ]
+      }
+    },
+    "processes": []
+  }
+}

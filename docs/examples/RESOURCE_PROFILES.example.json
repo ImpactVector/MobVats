@@ -1,0 +1,25 @@
+{
+  "minecraft:zombie": {
+    "entity": "minecraft:zombie",
+    "buffers": {
+      "somepack:water": {"fluids": ["#minecraft:water"], "capacity": 4000, "input": true},
+      "somepack:ichor": {"fluids": ["mobvats:culture_slurry"], "capacity": 4000, "input": false}
+    },
+    "processes": [
+      {
+        "id": "somepack:gold",
+        "requires_stage": "ANY",
+        "duration_ticks": 600,
+        "inputs": [
+          {"type": "item", "items": ["#c:ingots/iron", "minecraft:iron_ingot"], "count": 1},
+          {"type": "fluid", "fluids": ["#minecraft:water"], "amount": 500}
+        ],
+        "outputs": [
+          {"type": "item", "item": "minecraft:gold_ingot", "count": 4},
+          {"type": "fluid", "buffer": "somepack:ichor", "fluid": "mobvats:culture_slurry", "amount": 250},
+          {"type": "xp", "amount": 12}
+        ]
+      }
+    ]
+  }
+}

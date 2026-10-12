@@ -1,0 +1,82 @@
+{
+  "bindings": [
+    {
+      "recipe": "casing",
+      "palette": "t1",
+      "variant": "clean",
+      "resourceLocation": "mobvats:block/procedural/t1/casing_clean",
+      "consumers": [
+        "vat_casing",
+        "casing_material"
+      ],
+      "textureSlots": {
+        "vat_casing": [
+          "all"
+        ],
+        "casing_material": [
+          "particle",
+          "down",
+          "south",
+          "east",
+          "west"
+        ]
+      },
+      "enabled": true,
+      "provenance": "AUTHORED_PROCEDURAL"
+    },
+    {
+      "recipe": "socket",
+      "palette": "t1",
+      "variant": "item_inward",
+      "resourceLocation": "mobvats:block/procedural/t1/socket_item_inward",
+      "consumers": [
+        "item_port"
+      ],
+      "enabled": true,
+      "provenance": "AUTHORED_PROCEDURAL",
+      "portOutput": false
+    },
+    {
+      "recipe": "socket",
+      "palette": "t1",
+      "variant": "item_outward",
+      "resourceLocation": "mobvats:block/procedural/t1/socket_item_outward",
+      "consumers": [
+        "item_port"
+      ],
+      "enabled": true,
+      "provenance": "AUTHORED_PROCEDURAL",
+      "portOutput": true
+    },
+    {
+      "recipe": "socket",
+      "palette": "t1",
+      "variant": "fluid_inward",
+      "resourceLocation": "mobvats:block/procedural/t1/socket_fluid_inward",
+      "consumers": [
+        "fluid_port"
+      ],
+      "enabled": true,
+      "provenance": "AUTHORED_PROCEDURAL",
+      "portOutput": false
+    },
+    {
+      "recipe": "socket",
+      "palette": "t1",
+      "variant": "fluid_outward",
+      "resourceLocation": "mobvats:block/procedural/t1/socket_fluid_outward",
+      "consumers": [
+        "fluid_port"
+      ],
+      "enabled": true,
+      "provenance": "AUTHORED_PROCEDURAL",
+      "portOutput": true
+    }
+  ],
+  "deferred": [
+    "T2/T3 are unregistered art finishes.",
+    "Weathering selection: no existing controller-coordinate selector.",
+    "Undirected sockets: no ordinary port has a neutral direction.",
+    "Fill/Drain valves, pumps, voids, tool/feed ports, drives and controllers retain distinct materials."
+  ]
+}

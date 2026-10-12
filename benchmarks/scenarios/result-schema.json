@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Lifecycle benchmark measurement, version 1",
+  "type": "object",
+  "required": ["schema_version", "implementation", "machine", "scenario", "count", "repetition", "duration_ms", "server_cpu_ms", "allocation_bytes", "gc_count", "gc_ms", "ticks", "connected_parts", "callbacks", "deferred_operation_counts", "network", "environment"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "implementation": {"enum": ["mobvats", "xr2"]},
+    "machine": {"type": "string"},
+    "scenario": {"type": "string"},
+    "count": {"type": "integer", "minimum": 1},
+    "repetition": {"type": "integer", "minimum": 1},
+    "duration_ms": {"type": "number", "minimum": 0},
+    "server_cpu_ms": {"type": ["number", "null"], "minimum": 0},
+    "allocation_bytes": {"type": ["integer", "null"], "minimum": 0},
+    "gc_count": {"type": "integer", "minimum": 0},
+    "gc_ms": {"type": "integer", "minimum": 0},
+    "ticks": {"type": "integer", "minimum": 0},
+    "connected_parts": {"type": "integer", "minimum": 0},
+    "callbacks": {
+      "type": ["object", "null"],
+      "additionalProperties": {"type": "object", "required": ["calls", "inclusive_ms"], "properties": {"calls": {"type": "integer", "minimum": 0}, "inclusive_ms": {"type": "number", "minimum": 0}}}
+    },
+    "deferred_operation_counts": {"type": ["object", "null"], "additionalProperties": {"type": "integer", "minimum": 0}},
+    "network": {
+      "type": ["object", "null"],
+      "properties": {
+        "actual_packet_count": {"type": ["integer", "null"], "minimum": 0},
+        "payload_bytes": {"type": ["integer", "null"], "minimum": 0},
+        "recipient_count": {"type": ["integer", "null"], "minimum": 0},
+        "coalesced_packet_count": {"type": ["integer", "null"], "minimum": 0},
+        "latency_ms": {"type": ["number", "null"], "minimum": 0},
+        "client_interpolation": {"type": ["object", "null"]}
+      }
+    },
+    "environment": {"type": "object", "required": ["mobvats_commit", "xr2_reference_commit", "artifacts", "harness_sha256", "zerocore", "minecraft", "neoforge", "java", "jvm_flags", "os", "max_heap", "warmup_ticks", "measure_ticks", "profile", "probes"]}
+  }
+}

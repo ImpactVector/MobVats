@@ -1,0 +1,277 @@
+{
+  "authorship": "AUTHORED_PROCEDURAL",
+  "inputs": "Integer coordinates and fixed palettes only; no PNG, vanilla, historical mask or overlay inputs",
+  "bindings": {
+    "block/vat_head": {"north":"blocks/vat_face", "south":"blocks/vat_head", "east":"blocks/vat_head", "west":"blocks/vat_head", "up":"blocks/vat_head", "down":"blocks/vat_head", "particle":"blocks/vat_head"},
+    "block/vat_flesh": {"all":"blocks/vat_flesh"},
+    "block/hidden": {"particle":"blocks/vat_head"},
+    "item/syringe": {"layer0":"items/item_syringe"},
+    "item/essence": {"layer0":"items/item_essence"}
+  },
+  "palettes": {
+    "tissue": [
+      "#542D2C",
+      "#743B32",
+      "#974F38",
+      "#B16B46",
+      "#CA8960",
+      "#73705A"
+    ],
+    "ivory": [
+      "#655F50",
+      "#ABA082",
+      "#D0C4A0",
+      "#EEE2BE"
+    ],
+    "eye": [
+      "#321B2B",
+      "#592439",
+      "#87324C",
+      "#B74B64",
+      "#E79B9E"
+    ],
+    "glass": [
+      "#455B61",
+      "#718C91",
+      "#AAC4C5",
+      "#E0ECE6"
+    ],
+    "liquid": [
+      "#49232D",
+      "#7A2B38",
+      "#AD3D49"
+    ],
+    "cap": [
+      "#4F4541",
+      "#89725B",
+      "#B99A73"
+    ]
+  },
+  "primitives": {
+    "tissue_cluster": [
+      "..22.",
+      ".2332",
+      "12341",
+      ".221.",
+      "..0.."
+    ],
+    "ivory_fragment": [
+      ".23..",
+      "1232.",
+      ".2211",
+      "..10."
+    ],
+    "organic_eye": [
+      ".000.",
+      "01210",
+      "02420",
+      "01310",
+      ".000."
+    ],
+    "vessel": [
+      "...00...",
+      "..0220..",
+      "..0220..",
+      ".022220.",
+      "02222220",
+      "02222220",
+      "02222220",
+      "02222220",
+      ".000000."
+    ],
+    "liquid": [
+      ".2222.",
+      "211112",
+      "110011",
+      "110011",
+      ".1111."
+    ],
+    "stopper": [
+      "01110",
+      ".000."
+    ],
+    "barrel": [
+      "000000000",
+      "033222220",
+      "022121210",
+      "000000000"
+    ]
+  },
+  "assets": [
+    {
+      "id": "vat_head",
+      "path": "blocks/vat_head",
+      "seed": 107,
+      "tissue": true,
+      "layers": [],
+      "replaces": [
+        "Rotten Flesh background"
+      ],
+      "historicalSha256": "7f5c3eca50911af70fb016746e0ec4f194f0969db444025bc2ddbef645e277a8",
+      "outputSha256": "b75f38b3a50f3ef8295a670d1c3a7310816bcb05ee4206b965a9d989da9810fd"
+    },
+    {
+      "id": "vat_face",
+      "path": "blocks/vat_face",
+      "seed": 107,
+      "tissue": true,
+      "layers": [
+        {
+          "shape": "organic_eye",
+          "palette": "eye",
+          "at": [
+            1,
+            3
+          ]
+        },
+        {
+          "shape": "organic_eye",
+          "palette": "eye",
+          "at": [
+            9,
+            3
+          ]
+        }
+      ],
+      "replaces": [
+        "Rotten Flesh background",
+        "Spider Eye lenses"
+      ],
+      "historicalSha256": "d37882750907af5705c22c0edb9991e1dbfc7c7275b395e356e955cf690d7459",
+      "outputSha256": "8a0738576c1048d5d5b55a122532e71881f9b4160faefb0bf66fc110c904ec9e"
+    },
+    {
+      "id": "vat_flesh",
+      "path": "blocks/vat_flesh",
+      "seed": 107,
+      "tissue": true,
+      "layers": [
+        {
+          "shape": "ivory_fragment",
+          "palette": "ivory",
+          "at": [
+            9,
+            1
+          ]
+        },
+        {
+          "shape": "ivory_fragment",
+          "palette": "ivory",
+          "at": [
+            2,
+            6
+          ]
+        },
+        {
+          "shape": "ivory_fragment",
+          "palette": "ivory",
+          "at": [
+            7,
+            11
+          ]
+        }
+      ],
+      "replaces": [
+        "Rotten Flesh background",
+        "Bone fragments"
+      ],
+      "historicalSha256": "bfc7d66595dfb99a66aceec33c75d59942fa57ec1c1b3cdeaae7fcdbb9ce94e2",
+      "outputSha256": "a49a19c01109dd6856fc8196cc2f3bd8c11832eab4ddc116b1926543ed409513"
+    },
+    {
+      "id": "item_essence",
+      "path": "items/item_essence",
+      "seed": 211,
+      "layers": [
+        {
+          "shape": "vessel",
+          "palette": "glass",
+          "at": [
+            4,
+            5
+          ]
+        },
+        {
+          "shape": "liquid",
+          "palette": "liquid",
+          "at": [
+            5,
+            9
+          ]
+        },
+        {
+          "shape": "stopper",
+          "palette": "cap",
+          "at": [
+            6,
+            3
+          ]
+        }
+      ],
+      "replaces": [
+        "Glass Bottle entire recolored vessel"
+      ],
+      "historicalSha256": "b3a03ae739efcfa80ad6e9d9049be8d0ee5deb33e02b6071e1444ac542acab02",
+      "outputSha256": "241c992e35669626cef113ae7bafc6a483410d561db4cd909175c39881676cca"
+    },
+    {
+      "id": "item_syringe",
+      "path": "items/item_syringe",
+      "seed": 307,
+      "layers": [
+        {
+          "shape": "barrel",
+          "palette": "glass",
+          "at": [
+            5,
+            6
+          ]
+        }
+      ],
+      "lines": [
+        {
+          "palette": "ivory",
+          "index": 2,
+          "from": [
+            0,
+            7
+          ],
+          "to": [
+            4,
+            7
+          ]
+        },
+        {
+          "palette": "glass",
+          "index": 1,
+          "from": [
+            13,
+            5
+          ],
+          "to": [
+            13,
+            10
+          ]
+        },
+        {
+          "palette": "cap",
+          "index": 1,
+          "from": [
+            14,
+            7
+          ],
+          "to": [
+            15,
+            7
+          ]
+        }
+      ],
+      "replaces": [
+        "Suspected bottle-derived barrel/highlights; conservative redraw",
+        "Ivory needle; conservative redraw"
+      ],
+      "historicalSha256": "d1401985de5d10c9382113ee960215daf090382d5304cacc2d6e21e44c161cbb",
+      "outputSha256": "69ead9477b43a6aa5b34928c3477dc96b4144a51e776262a5550281c8a05a81b"
+    }
+  ]
+}

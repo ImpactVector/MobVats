@@ -1,0 +1,44 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "mobvats:blocks/vat_head"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "mobvats:blocks/vat_face"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "mobvats:blocks/vat_flesh"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "mobvats:items/item_syringe"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "mobvats:items/item_essence"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "mobvats:blocks/tank_surface"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "mobvats:blocks/tank_rim"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "mobvats:blocks/vat_casing_face"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "mobvats:blocks/vat_casing_edge"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "mobvats:blocks/vat_casing_inner"
+    }
+  ]
+}

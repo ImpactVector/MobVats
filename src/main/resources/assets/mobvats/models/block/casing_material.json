@@ -1,0 +1,13 @@
+{
+  "parent": "minecraft:block/cube",
+  "render_type": "minecraft:solid",
+  "textures": {
+    "particle": "mobvats:blocks/vat_casing_face",
+    "down": "mobvats:blocks/vat_casing_face",
+    "up": "mobvats:blocks/vat_casing_edge",
+    "north": "mobvats:blocks/vat_casing_inner",
+    "south": "mobvats:blocks/vat_casing_face",
+    "east": "mobvats:blocks/vat_casing_face",
+    "west": "mobvats:blocks/vat_casing_face"
+  }
+}

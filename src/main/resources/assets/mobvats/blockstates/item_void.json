@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "cladding_material=none,port_output=false": {
+      "model": "mobvats:block/procedural/t1/vat_bare_item_void"
+    },
+    "cladding_material=none,port_output=true": {
+      "model": "mobvats:block/procedural/t1/vat_bare_item_void"
+    },
+    "cladding_material=vat_t1_casing,port_output=false": {
+      "model": "mobvats:block/procedural/t1/vat_casing_item_void"
+    },
+    "cladding_material=vat_t1_casing,port_output=true": {
+      "model": "mobvats:block/procedural/t1/vat_casing_item_void"
+    },
+    "cladding_material=vat_t1_glass,port_output=false": {
+      "model": "mobvats:block/procedural/t1/vat_glass_item_void"
+    },
+    "cladding_material=vat_t1_glass,port_output=true": {
+      "model": "mobvats:block/procedural/t1/vat_glass_item_void"
+    },
+    "cladding_material=mixer_t1_casing,port_output=false": {
+      "model": "mobvats:block/procedural/t1/vat_casing_item_void"
+    },
+    "cladding_material=mixer_t1_casing,port_output=true": {
+      "model": "mobvats:block/procedural/t1/vat_casing_item_void"
+    },
+    "cladding_material=mixer_t1_glass,port_output=false": {
+      "model": "mobvats:block/procedural/t1/vat_glass_item_void"
+    },
+    "cladding_material=mixer_t1_glass,port_output=true": {
+      "model": "mobvats:block/procedural/t1/vat_glass_item_void"
+    }
+  }
+}

@@ -1,0 +1,305 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+    id 'idea'
+}
+version = mod_version
+group = mod_group_id
+base { archivesName = mod_id }
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
+sourceSets.test.runtimeClasspath += sourceSets.main.runtimeClasspath
+tasks.register('renderBufferTest', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'net.impactvector.mobvats.render.VatBufferOrderingTest'
+    description = 'CPU-only Minecraft buffer ordering regression; no game or window is launched.'
+}
+tasks.named('test') { exclude '**/VatBufferOrderingTest*', '**/MixerShaftGeometryTest*' }
+tasks.named('check') { dependsOn tasks.named('renderBufferTest') }
+tasks.register('mixerShaftGeometryTest', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'net.impactvector.mobvats.render.MixerShaftGeometryTest'
+    args layout.buildDirectory.file('tmp/mixer-art-examples.json').get().asFile.absolutePath
+    outputs.file(layout.buildDirectory.file('tmp/mixer-art-examples.json'))
+    description = 'CPU-only formed Mixer Shaft geometry regression; no client or world is launched.'
+}
+tasks.named('check') { dependsOn tasks.named('mixerShaftGeometryTest') }
+def manualWorldName = providers.gradleProperty('worldName').getOrElse('MobVatsTest')
+if (!(manualWorldName ==~ /[A-Za-z0-9][A-Za-z0-9_-]{0,63}/) ||
+    manualWorldName.toUpperCase(java.util.Locale.ROOT) ==~ /CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]/) {
+    throw new GradleException('worldName must be a simple folder name (letters, digits, hyphens, underscores; max 64 characters).')
+}
+def manualSaves = file('run/saves').toPath().toAbsolutePath().normalize()
+def manualWorld = manualSaves.resolve(manualWorldName).normalize()
+def manualServerDir = file('run-world-generator')
+// Operator tools belong only to the normal manual client run, never shared classpaths.
+configurations {
+    manualClientRuntime {
+        canBeResolved = false
+        canBeConsumed = false
+        description = 'QoL mods for operator-controlled runClient sessions only.'
+    }
+}
+// FML discovers mod jars on the launch classpath, not the legacy library classpath.
+sourceSets {
+    manualClient {
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+configurations.manualClientRuntimeClasspath.extendsFrom configurations.runtimeClasspath, configurations.manualClientRuntime
+repositories {
+    maven {
+        url = 'https://api.modrinth.com/maven'
+        content { includeGroup 'maven.modrinth' }
+    }
+    maven {
+        url = 'https://www.cursemaven.com'
+        content { includeGroup 'curse.maven' }
+    }
+}
+neoForge {
+    version = neo_version
+    runs {
+        client {
+            client()
+            sourceSet = sourceSets.manualClient
+        }
+        clientSmokeTest {
+            client()
+            gameDirectory = file('run-client-smoke')
+            systemProperty 'mobvats.clientSmokeTest', 'true'
+        }
+        clientReloadTest {
+            client()
+            gameDirectory = file('run-client-smoke')
+            systemProperty 'mobvats.clientSmokeTest', 'true'
+            systemProperty 'mobvats.smokeReload', 'true'
+        }
+        server { server(); programArgument '--nogui' }
+        buildTestWorldServer {
+            server()
+            gameDirectory = manualServerDir
+            programArguments.addAll '--nogui', '--universe', manualSaves.toString(), '--world', manualWorldName
+            systemProperty 'mobvats.buildTestWorld', 'true'
+            systemProperty 'mobvats.conduitPerformance', providers.gradleProperty('conduitPerformance').getOrElse('false')
+            systemProperty 'mobvats.acceptanceMinimumCowXp', providers.gradleProperty('acceptanceMinimumCowXp').getOrElse('false')
+            systemProperty 'mobvats.testWorldPath', manualWorld.toString()
+        }
+        gameTestServer {
+            type = 'gameTestServer'
+            // Keep generated test defaults independent of operator-authored run/config files.
+            gameDirectory = file('.cache/gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+        }
+    }
+    mods { mobvats { sourceSet sourceSets.main } }
+}
+dependencies {
+    // Official published ZeroCore2 1.21.1-2.4.18; external, never bundled.
+    implementation 'curse.maven:zerocore-247921:6648746'
+
+    // Optional inspection API: never inherited by runtime or GameTest classpaths.
+    compileOnly 'maven.modrinth:jade:15.10.6+neoforge'
+
+    // Minecraft 1.21.1 / NeoForge operator QoL mods.
+    manualClientRuntime 'maven.modrinth:pipez:neoforge-1.21.1-1.2.31'
+    manualClientRuntime 'curse.maven:building-gadgets-298187:6850515' // Building Gadgets 2 1.3.9
+    manualClientRuntime 'maven.modrinth:jei:RI8WCow6' // JEI 19.57.0.451, pinned NeoForge artifact
+    manualClientRuntime 'maven.modrinth:jade:15.10.6+neoforge'
+}
+def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    def values = [minecraft_version_range: minecraft_version_range,
+        neo_version: neo_version, loader_version_range: loader_version_range,
+        mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version]
+    inputs.properties values
+    expand values
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
+}
+sourceSets.main.resources.srcDir generateModMetadata
+tasks.named('processResources') {
+    from('ATTRIBUTION.md') { into 'META-INF' }
+}
+neoForge.ideSyncTask generateModMetadata
+
+// Development resources and mandatory public-distribution validation.
+apply from: 'gradle/ai-placeholder-art.gradle'
+apply from: 'gradle/procedural-art.gradle'
+
+// Local development housekeeping only; never attached to a Minecraft run task.
+def invalidateDevMixerDefaults = tasks.register('invalidateDevMixerDefaults') {
+    group = 'MobVats development'
+    description = 'Invalidate only run/config/mobvats/mixer/_defaults.json; preserve authored siblings.'
+    def defaultsFile = layout.projectDirectory.file('run/config/mobvats/mixer/_defaults.json').asFile
+    // No outputs: execute on every build, including otherwise up-to-date builds.
+    doLast {
+        def target = defaultsFile.toPath().toAbsolutePath().normalize()
+        for (def path = target; path != null; path = path.parent) {
+            if (java.nio.file.Files.isSymbolicLink(path) ||
+                (java.nio.file.Files.exists(path, java.nio.file.LinkOption.NOFOLLOW_LINKS) &&
+                 java.nio.file.Files.readAttributes(path, java.nio.file.attribute.BasicFileAttributes, java.nio.file.LinkOption.NOFOLLOW_LINKS).isOther()))
+                throw new GradleException("Refusing linked Mixer defaults path: ${path}")
+        }
+        if (java.nio.file.Files.exists(target, java.nio.file.LinkOption.NOFOLLOW_LINKS) &&
+            !java.nio.file.Files.isRegularFile(target, java.nio.file.LinkOption.NOFOLLOW_LINKS))
+            throw new GradleException("Mixer defaults must be a regular file: ${target}")
+        logger.lifecycle(java.nio.file.Files.deleteIfExists(target) ?
+            'Invalidated generated development Mixer defaults.' : 'Development Mixer defaults absent; nothing to invalidate.')
+    }
+}
+tasks.named('build').configure { dependsOn invalidateDevMixerDefaults }
+
+def prepareManualWorld = tasks.register('prepareManualTestWorld') {
+    notCompatibleWithConfigurationCache('Disposable world reset uses filesystem locks and a live development server.')
+    group = 'MobVats development'
+    description = 'Reset only a generator-owned world and configure a headless creative superflat server.'
+    doLast {
+        if (manualWorld.parent != manualSaves) throw new GradleException('World path escaped run/saves.')
+        // Refuse symlinks/junctions in the target ancestry or tree before any recursive removal.
+        for (def path = manualWorld; path != null; path = path.parent) {
+            if (java.nio.file.Files.isSymbolicLink(path) || (java.nio.file.Files.exists(path, java.nio.file.LinkOption.NOFOLLOW_LINKS) && java.nio.file.Files.readAttributes(path, java.nio.file.attribute.BasicFileAttributes, java.nio.file.LinkOption.NOFOLLOW_LINKS).isOther()))
+                throw new GradleException("Refusing linked world path: ${path}")
+        }
+        if (java.nio.file.Files.exists(manualWorld)) {
+            if (!java.nio.file.Files.isRegularFile(manualWorld.resolve('.mobvats-generated-world')))
+                throw new GradleException("Refusing to reset an existing world not owned by this generator: ${manualWorld}")
+            def lock = manualWorld.resolve('session.lock')
+            if (java.nio.file.Files.exists(lock)) {
+                try (def channel = java.nio.channels.FileChannel.open(lock, java.nio.file.StandardOpenOption.WRITE)) {
+                    def held = channel.tryLock()
+                    if (held == null) throw new GradleException('Close this test world in Minecraft before regenerating it.')
+                    held.release()
+                }
+            }
+            try (def tree = java.nio.file.Files.walk(manualWorld)) {
+                def paths = new ArrayList(tree.toList())
+                if (paths.any { java.nio.file.Files.isSymbolicLink(it) || java.nio.file.Files.readAttributes(it, java.nio.file.attribute.BasicFileAttributes, java.nio.file.LinkOption.NOFOLLOW_LINKS).isOther() })
+                    throw new GradleException('Refusing to reset a generated world containing links.')
+                paths.sort { a, b -> b.nameCount <=> a.nameCount }.each { java.nio.file.Files.delete(it) }
+            }
+        }
+        java.nio.file.Files.createDirectories(manualWorld)
+        java.nio.file.Files.writeString(manualWorld.resolve('.mobvats-generated-world'), 'Disposable MobVats development world\n')
+        manualServerDir.mkdirs()
+        new File(manualServerDir, 'eula.txt').text = 'eula=true\n'
+        new File(manualServerDir, 'server.properties').text = '''gamemode=creative
+force-gamemode=true
+difficulty=peaceful
+allow-flight=true
+level-type=minecraft:flat
+generate-structures=false
+generator-settings={"biome":"minecraft:plains","layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:dirt","height":2},{"block":"minecraft:grass_block","height":1}],"structure_overrides":[]}
+spawn-protection=0
+online-mode=false
+server-ip=127.0.0.1
+server-port=0
+view-distance=6
+simulation-distance=6
+max-tick-time=120000
+'''
+    }
+}
+tasks.named('runBuildTestWorldServer').configure {
+    notCompatibleWithConfigurationCache('This development run resets and validates a saved world on every invocation.')
+    dependsOn prepareManualWorld
+    doLast {
+        if (!java.nio.file.Files.isRegularFile(manualWorld.resolve('generation-complete.txt')) ||
+            !java.nio.file.Files.isRegularFile(manualWorld.resolve('level.dat')))
+            throw new GradleException('Test world generation failed; see run-world-generator/logs/latest.log.')
+    }
+}
+tasks.register('buildTestWorld') {
+    notCompatibleWithConfigurationCache('Always regenerate the disposable manual world.')
+    group = 'MobVats development'
+    description = 'Generate/reset a manual fixture world in run/saves (default: MobVatsTest). No client is launched.'
+    dependsOn tasks.named('runBuildTestWorldServer')
+    doLast { logger.lifecycle("Generated and verified manual test world: ${manualWorld}") }
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+idea.module.downloadSources = true
+tasks.named('jar').configure {
+    exclude 'net/impactvector/mobvats/gametest/**'
+    exclude 'data/mobvats/structure/empty.nbt'
+}
+
+tasks.register('verifyDevelopmentHooksExcluded') {
+    dependsOn tasks.named('jar')
+    inputs.file(tasks.named('jar', Jar).flatMap { it.archiveFile })
+    doLast {
+        def archive = new java.util.zip.ZipFile(inputs.files.singleFile)
+        try {
+            if (archive.entries().toList().any { it.name.startsWith('net/impactvector/mobvats/gametest/') }) {
+                throw new GradleException('Development subscribers/tests must not be packaged.')
+            }
+            logger.lifecycle('Verified development GameTest/acceptance/client-smoke hooks excluded from JAR.')
+        } finally { archive.close() }
+    }
+}
+tasks.named('check').configure { dependsOn tasks.named('verifyDevelopmentHooksExcluded') }
+
+// Inspect the actual distributable without loading Minecraft's client or requiring Python.
+def packagedRenderJar = tasks.named('jar', Jar).flatMap { it.archiveFile }
+tasks.register('verifyRenderResources') {
+    dependsOn tasks.named('jar')
+    inputs.file(packagedRenderJar)
+    doLast {
+        def archive = new java.util.zip.ZipFile(inputs.files.singleFile)
+        try {
+            def parser = new groovy.json.JsonSlurper()
+            def atlas = parser.parse(archive.getInputStream(archive.getEntry('assets/minecraft/atlases/blocks.json')))
+            def sprites = atlas.sources.collect { it.resource }.toSet()
+            def headStates = parser.parse(archive.getInputStream(archive.getEntry('assets/mobvats/blockstates/vat_head.json')))
+            [north: 0, east: 90, south: 180, west: 270].each { facing, angle ->
+                def variant = headStates.variants["facing=${facing}"]
+                if (variant?.model != 'mobvats:block/vat_head' || (variant.y ?: 0) != angle)
+                    throw new GradleException("Head model facing/rotation mismatch: ${facing}")
+            }
+            ['vat_casing_face', 'vat_casing_edge', 'vat_casing_inner', 'tank_surface', 'tank_rim'].each { texture ->
+                def path = "assets/mobvats/textures/blocks/${texture}.png"
+                def entry = archive.getEntry(path)
+                if (entry == null) throw new GradleException("Missing packaged material: ${path}")
+                def image = javax.imageio.ImageIO.read(archive.getInputStream(entry))
+                if (image == null || image.width != 16 || image.height != 16) throw new GradleException("Material must be 16x16: ${path}")
+            }
+            archive.entries().toList().findAll { it.name.startsWith('assets/mobvats/models/') && it.name.endsWith('.json') }.each { entry ->
+                def model = parser.parse(archive.getInputStream(entry))
+                if (model.parent?.startsWith('mobvats:')) {
+                    def parent = 'assets/mobvats/models/' + model.parent.substring(8) + '.json'
+                    if (archive.getEntry(parent) == null) throw new GradleException("Unresolved model parent ${parent} in ${entry.name}")
+                }
+                model.textures?.values()?.findAll { it.startsWith('mobvats:') }?.each { texture ->
+                    def path = 'assets/mobvats/textures/' + texture.substring(8) + '.png'
+                    if (archive.getEntry(path) == null || !(sprites.contains(texture) || texture.startsWith('mobvats:block/procedural/')))
+                        throw new GradleException("Unresolved texture/atlas sprite ${texture} in ${entry.name}")
+                }
+            }
+            def preserved = [
+                'blocks/tank_surface': '5b3c94ea6f39fd4ca68aec3fa7b6760f4af95aa3b6bac81c9680981d834682c6',
+                'blocks/tank_rim': 'aeb22b5b15f54d1582e0b8031d1b1cdb6256242e2fda17c488ba1afc2feaa45b']
+            preserved.each { texture, expected ->
+                def entry = archive.getEntry('assets/mobvats/textures/' + texture + '.png')
+                if (entry == null) throw new GradleException("Missing preserved texture ${texture}")
+                def hash = java.security.MessageDigest.getInstance('SHA-256').digest(archive.getInputStream(entry).readAllBytes()).encodeHex().toString()
+                if (hash != expected) throw new GradleException("Preserved artwork changed: ${texture}")
+            }
+            logger.lifecycle('Verified packaged casing materials, model/atlas references, and two preserved glass texture hashes.')
+        } finally {
+            archive.close()
+        }
+    }
+}
+tasks.named('check').configure { dependsOn tasks.named('verifyRenderResources') }
+
+def smokeLog = layout.projectDirectory.file('run-client-smoke/logs/latest.log')
+['runClientSmokeTest', 'runClientReloadTest'].each { runName ->
+    tasks.named(runName).configure {
+        doLast {
+            def log = smokeLog.asFile.text
+            if (!log.contains('MOBVATS CLIENT SMOKE PASSED') || log.contains('MOBVATS CLIENT SMOKE FAILED')) {
+                throw new GradleException('Client acceptance failed; see run-client-smoke/logs/latest.log')
+            }
+        }
+    }
+}

@@ -1,0 +1,72 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+def implementationName = providers.gradleProperty('implementation').getOrElse('mobvats')
+if (!(implementationName in ['mobvats', 'xr2'])) throw new GradleException('implementation must be mobvats or xr2')
+def runId = providers.gradleProperty('runId').getOrElse('local')
+if (!(runId ==~ /[a-zA-Z0-9_-]+/)) throw new GradleException('runId must be a simple directory name')
+def runDir = file(".cache/${implementationName}/${runId}")
+def harnessHash = {
+    def digest = java.security.MessageDigest.getInstance('SHA-256')
+    ([file('build.gradle')] + fileTree('src').files.toList()).sort { it.path }.each {
+        digest.update(project.relativePath(it).getBytes('UTF-8')); digest.update(it.bytes)
+    }
+    digest.digest().encodeHex().toString()
+}
+repositories { maven { url = 'https://www.cursemaven.com'; content { includeGroup 'curse.maven' } } }
+dependencies {
+    implementation 'curse.maven:zerocore-247921:6648746'
+    if (implementationName == 'xr2') runtimeOnly 'curse.maven:extreme-reactors-250277:7293725'
+    else runtimeOnly files('../build/libs/mobvats-0.1.0.jar')
+}
+neoForge {
+    version = '21.1.252'
+    runs {
+        benchmark {
+            server()
+            gameDirectory = runDir
+            programArguments.addAll '--nogui', '--world', 'benchmark'
+            jvmArguments.addAll '-Xms2G', '-Xmx2G'
+            ['machine':'mixer_min', 'count':'1', 'repetitions':'5', 'warmup':'200', 'measure':'200',
+             'phase':'suite', 'profile':'true', 'probes':'true'].each { key, fallback ->
+                systemProperty "benchmark.${key}", providers.gradleProperty(key).getOrElse(fallback)
+            }
+            systemProperty 'benchmark.implementation', implementationName
+            systemProperty 'benchmark.harnessSha256', harnessHash()
+            systemProperty 'benchmark.mobvatsCommit', providers.exec { commandLine 'git', '-C', '..', 'rev-parse', 'HEAD' }.standardOutput.asText.get().trim()
+            systemProperty 'benchmark.results', new File(runDir, 'results.jsonl').absolutePath
+        }
+    }
+    mods { lifecycle_benchmark { sourceSet sourceSets.main } }
+}
+tasks.register('prepareBenchmark') {
+    doLast {
+        if (implementationName == 'mobvats' && !file('../build/libs/mobvats-0.1.0.jar').isFile())
+            throw new GradleException('Build MobVats first using ../gradlew.bat build')
+        runDir.mkdirs()
+        new File(runDir, 'eula.txt').text = 'eula=true\n'
+        new File(runDir, 'server.properties').text = '''gamemode=creative
+force-gamemode=true
+difficulty=peaceful
+level-type=minecraft:flat
+generate-structures=false
+generator-settings={"biome":"minecraft:plains","layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:dirt","height":2},{"block":"minecraft:grass_block","height":1}],"structure_overrides":[]}
+spawn-protection=0
+online-mode=false
+server-ip=127.0.0.1
+server-port=0
+view-distance=6
+simulation-distance=6
+max-tick-time=120000
+'''
+    }
+}
+tasks.named('runBenchmark').configure {
+    dependsOn 'prepareBenchmark'
+    doLast {
+        if (!new File(runDir, 'complete.txt').isFile() || new File(runDir, 'failed.txt').isFile())
+            throw new GradleException("Benchmark did not complete: ${runDir}/logs/latest.log")
+    }
+}

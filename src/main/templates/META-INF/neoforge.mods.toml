@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+description='''Deterministic mob simulation in specimen vats.'''
+[[dependencies.mobvats]]
+modId="neoforge"
+type="required"
+versionRange="[${neo_version},)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.mobvats]]
+modId="minecraft"
+type="required"
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="BOTH"
+[[dependencies.mobvats]]
+modId="zerocore"
+type="required"
+versionRange="[1.21.1-2.4.18,1.21.1-2.5.0)"
+ordering="AFTER"
+side="BOTH"

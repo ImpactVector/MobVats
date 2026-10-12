@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "mobvats:block/mixer_casing"
+    }
+  }
+}

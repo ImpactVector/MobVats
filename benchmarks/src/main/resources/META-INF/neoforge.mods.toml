@@ -1,0 +1,15 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="All Rights Reserved"
+[[mods]]
+modId="lifecycle_benchmark"
+version="1.0.0"
+displayName="Development lifecycle benchmark"
+[[mixins]]
+config="benchmark.mixins.json"
+[[dependencies.lifecycle_benchmark]]
+modId="zerocore"
+type="required"
+versionRange="[1.21.1-2.4.18]"
+ordering="AFTER"
+side="SERVER"
