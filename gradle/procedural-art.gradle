@@ -30,57 +30,6 @@ class MobPixelCanvas {
             if (twice <= dx) { error += dx; y0 += sy }
         }
     }
-    void bevel(int x0, int y0, int x1, int y1, boolean raised = true) {
-        line(x0,y0,x1,y0, raised ? 'light' : 'deep')
-        line(x0,y0,x0,y1, raised ? 'light' : 'deep')
-        line(x0,y1,x1,y1, raised ? 'deep' : 'light')
-        line(x1,y0,x1,y1, raised ? 'deep' : 'light')
-    }
-    void rivet(int x, int y) { put(x,y,'deep'); put(x,y-1,'highlight') }
-    void slot(int x0, int y0, int x1, int y1) {
-        panel(x0,y0,x1,y1,'deep'); line(x0,y1+1,x1,y1+1,'light')
-    }
-    void indicator(int x, int y, int rgba) { put(x,y,rgba) }
-    void recessedBorder(int x0, int y0, int x1, int y1) {
-        def recess=[material:'base',toward:'shadow',eighths:3]
-        line(x0,y0,x1,y0,recess); line(x0,y1,x1,y1,recess)
-        line(x0,y0,x0,y1,recess); line(x1,y0,x1,y1,recess)
-    }
-    void fastener(int x, int y) { put(x,y,'shadow') }
-    void materialVariation() {
-        // Quiet, authored clusters: one eighth of a brightness-channel step.
-        def soft=[material:'base',toward:'light',eighths:1]
-        [[5,5],[6,5],[7,5],[5,6],[9,9],[10,9],[10,10]].each { p -> put(p[0],p[1],soft) }
-    }
-    // One four-pixel diagonal motif reflected into all corners. Only endpoint
-    // cardinal arms change with direction; the 6..9 center remains unobstructed.
-    void channels(String direction, Object token) {
-        if (!(direction in ['none','inward','outward'])) throw new IllegalArgumentException('Unknown direction')
-        def motif=(1..4).collect { p -> [p,p] }
-        // Each cardinal stroke is two pixels including the shared endpoint.
-        if (direction == 'inward') motif.addAll([[3,4],[4,3]])
-        if (direction == 'outward') motif.addAll([[1,2],[2,1]])
-        [false,true].each { flipX -> [false,true].each { flipY ->
-            motif.each { p -> put(flipX ? 15-p[0] : p[0],flipY ? 15-p[1] : p[1],token) }
-        } }
-    }
-    void weather(long seed) {
-        // Two short, irregular scratches and one worn-edge cluster. Never noise.
-        def random = new Random(seed)
-        def candidates = [[4,6],[8,4],[5,10],[8,9],[3,8],[9,7]]
-        Collections.shuffle(candidates, random)
-        candidates.take(2).each { p ->
-            put(p[0],p[1],'shadow'); put(p[0]+1,p[1],'wear')
-            put(p[0]+2,p[1]-1,[material:'base',toward:'light',eighths:2])
-        }
-        int offset=5+random.nextInt(5), edge=random.nextInt(4)
-        def edgePixels=[[offset,1],[offset+1,1],[offset+2,0]]
-        edgePixels.eachWithIndex { p,i ->
-            int x=p[0],y=p[1]
-            for(int turn=0;turn<edge;turn++) { int nextX=15-y; y=x; x=nextX }
-            put(x,y,i == 1 ? 'wear' : [material:'base',toward:'light',eighths:1])
-        }
-    }
     BufferedImage image(List channels, List palette, int wear) {
         def out = new BufferedImage(16,16,BufferedImage.TYPE_INT_ARGB)
         pixels.eachWithIndex { token, i ->
@@ -95,44 +44,312 @@ class MobPixelCanvas {
     }
 }
 
-/** Independent integer-pixel biological shapes. This renderer accepts no image inputs. */
+/** Small build-only raster vocabulary. Definitions are data, never evaluated code. */
+class MobArtwork {
+    static void fail(File file, String path, String message) {
+        throw new IllegalArgumentException("${file}: ${path}: ${message}")
+    }
+    static Map read(File file) {
+        Map value
+        try { value = new JsonSlurper().parse(file) as Map }
+        catch (Exception ex) { fail(file, '$', 'invalid JSON: '+ex.message) }
+        if (value.schemaVersion != 1) fail(file,'schemaVersion','expected supported version 1')
+        value
+    }
+    static Object lookup(Map palette, String reference, File file, String path) {
+        Object value = palette
+        reference.split('\\.').each { key ->
+            if (value instanceof Map) value = value[key]
+            else if (value instanceof List && key ==~ /\d+/ && key.toInteger() < value.size()) value = value[key.toInteger()]
+            else value = null
+        }
+        if (!(value instanceof String)) fail(file,path,'undefined palette reference '+reference)
+        value
+    }
+    static Object token(Object value, Map palette, Map parameters, File file, String path) {
+        if (value == null) return null
+        if (value instanceof String) {
+            if (!(value in ['highlight','light','base','shadow','deep','wear'])) fail(file,path,'unknown material '+value)
+            return value
+        }
+        if (!(value instanceof Map)) fail(file,path,'expected semantic token or color reference')
+        if (value.containsKey('parameter')) {
+            if (!parameters.containsKey(value.parameter)) fail(file,path,'undefined parameter '+value.parameter)
+            return token(parameters[value.parameter],palette,[:],file,path)
+        }
+        if (value.containsKey('material')) {
+            try { MobProceduralArt.materialMix(value, ['highlight','light','base','shadow','deep'], ['#000000']*5) }
+            catch (Exception ex) { fail(file,path,ex.message) }
+            return value
+        }
+        def color = value.containsKey('colorRef') ? lookup(palette,value.colorRef,file,path+'.colorRef') : value.rgba
+        if (!(color instanceof String) || !(color ==~ /#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?/)) fail(file,path,'invalid RGB/ARGB color '+color)
+        (int)(Long.parseLong(color.substring(1),16) | (color.length()==7 ? 0xff000000L : 0L))
+    }
+    static List coordinates(Object value, int length, File file, String path, boolean signed=false) {
+        if (!(value instanceof List) || value.size()!=length || value.any { !(it instanceof Integer) || (!signed && (it<0 || it>15)) })
+            fail(file,path,"expected ${length} integer texture-pixel coordinates"+(signed?'':' within 0..15'))
+        value
+    }
+    static void requireField(Map layer, String key, File file, String path) {
+        if (!layer.containsKey(key)) fail(file,path+'.'+key,'missing required field')
+    }
+    static void validateGrid(Map l, Map palette, Map parameters, File file, String path, boolean scatter=false) {
+        ['pixels','palette'].each { requireField(l,it,file,path) }
+        if (!(l.pixels instanceof List) || l.pixels.empty || !(l.palette instanceof Map)) fail(file,path,'expected nonempty pixels and symbol palette')
+        int width=scatter ? l.pixels[0].size() : (l.width instanceof Integer ? l.width : -1)
+        int height=scatter ? l.pixels.size() : (l.height instanceof Integer ? l.height : -1)
+        if(width<=0 || height<=0 || width>16 || height>16)fail(file,path,'width/height must be positive and at most 16 texture pixels')
+        if(l.pixels.size()!=height)fail(file,path+'.pixels','expected '+height+' rows')
+        l.pixels.eachWithIndex { row,y ->
+            if(!(row instanceof String) || row.length()!=width)fail(file,path+".pixels[${y}]","expected ${width} characters, found ${row instanceof String ? row.length() : 'non-string'}")
+            row.eachWithIndex { symbol,x ->
+                if(!l.palette.containsKey(symbol))fail(file,path+".pixels[${y}][${x}]",'undefined palette symbol '+symbol)
+            }
+        }
+        l.palette.each { symbol, v ->
+            if(symbol.size()!=1)fail(file,path+'.palette.'+symbol,'symbol must be one character')
+            token(v,palette,parameters,file,path+'.palette.'+symbol)
+        }
+        if(!scatter) {
+            def at=coordinates(l.at,2,file,path+'.at')
+            if(at[0]+width>16 || at[1]+height>16)fail(file,path+'.at','sprite extends outside texture')
+        }
+    }
+    static void validateLayer(Map l, Map definitions, Map palette, Map parameters, File file, String path, List stack=[]) {
+        requireField(l,'primitive',file,path)
+        switch(l.primitive) {
+            case 'panel':
+                def b=coordinates(l.bounds,4,file,path+'.bounds')
+                if(b[0]>b[2] || b[1]>b[3])fail(file,path+'.bounds','reversed/negative dimensions')
+                requireField(l,'token',file,path);token(l.token,palette,parameters,file,path+'.token');break
+            case 'line':
+                coordinates(l.from,2,file,path+'.from');coordinates(l.to,2,file,path+'.to')
+                requireField(l,'token',file,path);token(l.token,palette,parameters,file,path+'.token');break
+            case 'points':
+                requireField(l,'points',file,path);requireField(l,'token',file,path)
+                if(!(l.points instanceof List))fail(file,path+'.points','expected point array')
+                l.points.eachWithIndex { p,i -> coordinates(p,2,file,path+".points[${i}]") }
+                if(l.containsKey('reflectCorners') && !(l.reflectCorners instanceof Boolean))fail(file,path+'.reflectCorners','expected boolean')
+                token(l.token,palette,parameters,file,path+'.token');break
+            case 'pixel_grid':validateGrid(l,palette,parameters,file,path);break
+            case 'scatter_grid':
+                validateGrid(l,palette,parameters,file,path,true)
+                coordinates(l.gridMin,2,file,path+'.gridMin',true);coordinates(l.gridMax,2,file,path+'.gridMax',true)
+                ['spacing','jitter'].each { key ->
+                    coordinates(l[key],2,file,path+'.'+key)
+                    if(l[key].any { it<=0 })fail(file,path+'.'+key,'expected positive dimensions')
+                }
+                if((0..1).any { l.gridMin[it]>l.gridMax[it] })fail(file,path,'reversed scatter bounds')
+                validateSeed(l.seed,file,path+'.seed');break
+            case 'reference':
+                requireField(l,'recipe',file,path)
+                def target=definitions.patterns[l.recipe] ?: definitions.textures[l.recipe]
+                if(!target)fail(file,path+'.recipe','invalid layer reference '+l.recipe)
+                if(stack.contains(l.recipe))fail(file,path+'.recipe','cyclic recipe reference '+(stack+[l.recipe]).join(' -> '))
+                def args=(target.defaults ?: [:])+parameters+(l.parameters ?: [:])
+                def layers=target.containsKey('layers') ? target.layers : [target]
+                layers.eachWithIndex { nested,i -> validateLayer(nested,definitions,palette,args,file,'references.'+l.recipe+".layers[${i}]",stack+[l.recipe]) };break
+            case 'weather':
+                validateSeed(l.seed,file,path+'.seed')
+                if(!definitions.weathering.containsKey(l.profile))fail(file,path+'.profile','unknown weathering profile '+l.profile)
+                break
+            case 'overlay':
+                if(l.authorship!='hand-authored' || !(l.mode in ['fixed','material']))fail(file,path,'overlay requires hand-authored provenance and fixed/material mode')
+                requireField(l,'source',file,path);break
+            default:fail(file,path+'.primitive','unknown primitive '+l.primitive)
+        }
+    }
+    static void validateSeed(Object seed, File file, String path) {
+        if(!(seed instanceof Integer || seed instanceof Long) || seed<0)fail(file,path,'expected nonnegative integer seed')
+    }
+    static Map definitions(File root, Map palette) {
+        def file=new File(root,'drawing.json'), d=read(file)
+        if(d.authorship!='AUTHORED_PROCEDURAL')fail(file,'authorship','expected explicit authored provenance')
+        ['patterns','textures','weathering'].each { key -> if(!(d[key] instanceof Map))fail(file,key,'expected object') }
+        d.weathering.each { name,w ->
+            def path='weathering.'+name
+            ['scratchCount','edgeOffsetMin','edgeOffsetCount','edgeTurns'].each { key ->
+                if(!(w[key] instanceof Integer) || w[key]<0)fail(file,path+'.'+key,'expected nonnegative integer')
+            }
+            if(w.edgeOffsetCount<1 || w.edgeTurns<1 || w.edgeTurns>4)fail(file,path,'invalid random bounds')
+            if(!(w.candidates instanceof List) || w.scratchCount>w.candidates.size())fail(file,path+'.candidates','insufficient scratch candidates')
+            w.candidates.eachWithIndex { p,i -> coordinates(p,2,file,path+".candidates[${i}]") }
+            ['scratch','edge'].each { key ->
+                if(!(w[key] instanceof List))fail(file,path+'.'+key,'expected pixel offsets')
+                w[key].eachWithIndex { p,i ->
+                    coordinates(p.at,2,file,path+".${key}[${i}].at",true);token(p.token,palette,[:],file,path+".${key}[${i}].token")
+                    def origins=key=='scratch' ? w.candidates : [[w.edgeOffsetMin,0],[w.edgeOffsetMin+w.edgeOffsetCount-1,0]]
+                    if(origins.any { o -> (0..1).any { axis -> o[axis]+p.at[axis]<0 || o[axis]+p.at[axis]>15 } })fail(file,path+".${key}[${i}].at",'weathering extends outside texture')
+                }
+            }
+        }
+        if(JsonOutput.toJson(d).contains('\"primitive\":\"overlay\"'))fail(file,'$','overlays belong in recipes.json with explicit hand-authored provenance')
+        d.patterns.each { id,l ->
+            def layers=l.containsKey('layers') ? l.layers : [l]
+            layers.eachWithIndex { layer,i -> validateLayer(layer,d,palette,l.defaults ?: [:],file,"patterns.${id}.layers[${i}]",[id]) }
+        }
+        d.textures.each { id,r ->
+            if(!(id ==~ /[a-z][a-z0-9_]*/))fail(file,'textures.'+id,'invalid output texture id')
+            if(!(r.layers instanceof List))fail(file,'textures.'+id+'.layers','missing layer array')
+            r.layers.eachWithIndex { l,i -> validateLayer(l,d,palette,[:],file,"textures.${id}.layers[${i}]",[id]) }
+        }
+        d
+    }
+    static void render(MobPixelCanvas c, Map l, Map d, Map palette, Map parameters) {
+        def value={ v -> token(v,palette,parameters,new File('validated artwork'),'token') }
+        switch(l.primitive) {
+            case 'panel':c.panel(*l.bounds,value(l.token));break
+            case 'line':c.line(*l.from,*l.to,value(l.token));break
+            case 'points':
+                l.points.each { p ->
+                    c.put(*p,value(l.token))
+                    if(l.reflectCorners) { c.put(15-p[0],p[1],value(l.token));c.put(p[0],15-p[1],value(l.token));c.put(15-p[0],15-p[1],value(l.token)) }
+                };break
+            case 'pixel_grid':
+                l.pixels.eachWithIndex { row,y -> row.eachWithIndex { symbol,x ->
+                    def v=value(l.palette[symbol]);if(v!=null)c.put(l.at[0]+x,l.at[1]+y,v)
+                } };break
+            case 'scatter_grid':
+                def random=new Random(l.seed as long)
+                for(int gy=l.gridMin[1];gy<=l.gridMax[1];gy++)for(int gx=l.gridMin[0];gx<=l.gridMax[0];gx++) {
+                    int ox=gx*l.spacing[0]+random.nextInt(l.jitter[0]),oy=gy*l.spacing[1]+random.nextInt(l.jitter[1])
+                    l.pixels.eachWithIndex { row,y -> row.eachWithIndex { symbol,x ->
+                        def v=value(l.palette[symbol]);if(v!=null)c.put(Math.floorMod(ox+x,16),Math.floorMod(oy+y,16),v)
+                    } }
+                };break
+            case 'reference':
+                def r=d.patterns[l.recipe] ?: d.textures[l.recipe]
+                (r.containsKey('layers') ? r.layers : [r]).each { render(c,it,d,palette,(r.defaults ?: [:])+parameters+(l.parameters ?: [:])) };break
+            case 'weather':
+                def w=d.weathering[l.profile], random=new Random(l.seed as long), candidates=w.candidates.collect { it.toList() }
+                Collections.shuffle(candidates,random)
+                candidates.take(w.scratchCount).each { origin -> w.scratch.each { p -> c.put(origin[0]+p.at[0],origin[1]+p.at[1],value(p.token)) } }
+                int offset=w.edgeOffsetMin+random.nextInt(w.edgeOffsetCount),edge=random.nextInt(w.edgeTurns)
+                w.edge.each { p ->
+                    int x=offset+p.at[0],y=p.at[1]
+                    for(int turn=0;turn<edge;turn++) { int nx=15-y;y=x;x=nx }
+                    c.put(x,y,value(p.token))
+                };break
+            case 'overlay':
+                def image=MobProceduralArt.overlay(parameters.root as File,l)
+                if(image==null || image.width!=16 || image.height!=16)throw new IllegalArgumentException('Overlay must be 16x16')
+                for(int y=0;y<16;y++)for(int x=0;x<16;x++) {
+                    int rgba=image.getRGB(x,y);if((rgba>>>24)==0)continue
+                    def v=l.mode=='fixed' ? rgba : l.channelMap[String.format('#%08X',rgba)]
+                    if(v==null)throw new IllegalArgumentException('Unmapped semantic overlay pixel')
+                    c.put(x,y,v)
+                };break
+        }
+    }
+    static MobPixelCanvas draw(Map recipe, Map definitions, Map palette, File file, String path, Map parameters=[:]) {
+        if(!(recipe.layers instanceof List))fail(file,path+'.layers','missing required layer array')
+        recipe.layers.eachWithIndex { l,i -> validateLayer(l,definitions,palette,parameters,file,path+".layers[${i}]") }
+        def c=new MobPixelCanvas()
+        recipe.layers.each { render(c,it,definitions,palette,parameters) }
+        c
+    }
+}
+
+
+/** Isolated definition edits exercise the production raster paths without editing source artwork. */
+class MobArtworkTests {
+    static void run(File root, File dir, List assets, File normal) {
+        def fixture=new File(dir,'editable-definitions');fixture.mkdirs()
+        def files=['palettes.json','drawing.json','recipes.json','biological.json']
+        def reset={ files.each { new File(fixture,it).bytes=new File(root,it).bytes } }
+        def edit={ String name, Closure mutation ->
+            def value=new JsonSlurper().parse(new File(fixture,name));mutation(value)
+            MobProceduralArt.json(new File(fixture,name),value)
+        }
+        def pngs={ String name ->
+            def output=new File(dir,'edits/'+name)
+            def palette=MobArtwork.read(new File(fixture,'palettes.json'))
+            def definitions=MobArtwork.definitions(fixture,palette)
+            palette.artwork=definitions
+            def recipes=MobArtwork.read(new File(fixture,'recipes.json'))
+            def biological=MobArtwork.read(new File(fixture,'biological.json'))
+            assets.each { asset ->
+                MobPixelCanvas canvas
+                if(asset.finish=='fixed_biological')canvas=MobBiologicalArt.draw(biological,biological.assets.find { it.id==asset.recipeId })
+                else if(definitions.textures.containsKey(asset.recipeId))canvas=MobArtwork.draw(definitions.textures[asset.recipeId],definitions,palette,new File(fixture,'drawing.json'),'textures.'+asset.recipeId,[root:fixture])
+                else canvas=MobProceduralArt.draw(fixture,recipes.recipes.find { it.id==asset.recipeId },palette,asset.seed as Long,asset.resource,asset.direction)
+                def colors=asset.finish=='fixed_biological' ? [] : asset.finish=='master' ? palette.grayscale : palette.tiers[asset.finish].metal
+                int wear=asset.finish=='fixed_biological' ? 0 : MobProceduralArt.color(asset.finish=='master' ? palette.grayscale[1] : palette.tiers[asset.finish].wear)
+                MobProceduralArt.png(new File(output,asset.path),canvas.image(palette.channels,colors,wear))
+            }
+            output
+        }
+        def changed={ File output -> assets.findAll { MobProceduralArt.hash(new File(normal,it.path))!=MobProceduralArt.hash(new File(output,it.path)) }*.path.toSet() }
+        reset()
+        assert changed(pngs('unchanged')).empty : 'Fixture renderer differs from production'
+        edit('drawing.json') { d ->
+            def row=d.patterns.controller_skull.pixels[2]
+            assert row[5]=='#'
+            d.patterns.controller_skull.pixels[2]=row.substring(0,5)+'.'+row.substring(6)
+        }
+        def skull=pngs('skull')
+        assert changed(skull)==assets.findAll { it.recipeId=='greenscreen_skull' }*.path.toSet()
+        assets.findAll { it.recipeId=='greenscreen_skull' }.each { a ->
+            def before=ImageIO.read(new File(normal,a.path)),after=ImageIO.read(new File(skull,a.path))
+            assert after.getRGB(5,2)==MobProceduralArt.color('#071C12')
+            assert (0..<256).findAll { before.getRGB(it%16,(int)(it/16))!=after.getRGB(it%16,(int)(it/16)) }==[37]
+        }
+        reset();edit('palettes.json') { p -> p.tiers.t1.metal[2]='#010203' }
+        def tier=pngs('tier'),tierChanged=changed(tier)
+        assert !tierChanged.empty && tierChanged.every { it.contains('/t1/') }
+        assert ImageIO.read(new File(tier,'assets/mobvats/textures/block/procedural/t1/casing_clean.png')).getRGB(8,8)==MobProceduralArt.color('#010203')
+        reset();edit('palettes.json') { p -> p.fixed.fluid='#102030' }
+        def functional=pngs('functional')
+        int azure=MobProceduralArt.color('#168BFA'),replacement=MobProceduralArt.color('#102030')
+        def colored=assets.findAll { a ->
+            def image=ImageIO.read(new File(normal,a.path))
+            (0..<256).any { image.getRGB(it%16,(int)(it/16))==azure }
+        }
+        assert changed(functional)==colored*.path.toSet()
+        colored.each { a ->
+            def before=ImageIO.read(new File(normal,a.path)),after=ImageIO.read(new File(functional,a.path))
+            (0..<256).each { i -> int x=i%16,y=(int)(i/16);assert after.getRGB(x,y)==(before.getRGB(x,y)==azure ? replacement : before.getRGB(x,y)) }
+        }
+        reset();edit('recipes.json') { r -> r.recipes.find { it.id=='casing' }.layers[1].token.eighths=4 }
+        def border=pngs('border')
+        assert changed(border)==assets.findAll { it.recipeId=='casing' }*.path.toSet()
+        assert ImageIO.read(new File(normal,'assets/mobvats/textures/block/procedural/t1/casing_clean.png')).getRGB(5,1)!=ImageIO.read(new File(border,'assets/mobvats/textures/block/procedural/t1/casing_clean.png')).getRGB(5,1)
+        // Extending the vocabulary of artwork requires only a new definition/reference.
+        reset();edit('drawing.json') { d -> d.textures.extra_icon=[layers:[[primitive:'reference',recipe:'controller_rotor']]] }
+        def palette=MobArtwork.read(new File(fixture,'palettes.json')),definitions=MobArtwork.definitions(fixture,palette)
+        assert MobArtwork.draw(definitions.textures.extra_icon,definitions,palette,new File(fixture,'drawing.json'),'textures.extra_icon').get(7,2)==MobProceduralArt.color(palette.fixed.phosphor_green)
+        def reject={ String expected, Closure mutation ->
+            reset();edit('drawing.json',mutation)
+            try { MobArtwork.definitions(fixture,MobArtwork.read(new File(fixture,'palettes.json')));assert false : 'Accepted invalid artwork '+expected }
+            catch(IllegalArgumentException ex) { assert ex.message.contains('drawing.json') && ex.message.contains(expected) : ex.message }
+        }
+        reject('schemaVersion') { it.schemaVersion=2 }
+        reject('unknown primitive') { it.textures.buffer_glass.layers[0].primitive='mystery' }
+        reject('missing required field') { it.textures.buffer_glass.layers[0].remove('palette') }
+        reject('invalid RGB/ARGB') { it.textures.buffer_glass.layers[0].palette.A=[rgba:'#xyz'] }
+        reject('pixels[4]') { it.patterns.controller_skull.pixels[4]='short' }
+        reject('undefined palette symbol') { it.patterns.controller_skull.pixels[0]='?'*16 }
+        reject('width/height') { it.patterns.controller_skull.width=-1 }
+        reject('sprite extends outside texture') { it.patterns.controller_skull.at=[1,0] }
+        reject('invalid layer reference') { it.textures.buffer_glass.layers=[[primitive:'reference',recipe:'missing']] }
+        reject('cyclic recipe reference') { it.patterns.loop=[primitive:'reference',recipe:'loop'] }
+        reset()
+    }
+}
+
+
+/** Fixed biological palettes rendered with the same generic integer primitives. */
 class MobBiologicalArt {
     static MobPixelCanvas draw(Map spec, Map asset) {
-        def c=new MobPixelCanvas()
-        def stamp={ String shape,String palette,int ox,int oy ->
-            spec.primitives[shape].eachWithIndex { row,y -> row.eachWithIndex { digit,x ->
-                if(digit != '.')c.put(ox+x,oy+y,MobProceduralArt.color(spec.palettes[palette][Integer.parseInt(digit)]))
-            } }
-        }
-        if(asset.tissue) {
-            c.panel(0,0,15,15,MobProceduralArt.color(spec.palettes.tissue[1]))
-            def random=new Random(asset.seed as long)
-            // Authored lobes, toroidally tiled with seeded palette/placement variation.
-            for(int gy=-1;gy<4;gy++)for(int gx=-1;gx<4;gx++) {
-                int ox=gx*5+random.nextInt(2),oy=gy*5+random.nextInt(2)
-                spec.primitives.tissue_cluster.eachWithIndex { row,y -> row.eachWithIndex { digit,x ->
-                    if(digit!='.') {
-                        int px=Math.floorMod(ox+x,16),py=Math.floorMod(oy+y,16)
-                        c.put(px,py,MobProceduralArt.color(spec.palettes.tissue[Integer.parseInt(digit)]))
-                    }
-                } }
-            }
-            [[3,4],[11,10],[6,14]].each { p -> c.put(p[0],p[1],MobProceduralArt.color(spec.palettes.tissue[5])) }
-        }
-        asset.layers.each { l -> stamp(l.shape,l.palette,l.at[0] as int,l.at[1] as int) }
-        asset.lines?.each { l -> c.line(l.from[0] as int,l.from[1] as int,l.to[0] as int,l.to[1] as int,MobProceduralArt.color(spec.palettes[l.palette][l.index])) }
-        if(asset.id=='item_essence') {
-            c.line(5,8,5,10,MobProceduralArt.color(spec.palettes.glass[3]))
-            c.put(10,7,MobProceduralArt.color(spec.palettes.glass[3]))
-        }
-        c
+        MobArtwork.draw(asset,[patterns:[:],textures:[:],weathering:[:]],spec.palettes,
+            new File('tools/procedural-art/biological.json'),'assets.'+asset.id)
     }
     static void generate(File root,File output,List assets,Set names) {
         def file=new File(root,'biological.json')
         if(!file.isFile())return // Small collision fixtures have no biological recipes.
-        def spec=new JsonSlurper().parse(file)
+        def spec=MobArtwork.read(file)
         assert spec.authorship=='AUTHORED_PROCEDURAL'
-        assert spec.primitives.values().every { rows -> rows.every { it ==~ /[.0-9]+/ } }
         spec.assets.each { a ->
             assert a.path ==~ /(?:blocks|items)\/[a-z][a-z0-9_]*/
             assert a.seed instanceof Integer && a.seed>=0
@@ -188,7 +405,7 @@ class MobBiologicalArt {
 }
 
 class MobProceduralArt {
-    static final String VERSION = '1.13.0'
+    static final String VERSION = '1.14.0'
     static final List FACES = ['down','up','north','south','west','east']
     static Map cuboid(List from, List to, String material) {
         [from:from,to:to,faces:FACES.collectEntries { [(it):[uv:[0,0,16,16],texture:'#'+material]] }]
@@ -241,13 +458,7 @@ class MobProceduralArt {
         [render_type:cladding=='glass'?'minecraft:translucent':'minecraft:cutout',ambientocclusion:false,textures:[particle:base+"conduit_node_${resource}",
             node:base+"conduit_node_${resource}",pipe:base+"conduit_pipe_${resource}",frame:base+"${family}_frame",trim:base+"${family}_trim",accent:base+"${family}_accent"],elements:elements]
     }
-    static void conduitAssets(File root, File output, Map palettes, List assets, Set names, Set productionPaths) {
-        def geometry=new JsonSlurper().parse(new File(root,'geometry.json'))
-        def repository=root.parentFile.parentFile
-        def physical=new File(repository,'src/main/java/net/impactvector/mobvats/gamecontent/multiblock/conduit/ConduitGeometry.java').text
-        def diameter=(physical =~ /DIAMETER=(\d+(?:\.\d+)?)\/16/)
-        assert diameter.find() && geometry.nodeWidth == Double.parseDouble(diameter.group(1)) : 'Preview must use the physical pipe diameter'
-        assert geometry.cornerLength == 4 && geometry.railWidth == 1 && geometry.tapEndpointRatio == 0.5
+    static void conduitAssets(File root, File output, Map palettes, List assets, Set names, Set productionPaths, Map geometry) {
         json(new File(output,'assets/mobvats/conduit_preview.json'),geometry)
         productionPaths.add('assets/mobvats/conduit_preview.json')
         def model={ String id, Map value ->
@@ -258,56 +469,28 @@ class MobProceduralArt {
         ['master','t1','t2','t3'].each { finish ->
             def palette=finish=='master' ? palettes.grayscale : palettes.tiers[finish].metal
             int wear=color(finish=='master' ? palettes.grayscale[1] : palettes.tiers[finish].wear)
-            def texture={ String id, MobPixelCanvas canvas ->
+            def texture={ String id ->
+                def definition=palettes.artwork.textures[id]
+                if(!definition)MobArtwork.fail(new File(root,'drawing.json'),'textures.'+id,'undefined texture recipe')
+                def canvas=MobArtwork.draw(definition,palettes.artwork,palettes,new File(root,'drawing.json'),'textures.'+id,[root:root])
                 String path="assets/mobvats/textures/block/procedural/${finish}/${id}.png"
                 assert names.add(path)
                 def file=new File(output,path); png(file,canvas.image(palettes.channels,palette,wear))
-                assets << [path:path,recipe:'tools/procedural-art/geometry.json',recipeId:id,paletteSource:'tools/procedural-art/palettes.json',finish:finish,seed:null,resource:null,direction:null,handAuthoredOverlay:false,overlays:[],sha256:hash(file)]
+                assets << [path:path,recipe:'tools/procedural-art/drawing.json',recipeId:id,paletteSource:'tools/procedural-art/palettes.json',finish:finish,seed:definition.layers.find { it.primitive=='weather' }?.seed,resource:definition.resource,direction:definition.direction,provenance:'AUTHORED_PROCEDURAL',definitionSha256:hash(new File(root,'drawing.json')),handAuthoredOverlay:false,overlays:[],sha256:hash(file)]
             };
-            ['item','fluid'].each { resource ->
-                ['node','pipe'].each { part ->
-                    def c=new MobPixelCanvas(); c.panel(0,0,15,15,'base');c.bevel(0,0,15,15)
-                    c.panel(part=='node'?6:7,0,part=='node'?9:8,15,color(palettes.fixed[resource]))
-                    texture("conduit_${part}_${resource}",c)
-                }
-            };
+            palettes.artwork.textures.keySet().each { texture(it) }
             ['vat','mixer'].each { family ->
-                ['frame','trim','accent','surface','glass'].each { part ->
-                    def c=new MobPixelCanvas()
-                    int pane=(geometry.glassAlpha<<24) | (color(geometry.glassColor)&0xffffff)
-                    int edge=(geometry.glassEdgeAlpha<<24) | (color(geometry.glassColor)&0xffffff)
-                    if(part in ['surface','glass']) {
-                        c.panel(0,0,15,15,pane)
-                        if(part=='glass') {c.line(0,0,15,0,edge);c.line(0,15,15,15,edge);c.line(0,0,0,15,edge);c.line(15,0,15,15,edge)}
-                    } else if(part=='accent')c.panel(0,0,15,15,edge)
-                    else {c.panel(0,0,15,15,part=='trim'?'shadow':'base');c.bevel(0,0,15,15);}
-                    if(part=='glass') {
-                        c.line(0,0,15,0,'base'); c.line(0,15,15,15,'base');c.line(0,0,0,15,'base');c.line(15,0,15,15,'base');
-                        [0,15].each { x -> [0,15].each { y ->
-                            c.line(x,y,x==0?3:12,y,'light');c.line(x,y,x,y==0?3:12,'light')
-                        } }
-                    }
-                    if(family=='mixer' && part in ['frame','trim','glass']) {
-                        c.line(2,2,13,2,'deep');c.line(2,13,13,13,'deep');c.fastener(3,3);c.fastener(12,12)
-                    } else if(part=='frame') {c.recessedBorder(1,1,14,14);c.fastener(3,3);c.fastener(12,12)}
-                    texture("${family}_${part}",c)
-                }
                 def base="mobvats:block/procedural/${finish}/"
                 model("procedural/${finish}/${family}_glass",[parent:'minecraft:block/cube_all',render_type:'minecraft:translucent',textures:[all:base+"${family}_glass",particle:base+"${family}_trim"]])
                 if(finish=='t1') {
                     model("${family}_glass",[parent:"mobvats:block/procedural/${finish}/${family}_glass"])
                     model(family=='vat'?'formed_glass_material':'mixer_formed_glass_material',[parent:'minecraft:block/cube_all',render_type:'minecraft:translucent',textures:[all:base+"${family}_surface",particle:base+"${family}_trim"]])
                 }
-            };
-            def bufferPane=new MobPixelCanvas();bufferPane.panel(0,0,15,15,(geometry.bufferGlassAlpha<<24)|(color(geometry.glassColor)&0xffffff))
-            texture('buffer_glass',bufferPane)
-            def bufferMetal=new MobPixelCanvas();bufferMetal.panel(0,0,15,15,'base');bufferMetal.recessedBorder(1,1,14,14);
-            [3,12].each { x -> [3,12].each { y -> bufferMetal.fastener(x,y) } }
-            bufferMetal.weather(29L);texture('buffer_metal',bufferMetal)
+            }
             conduitModels(geometry, finish, model,output,productionPaths)
             bufferModels(geometry,finish,model)
             fixtureAssets(root,output,geometry,finish,palettes,assets,names,productionPaths,texture,model)
-            machineryAssets(root,output,finish,palettes,assets,productionPaths,texture,model)
+            machineryAssets(root,output,finish,palettes,assets,productionPaths,texture,model,geometry)
             if(finish=='t1') {
                 ['fluid_buffer'].each { id ->
                     String path="assets/mobvats/models/item/${id}.json"
@@ -412,36 +595,11 @@ class MobProceduralArt {
         }
         facets
     }
-    static MobPixelCanvas fixtureIdentity(Map variant,Map palettes) {
-        def c=new MobPixelCanvas();c.panel(0,0,15,15,'base');c.bevel(0,0,15,15)
-        c.recessedBorder(1,1,14,14)
-        if(variant.kind=='valve') {
-            [5,7,9,11].each { x -> [5,7,9,11].each { y -> c.put(x,y,'deep') } }
-        }
-        int accent=color(palettes.fixed[variant.resource])
-        if(variant.kind=='void') {
-            c=new MobPixelCanvas();c.panel(0,0,15,15,'base')
-            [3,12].each { x -> [3,12].each { y -> c.indicator(x,y,accent) } }
-        }
-        else c.channels(variant.direction,accent)
-        c
-    }
     static void fixtureAssets(File root,File output,Map geometry,String finish,Map palettes,List assets,
             Set names,Set paths,Closure texture,Closure writer) {
         def config=new JsonSlurper().parse(new File(root,'fixtures.json'))
-        int firstAsset=assets.size()
         assert config.bodyWidth==10
-        def metal=new MobPixelCanvas();metal.panel(0,0,15,15,'base');metal.bevel(0,0,15,15)
-        texture('fixture_metal',metal)
-        def auger=new MobPixelCanvas();auger.panel(0,0,15,15,'light');auger.line(0,15,15,15,'shadow')
-        texture('fixture_auger',auger)
-        def grate=new MobPixelCanvas();grate.panel(0,0,15,15,'shadow');grate.recessedBorder(0,0,15,15)
-        texture('fixture_grate',grate)
-        def hot=new MobPixelCanvas();hot.panel(0,0,15,15,color('#A82D16'))
-        hot.panel(2,2,13,13,color('#DF551B'));hot.panel(4,4,11,11,color('#FF942E'))
-        hot.panel(6,6,9,9,color('#FFC65B'));texture('fixture_hot',hot)
         for(def variant : config.variants) {
-            texture('fixture_'+variant.id,fixtureIdentity(variant,palettes))
             def base="mobvats:block/procedural/${finish}/"
             def materials=[particle:base+'fixture_'+variant.id,identity:base+'fixture_'+variant.id,
                 metal:base+'fixture_metal',auger:base+'fixture_auger',grate:base+'fixture_grate',hot:base+'fixture_hot']
@@ -473,16 +631,6 @@ class MobProceduralArt {
                 [[block:v.id,kind:v.kind,core:v.id+'_core',family:'vat',palette:'t1']]
             }])
         }
-        assets.drop(firstAsset).each { a ->
-            a.recipe='tools/procedural-art/fixtures.json'
-            def variant=config.variants.find { 'fixture_'+it.id==a.recipeId }
-            if(variant) {a.resource=variant.resource;a.direction=variant.direction}
-        }
-    }
-    static MobPixelCanvas greenscreen(Map spec,String glyph) {
-        def c=new MobPixelCanvas();c.panel(0,0,15,15,color(spec.background))
-        spec.glyphs[glyph].eachWithIndex { row,y -> row.eachWithIndex { pixel,x -> if(pixel=='#')c.put(x,y,color(spec.phosphor)) } }
-        c
     }
     static List controllerHousing() {
         def body=[cuboid([0,0,3],[16,16,16],'metal'),cuboid([0,0,0],[2,16,3],'metal'),
@@ -566,24 +714,9 @@ class MobProceduralArt {
         [cuboid([6,7.5,4.5],[10,8.5,5.5],'vise_pad')]
     }
     static List toolVise(Map v) {toolViseHousing(v)+toolViseJaws(v)+adjustmentScrew()}
-    static void machineryAssets(File root,File output,String finish,Map palettes,List assets,Set paths,Closure texture,Closure writer) {
-        def spec=new JsonSlurper().parse(new File(root,'machinery.json'));int first=assets.size()
+    static void machineryAssets(File root,File output,String finish,Map palettes,List assets,Set paths,Closure texture,Closure writer,Map geometry) {
+        def spec=new JsonSlurper().parse(new File(root,'machinery.json'))
         mixerMachineryAssets(spec,finish,texture,writer,output,paths)
-        ['metal','recess','bezel','fastener','channels','controls','vise_metal','vise_pad'].each { part ->
-            def c=new MobPixelCanvas();c.panel(0,0,15,15,part in ['recess','vise_pad']?'deep':part in ['bezel','fastener']?'shadow':'base')
-            if(part=='metal') {c.recessedBorder(1,1,14,14);[3,12].each { x -> [3,12].each { y -> c.fastener(x,y) } }}
-            if(part=='channels') {c.channels('none','deep');c.recessedBorder(1,1,14,14)}
-            if(part=='controls') {c.panel(0,0,15,15,'deep');[2,6,10].each { x -> c.panel(x,5,x+2,10,'light') };c.panel(13,3,14,5,color(palettes.fixed.status))}
-            texture('machinery_'+part,c)
-        }
-        ['skull','rotor'].each { glyph -> texture('greenscreen_'+glyph,greenscreen(spec,glyph)) }
-        def inlet=new MobPixelCanvas();inlet.panel(0,0,15,15,'base');inlet.bevel(0,0,15,15)
-        texture('feeder_connection',inlet)
-        def hose=new MobPixelCanvas();hose.panel(0,0,15,15,'shadow')
-        (0..spec.feeder.turns).each { turn -> int x=(int)Math.round(turn*15.0/spec.feeder.turns);hose.line(x,0,x,15,'deep') }
-        texture('feeder_hose',hose)
-        def socket=new MobPixelCanvas();socket.panel(0,0,15,15,'base');socket.bevel(0,0,15,15)
-        socket.panel(5,5,10,10,color('#141414'));texture('feeder_socket',socket)
         def base="mobvats:block/procedural/${finish}/"
         def viseMaterials=[vise_metal:base+'machinery_vise_metal',vise_pad:base+'machinery_vise_pad',particle:base+'machinery_metal']
         writer("procedural/${finish}/tool_vise",[render_type:'minecraft:solid',ambientocclusion:false,textures:viseMaterials,elements:toolVise(spec.vise)])
@@ -609,7 +742,6 @@ class MobProceduralArt {
             if(finish=='t1') {
                 writer(binding.block,[parent:"mobvats:block/procedural/t1/${binding.block}"])
                 if(binding.block in ['feed_port','blender','tool_port']) {
-                    def geometry=new JsonSlurper().parse(new File(root,'geometry.json'))
                     def variants=[:]
                     ['none','vat_t1_casing','vat_t1_glass','mixer_t1_casing','mixer_t1_glass'].each { installed ->
                         def family=installed.startsWith('mixer')?'mixer':'vat'
@@ -625,7 +757,6 @@ class MobProceduralArt {
                 json(new File(output,path),inventoryModel("mobvats:block/${binding.block}",binding.kind in ['feeder','blender','tool']?45:225))
             }
         }
-        assets.drop(first).each { it.recipe='tools/procedural-art/machinery.json' }
     }
     static Map heavyShaft() {
         def shaft=cuboid([5,0,5],[11,16,11],'shaft')
@@ -676,35 +807,6 @@ class MobProceduralArt {
     }
     static void mixerMachineryAssets(Map spec,String finish,Closure texture,Closure writer,File output,Set paths) {
         assert spec.mixer.shaftWidth==6
-        ['shaft','bearing','paddle','housing','creative','combustion','fe'].each { part ->
-            def c=new MobPixelCanvas();c.panel(0,0,15,15,'shadow')
-            if(part=='shaft') {
-                c.panel(3,0,12,15,'base');c.panel(6,0,9,15,'deep')
-                c.line(2,0,2,15,'light');c.line(13,0,13,15,'deep');c.line(11,0,11,15,'light')
-            } else if(part=='paddle') {
-                c.panel(0,0,15,15,'base');c.line(0,2,15,2,'light');c.line(0,13,15,13,'deep')
-            } else {
-                c.panel(0,0,15,15,part=='bearing'?'shadow':'base');c.bevel(0,0,15,15)
-                [2,13].each { x -> [2,13].each { y -> c.rivet(x,y) } }
-                if(part in ['creative','combustion','fe']) {
-                    c.panel(4,3,11,12,'deep')
-                    int indicator=color(spec.mixer.indicators[part])
-                    if(part=='creative') {
-                        c.line(7,4,7,8,indicator);c.line(5,6,5,10,indicator);c.line(10,6,10,10,indicator);c.line(6,11,9,11,indicator)
-                    } else if(part=='combustion') {
-                        c.panel(5,8,10,10,color('#8C3021'));c.line(6,9,9,9,indicator)
-                        [5,7,9].each { x -> c.line(x,4,x,6,'shadow') }
-                    } else {
-                        // Flat, centered square power terminal. The top panel
-                        // uses pixel-aligned UVs so the cyan socket is 6px wide.
-                        c.panel(3,3,12,12,'base');c.panel(4,4,11,11,'shadow')
-                        c.panel(5,5,10,10,indicator);c.panel(6,6,9,9,'deep')
-                    }
-                } else if(part=='bearing') {c.recessedBorder(4,4,11,11);c.panel(6,6,9,9,'deep')}
-                else {c.recessedBorder(1,1,14,14);c.line(4,5,11,5,'shadow')}
-            }
-            texture('mixer_'+part,c)
-        }
         def base="mobvats:block/procedural/${finish}/"
         def materials=['shaft','bearing','paddle','housing','creative','combustion','fe'].collectEntries { [(it):base+'mixer_'+it] }
         materials.particle=materials.housing
@@ -839,70 +941,41 @@ class MobProceduralArt {
     }
     static MobPixelCanvas draw(File root, Map recipe, Map palettes, Long seed = null,
                               String resource = null, String direction = null) {
-        def canvas = new MobPixelCanvas()
-        recipe.layers.each { layer ->
-            ['bounds','from','to','at','insets'].each { key ->
-                if (layer.containsKey(key) && (!(layer[key] instanceof List) || layer[key].any {
-                    !(it instanceof Integer) || it < 0 || it > 15
-                })) throw new IllegalArgumentException('Primitive coordinates must be integers within 0..15')
-            }
-            switch (layer.primitive) {
-                case 'panel':
-                    if (!palettes.channels.contains(layer.channel)) throw new IllegalArgumentException('Unknown material channel')
-                    canvas.panel(*layer.bounds,layer.channel); break
-                case 'fixed_panel': canvas.panel(*layer.bounds,color(palettes.fixed[layer.color])); break
-                case 'bevel': canvas.bevel(*layer.bounds,layer.get('raised',true)); break
-                case 'seam': canvas.line(*layer.from,*layer.to,'shadow'); break
-                case 'line': canvas.line(*layer.from,*layer.to,layer.channel); break
-                case 'rivet': canvas.rivet(*layer.at); break
-                case 'recessed_border': canvas.recessedBorder(*layer.bounds); break
-                case 'fastener': canvas.fastener(*layer.at); break
-                case 'material_variation': canvas.materialVariation(); break
-                case 'slot': canvas.slot(*layer.bounds); break
-                case 'indicator': canvas.indicator(*layer.at,color(palettes.fixed[layer.color])); break
-                case 'socket': layer.insets.each { int inset -> canvas.bevel(inset,inset,15-inset,15-inset) }; break
-                case 'overlay':
-                    if (layer.authorship != 'hand-authored' || !(layer.mode in ['fixed','material']))
-                        throw new IllegalArgumentException('Overlay requires explicit hand-authored provenance and fixed/material mode')
-                    def image = overlay(root,layer)
-                    if (image == null || image.width != 16 || image.height != 16) throw new IllegalArgumentException('Overlay must be 16x16')
-                    for (int y=0;y<16;y++) for (int x=0;x<16;x++) {
-                        int rgba = image.getRGB(x,y)
-                        if ((rgba >>> 24) == 0) continue
-                        if (layer.mode == 'fixed') canvas.put(x,y,rgba)
-                        else {
-                            def channel = layer.channelMap[String.format('#%08X',rgba)]
-                            if (!palettes.channels.contains(channel)) throw new IllegalArgumentException('Unmapped semantic overlay pixel')
-                            canvas.put(x,y,channel)
-                        }
-                    }
-                    break
-                default: throw new IllegalArgumentException("Unknown primitive ${layer.primitive}")
-            }
+        def definitions=palettes.artwork ?: MobArtwork.definitions(root,palettes)
+        def layers=new ArrayList(recipe.layers)
+        if(seed!=null)layers << [primitive:'weather',profile:recipe.weathering.profile,seed:seed]
+        if(resource!=null) {
+            if(!recipe.ports?.resourceColors?.containsKey(resource))MobArtwork.fail(new File(root,'recipes.json'),'recipes.'+recipe.id+'.ports.resourceColors','unknown resource '+resource)
+            if(!recipe.ports?.markings?.containsKey(direction))MobArtwork.fail(new File(root,'recipes.json'),'recipes.'+recipe.id+'.ports.markings','unknown direction '+direction)
+            layers << [primitive:'reference',recipe:recipe.ports.markings[direction],parameters:[(recipe.ports.colorParameter):recipe.ports.resourceColors[resource]]]
         }
-        if (seed != null) {
-            if (recipe.weathering?.profile != 'light') throw new IllegalArgumentException('Unknown weathering profile')
-            canvas.weather(seed)
-        }
-        if (resource != null) {
-            if (!(resource in ['fluid','item'])) throw new IllegalArgumentException('Unknown resource')
-            canvas.channels(direction,color(palettes.fixed[resource]))
-        }
-        canvas
+        MobArtwork.draw([layers:layers],definitions,palettes,new File(root,'recipes.json'),'recipes.'+(recipe.id ?: 'fixture'),[root:root])
     }
-    static List generate(File root, File output) {
-        Map palettes = new JsonSlurper().parse(new File(root,'palettes.json'))
-        Map config = new JsonSlurper().parse(new File(root,'recipes.json'))
+    static List generate(File root, File output, Map geometry) {
+        Map palettes = MobArtwork.read(new File(root,'palettes.json'))
+        Map config = MobArtwork.read(new File(root,'recipes.json'))
+        def recipeFile=new File(root,'recipes.json'), paletteFile=new File(root,'palettes.json')
+        if(!(config.recipes instanceof List))MobArtwork.fail(recipeFile,'recipes','missing required recipe array')
+        if(!(config.finishes instanceof List))MobArtwork.fail(recipeFile,'finishes','missing required finish array')
+        if(!(palettes.tiers instanceof Map) || !(palettes.fixed instanceof Map) || !(palettes.grayscale instanceof List))
+            MobArtwork.fail(paletteFile,'$','expected tiers, fixed colors and grayscale palette')
         if (config.size != 16 || palettes.channels != ['highlight','light','base','shadow','deep'])
-            throw new IllegalArgumentException('Expected 16x16 and the five semantic brightness channels')
+            MobArtwork.fail(recipeFile,'size','expected 16x16 and five semantic brightness channels in palettes.json')
         if (palettes.grayscale.size() != 5 || palettes.tiers.values().any { it.metal.size() != 5 })
-            throw new IllegalArgumentException('Each material palette requires five channels')
+            MobArtwork.fail(paletteFile,'tiers','each material palette requires five channels')
+        palettes.grayscale.eachWithIndex { v,i -> MobArtwork.token([rgba:v],palettes,[:],new File(root,'palettes.json'),"grayscale[${i}]") }
+        palettes.tiers.each { id,tier ->
+            tier.metal.eachWithIndex { v,i -> MobArtwork.token([rgba:v],palettes,[:],new File(root,'palettes.json'),"tiers.${id}.metal[${i}]") }
+            MobArtwork.token([rgba:tier.wear],palettes,[:],new File(root,'palettes.json'),"tiers.${id}.wear")
+        }
+        palettes.fixed.each { id,v -> MobArtwork.token([rgba:v],palettes,[:],new File(root,'palettes.json'),'fixed.'+id) }
+        palettes.artwork=MobArtwork.definitions(root,palettes)
         def assets = [], names = new HashSet(), plans = []
-        config.recipes.each { recipe ->
-            if (!(recipe.id ==~ /[a-z][a-z0-9_]*/)) throw new IllegalArgumentException('Invalid recipe id')
+        config.recipes.eachWithIndex { recipe,recipeIndex ->
+            if (!(recipe.id ==~ /[a-z][a-z0-9_]*/))MobArtwork.fail(recipeFile,"recipes[${recipeIndex}].id",'invalid recipe id')
             def variants = [[suffix:'clean',seed:null,resource:null,direction:null]]
             recipe.weathering?.seeds?.each { seed ->
-                if (!(seed instanceof Integer || seed instanceof Long) || seed.longValue() < 0) throw new IllegalArgumentException('Seed must be a nonnegative integer')
+                MobArtwork.validateSeed(seed,recipeFile,"recipes[${recipeIndex}].weathering.seeds")
                 variants << [suffix:"weather_${seed}",seed:seed.longValue(),resource:null,direction:null]
             }
             recipe.ports?.resources?.each { resource -> recipe.ports.directions.each { direction ->
@@ -910,14 +983,32 @@ class MobProceduralArt {
             } }
             variants.each { variant ->
                 (['master']+config.finishes).each { finish ->
-                    if (finish != 'master' && !palettes.tiers.containsKey(finish)) throw new IllegalArgumentException('Unknown finish')
+                    if (finish != 'master' && !palettes.tiers.containsKey(finish))MobArtwork.fail(recipeFile,'finishes','unknown finish '+finish)
                     String path = "assets/mobvats/textures/block/procedural/${finish}/${recipe.id}_${variant.suffix}.png"
-                    if (!names.add(path)) throw new IllegalArgumentException("Output collision: ${path}")
+                    if (!names.add(path))MobArtwork.fail(recipeFile,"recipes[${recipeIndex}]","output collision: ${path}")
                     plans << [recipe:recipe,variant:variant,finish:finish,path:path]
                 }
             }
         }
-        // Validate every output name before writing anything. No production resource edits.
+        def allNames=new HashSet(names)
+        palettes.artwork.textures.keySet().each { id ->
+            (['master']+config.finishes).each { finish ->
+                def path="assets/mobvats/textures/block/procedural/${finish}/${id}.png".toString()
+                if(!allNames.add(path))MobArtwork.fail(new File(root,'drawing.json'),'textures.'+id,'output collision: '+path)
+            }
+        }
+        def biologicalFile=new File(root,'biological.json')
+        if(biologicalFile.isFile()) {
+            def bio=MobArtwork.read(biologicalFile)
+            bio.palettes.each { id, colors -> colors.eachWithIndex { v,i -> MobArtwork.token([rgba:v],bio.palettes,[:],biologicalFile,"palettes.${id}[${i}]") } }
+            bio.assets.eachWithIndex { a,i ->
+                if(!(a.path ==~ /(?:blocks|items)\/[a-z][a-z0-9_]*/))MobArtwork.fail(biologicalFile,"assets[${i}].path",'invalid output path')
+                if(!allNames.add('assets/mobvats/textures/'+a.path+'.png'))MobArtwork.fail(biologicalFile,"assets[${i}].path",'output collision')
+                MobBiologicalArt.draw(bio,a)
+            }
+        }
+        plans.each { draw(root,it.recipe,palettes,it.variant.seed,it.variant.resource,it.variant.direction) }
+        // Validate every artwork input and output name before writing anything.
         plans.each { plan ->
             def r=plan.recipe, v=plan.variant, finish=plan.finish
             def canvas=draw(root,r,palettes,v.seed,v.resource,v.direction)
@@ -955,7 +1046,6 @@ class MobProceduralArt {
                     productionPaths.add(basePath.toString()); json(new File(output,basePath),model)
                 }
                 if(consumer in ['item_port','fluid_port']) {
-                    def geometry=new JsonSlurper().parse(new File(root,'geometry.json'))
                     ['none','vat_t1_casing','vat_t1_glass','mixer_t1_casing','mixer_t1_glass'].each { installed ->
                         def family=installed.startsWith('mixer')?'mixer':'vat'
                         def base='mobvats:block/procedural/t1/'
@@ -983,7 +1073,7 @@ class MobProceduralArt {
                 json(new File(output,statesPath),[variants:stateVariants])
             }
         }
-        if(new File(root,'geometry.json').isFile())conduitAssets(root,output,palettes,assets,names,productionPaths)
+        if(new File(root,'geometry.json').isFile())conduitAssets(root,output,palettes,assets,names,productionPaths,geometry)
         MobBiologicalArt.generate(root,output,assets,names)
         output.eachFileRecurse { file ->
             def path=output.toPath().relativize(file.toPath()).toString().replace('\\','/')
@@ -997,7 +1087,9 @@ class MobProceduralArt {
             biologicalRecipeSha256:new File(root,'biological.json').isFile()?hash(new File(root,'biological.json')):null,
             machineryRecipeSha256:hash(new File(root,'machinery.json')),
             fixtureRecipeSha256:new File(root,'fixtures.json').isFile()?hash(new File(root,'fixtures.json')):null,
-            generatorSource:'gradle/procedural-art.gradle',generatorSha256:hash(script),
+            generatorSource:'gradle/procedural-art.gradle',generatorSha256:hash(script),artworkSource:'tools/procedural-art/drawing.json',artworkSha256:hash(new File(root,'drawing.json')),
+            geometryExporterSource:'tools/procedural-art/GeometryExport.java',geometryExporterSha256:hash(new File(root,'GeometryExport.java')),
+            geometryContract:[schemaVersion:1,units:'model_pixels',modelPixelsPerBlock:16,nodeWidth:geometry.nodeWidth,bufferWidth:geometry.bufferWidth],
             recipeSha256:hash(new File(root,'recipes.json')),geometrySha256:new File(root,'geometry.json').isFile()?hash(new File(root,'geometry.json')):null,paletteSha256:hash(new File(root,'palettes.json')),bindings:bindings,bindingSha256:bindingFile.isFile() ? hash(bindingFile) : null,assets:assets])
         // Remove only stale files owned by this generator in its dedicated output directory.
         output.eachFileRecurse { file ->
@@ -1070,7 +1162,7 @@ class MobProceduralArt {
                     gripOffset:[0,gripY*16*s[1],(reverse?-1:1)*gripX*16*s[0]],coveredPixels:gripped,opaquePixels:opaque]
             }
         }
-        String data='const mixerExamples='+new File(root.parentFile.parentFile,'build/tmp/mixer-art-examples.json').text+';const models='+JsonOutput.toJson(models)+';const dimensions='+new File(root,'geometry.json').text+';const formed='+examples.text+';const fixtures='+new File(root,'fixtures.json').text+';const fixtureMesh='+new File(output,'assets/mobvats/fixture_mesh.json').text+';'
+        String data='const mixerExamples='+new File(root.parentFile.parentFile,'build/tmp/mixer-art-examples.json').text+';const models='+JsonOutput.toJson(models)+';const dimensions='+new File(output,'assets/mobvats/conduit_preview.json').text+';const formed='+examples.text+';const fixtures='+new File(root,'fixtures.json').text+';const fixtureMesh='+new File(output,'assets/mobvats/fixture_mesh.json').text+';'
         String html=new File(root,'preview3d.html').getText('UTF-8').replace('/* GENERATED_DATA */',data)
         def strap=new File(preview,'textures/reference/strap.png');strap.parentFile.mkdirs()
         strap.bytes=new File(root.parentFile.parentFile,'src/main/resources/assets/mobvats/textures/blocks/vat_casing_inner.png').bytes
@@ -1159,15 +1251,37 @@ class MobProceduralArt {
 def proceduralSources = layout.projectDirectory.dir('tools/procedural-art')
 def proceduralOutput = layout.buildDirectory.dir('generated/resources/procedural-art')
 def proceduralPreview = layout.buildDirectory.dir('procedural-art-preview')
+// The exporter sees compiled classes and dependency JARs, not resource outputs.
+// Depending on classes/testClasses here would create a processResources cycle.
+def artGeometry = layout.buildDirectory.file('tmp/procedural-art-geometry/geometry.json')
+def artExportClasses = layout.buildDirectory.dir('classes/artGeometryExport')
+def compileArtGeometryExport = tasks.register('compileArtGeometryExport', JavaCompile) {
+    dependsOn tasks.named('compileJava')
+    source proceduralSources.file('GeometryExport.java')
+    classpath = files(layout.buildDirectory.dir('classes/java/main')) + configurations.compileClasspath
+    destinationDirectory = artExportClasses
+    javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(21) }
+}
+def exportArtGeometry = tasks.register('exportArtGeometry', JavaExec) {
+    dependsOn compileArtGeometryExport
+    classpath = files(artExportClasses, layout.buildDirectory.dir('classes/java/main')) + configurations.runtimeClasspath
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    mainClass = 'GeometryExport'
+    args proceduralSources.file('geometry.json').asFile.absolutePath,
+        proceduralSources.file('palettes.json').asFile.absolutePath, artGeometry.get().asFile.absolutePath
+    inputs.files(proceduralSources.file('geometry.json'),proceduralSources.file('palettes.json'))
+    outputs.file(artGeometry)
+}
 def generateProceduralArt = tasks.register('generateProceduralArt') {
     group = 'MobVats development'
     description = 'Generate deterministic, authored 16x16 casing and socket prototypes offline.'
     inputs.dir(proceduralSources)
     inputs.file('gradle/procedural-art.gradle')
-    inputs.file('src/main/java/net/impactvector/mobvats/gamecontent/multiblock/conduit/ConduitGeometry.java')
+    dependsOn exportArtGeometry
+    inputs.file(artGeometry)
     inputs.dir('src/main/resources/assets/mobvats/models/block')
     outputs.dir(proceduralOutput)
-    doLast { MobProceduralArt.generate(proceduralSources.asFile,proceduralOutput.get().asFile) }
+    doLast { MobProceduralArt.generate(proceduralSources.asFile,proceduralOutput.get().asFile,MobArtwork.read(artGeometry.get().asFile).geometry) }
 }
 sourceSets.main.resources.srcDir(generateProceduralArt)
 tasks.register('proceduralArtPreview') {
@@ -1182,11 +1296,11 @@ tasks.register('proceduralArtPreview') {
 def conduitExamples = layout.buildDirectory.file('tmp/conduit-art-examples.json')
 tasks.register('conduitArtGeometryTest', JavaExec) {
     group = 'verification'
-    dependsOn tasks.named('testClasses')
+    dependsOn tasks.named('testClasses'),exportArtGeometry
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'net.impactvector.mobvats.render.ConduitArtGeometryTest'
-    args proceduralSources.file('geometry.json').asFile.absolutePath, conduitExamples.get().asFile.absolutePath
-    inputs.file(proceduralSources.file('geometry.json'))
+    args artGeometry.get().asFile.absolutePath, conduitExamples.get().asFile.absolutePath, proceduralSources.asFile.absolutePath
+    inputs.file(artGeometry)
     outputs.file(conduitExamples)
 }
 tasks.named('check').configure { dependsOn tasks.named('conduitArtGeometryTest') }
@@ -1215,6 +1329,8 @@ tasks.register('testProceduralArt') {
     description = 'CPU-only art contracts: semantic colors, direction, transparency, seeds, overlays and determinism.'
     inputs.dir(proceduralSources); inputs.file('gradle/procedural-art.gradle')
     inputs.dir('src/main/resources/assets/mobvats/models/block')
+    dependsOn exportArtGeometry
+    inputs.file(artGeometry)
     def fixtures=layout.buildDirectory.dir('tmp/procedural-art-tests')
     outputs.dir(fixtures)
     doLast {
@@ -1222,7 +1338,8 @@ tasks.register('testProceduralArt') {
         def palettes=new JsonSlurper().parse(new File(root,'palettes.json'))
         def config=new JsonSlurper().parse(new File(root,'recipes.json'))
         def first=new File(dir,'first'), second=new File(dir,'second')
-        def a=MobProceduralArt.generate(root,first), b=MobProceduralArt.generate(root,second)
+        def geometry=MobArtwork.read(artGeometry.get().asFile).geometry
+        def a=MobProceduralArt.generate(root,first,geometry), b=MobProceduralArt.generate(root,second,geometry)
         assert a == b : 'Non-deterministic generated assets'
         first.eachFileRecurse { file ->
             if (file.isFile()) {
@@ -1253,10 +1370,8 @@ tasks.register('testProceduralArt') {
             (1 + (recipe.weathering?.seeds?.size() ?: 0) +
                 (recipe.ports == null ? 0 : recipe.ports.resources.size()*recipe.ports.directions.size())) * (1+config.finishes.size())
         }
-        expected += 52 // Thirteen machinery textures per palette, including neutral reel materials.
-        expected += 28 // Seven Mixer materials, four semantic palettes.
-        expected += 104 // Conduit/buffer materials plus ten fixture materials per palette.
-        expected += 5 // Biological assets have fixed palettes, no tier variants.
+        expected += MobArtwork.definitions(root,palettes).textures.size()*(1+config.finishes.size())
+        expected += new JsonSlurper().parse(new File(root,'biological.json')).assets.size()
         assert a.size() == expected && a*.path.toSet().size() == expected
         def bio=new JsonSlurper().parse(new File(root,'biological.json'))
         assert bio.assets.size()==5 && bio.assets*.id.toSet().size()==5
@@ -1278,14 +1393,13 @@ tasks.register('testProceduralArt') {
             def image=ImageIO.read(new File(first,asset.path))
             def alpha=(0..<256).collect { image.getRGB(it%16,(int)(it/16))>>>24 }
             assert alpha.every { it==0 || it==255 }
-            assert (recipe.tissue ? alpha.every { it==255 } : (alpha.contains(0)&&alpha.contains(255)))
+            assert (recipe.layers.any { it.primitive=='scatter_grid' } ? alpha.every { it==255 } : (alpha.contains(0)&&alpha.contains(255)))
             assert !new File(root.parentFile.parentFile,'src/main/resources/'+asset.path).exists() : 'Obsolete production source remains'
         }
         a.each { asset ->
             def image=ImageIO.read(new File(first,asset.path))
             assert image.width == 16 && image.height == 16
         }
-        def geometry=new JsonSlurper().parse(new File(root,'geometry.json'))
         ['vat','mixer'].each { family ->
             def structural=MobProceduralArt.frame(geometry,family,false)
             assert structural.size() == (family=='vat'?36:60) : 'Eight three-arm corners and twelve rails required'
@@ -1342,14 +1456,19 @@ tasks.register('testProceduralArt') {
             }
             def image=ImageIO.read(new File(first,"assets/mobvats/textures/block/procedural/${finish}/mixer_shaft.png"))
             for(int x=0;x<16;x++)for(int y=1;y<16;y++)assert image.getRGB(x,y)==image.getRGB(x,0) : 'Shaft transverse banding'
-            machinery.mixer.indicators.each { kind,hex ->
+            ['creative','combustion','fe'].each { kind ->
+                def hex=palettes.fixed['drive_'+kind]
                 def indicatorImage=ImageIO.read(new File(first,"assets/mobvats/textures/block/procedural/${finish}/mixer_${kind}.png"))
                 assert (0..<16).any { x -> (0..<16).any { y -> indicatorImage.getRGB(x,y)==MobProceduralArt.color(hex) } } : 'Tier recolored functional indicator'
             }
         }
-        assert machinery.background=='#071C12' && machinery.phosphor=='#65F28B'
-        machinery.glyphs.each { glyph,rows -> assert rows.size()==16 && rows.every { it.size()==16 && it ==~ /[.#]+/ } }
-        assert MobProceduralArt.greenscreen(machinery,'skull').pixels != MobProceduralArt.greenscreen(machinery,'rotor').pixels
+        def artwork=MobArtwork.definitions(root,palettes)
+        assert palettes.fixed.screen_dark=='#071C12' && palettes.fixed.phosphor_green=='#65F28B'
+        ['skull','rotor'].each { glyph ->
+            def rows=artwork.patterns['controller_'+glyph].pixels
+            assert rows.size()==16 && rows.every { it.size()==16 && it ==~ /[.#]+/ }
+        }
+        assert artwork.patterns.controller_skull.pixels != artwork.patterns.controller_rotor.pixels
         ['master','t1','t2','t3'].each { finish ->
             def readModel={ id -> new JsonSlurper().parse(new File(first,"assets/mobvats/models/block/procedural/${finish}/${id}.json")) }
             def vat=readModel('vat_controller'),mixer=readModel('mixer_controller')
@@ -1358,7 +1477,7 @@ tasks.register('testProceduralArt') {
             assert vat.textures.findAll { k,v -> k!='screen' }==mixer.textures.findAll { k,v -> k!='screen' }
             ['skull','rotor'].each { glyph ->
                 def image=ImageIO.read(new File(first,"assets/mobvats/textures/block/procedural/${finish}/greenscreen_${glyph}.png"))
-                for(int y=0;y<16;y++)for(int x=0;x<16;x++)assert image.getRGB(x,y)==MobProceduralArt.color(machinery.glyphs[glyph][y][x]=='#'?machinery.phosphor:machinery.background)
+                for(int y=0;y<16;y++)for(int x=0;x<16;x++)assert image.getRGB(x,y)==MobProceduralArt.color(artwork.patterns['controller_'+glyph].pixels[y][x]=='#'?palettes.fixed.phosphor_green:palettes.fixed.screen_dark)
             }
             assert vat.textures.screen.endsWith('/greenscreen_skull') && mixer.textures.screen.endsWith('/greenscreen_rotor')
             def screen=vat.elements.find { it.faces.north?.texture=='#screen' }
@@ -1413,7 +1532,7 @@ tasks.register('testProceduralArt') {
             assert n.sum { it*it }>0.000001 : 'Degenerate normal'
         }
         fixtureConfig.variants.each { variant ->
-            def identity=MobProceduralArt.fixtureIdentity(variant,palettes)
+            def identity=MobArtwork.draw(artwork.textures['fixture_'+variant.id],artwork,palettes,new File(root,'drawing.json'),'textures.fixture_'+variant.id)
             int fixed=MobProceduralArt.color(palettes.fixed[variant.resource])
             assert identity.pixels.count { it==fixed }==(variant.kind=='void'?4:24)
             if(variant.kind=='valve')assert identity.pixels.count { it=='deep' }>=15
@@ -1633,20 +1752,23 @@ tasks.register('testProceduralArt') {
             assert wallFile.bytes == new File(dir,"preview-second/${relative}").bytes
         } } }
         def primitives=new MobPixelCanvas()
-        primitives.bevel(1,1,4,4,false)
+        primitives.line(1,1,4,1,'deep');primitives.line(1,1,1,4,'deep')
+        primitives.line(1,4,4,4,'light');primitives.line(4,1,4,4,'light')
         assert primitives.get(2,1) == 'deep' && primitives.get(2,4) == 'light'
-        primitives.slot(6,2,8,2)
+        primitives.panel(6,2,8,2,'deep');primitives.line(6,3,8,3,'light')
         assert primitives.get(7,2) == 'deep' && primitives.get(7,3) == 'light'
         primitives.line(1,6,3,8,'shadow')
         assert primitives.get(1,6) == 'shadow' && primitives.get(2,7) == 'shadow' && primitives.get(3,8) == 'shadow'
         // Collision fixture: refuse before any output is written.
         def collision=new File(dir,'collision'); collision.mkdirs()
         MobProceduralArt.json(new File(collision,'palettes.json'),palettes)
-        MobProceduralArt.json(new File(collision,'recipes.json'),[size:16,finishes:['t1','t1'],recipes:[casing]])
+        MobProceduralArt.json(new File(collision,'recipes.json'),[schemaVersion:1,size:16,finishes:['t1','t1'],recipes:[casing]])
+        new File(collision,'drawing.json').bytes=new File(root,'drawing.json').bytes
         boolean blocked=false
-        try { MobProceduralArt.generate(collision,new File(dir,'collision-output')) }
+        try { MobProceduralArt.generate(collision,new File(dir,'collision-output'),geometry) }
         catch (IllegalArgumentException ex) { assert ex.message.contains('collision'); blocked=true }
         assert blocked
+        new File(dir,'drawing.json').bytes=new File(root,'drawing.json').bytes
         // Actual PNG/Piskel loading and explicit semantic overlay mapping.
         def overlayImage=new BufferedImage(16,16,BufferedImage.TYPE_INT_ARGB)
         overlayImage.setRGB(4,4,MobProceduralArt.color('#858585'))
@@ -1660,6 +1782,8 @@ tasks.register('testProceduralArt') {
         MobProceduralArt.json(new File(dir,'overlay.piskel'),[piskel:[width:16,height:16,layers:[JsonOutput.toJson(layer)]]])
         fixedRecipe.layers[0].source='overlay.piskel'
         assert MobProceduralArt.draw(dir,fixedRecipe,palettes).pixels == fixedCanvas.pixels
+        MobArtworkTests.run(root,dir,a,first)
+        logger.lifecycle('JSON artwork edits passed: single skull pixel, tier palette, fixed color, casing border, unrelated PNG hashes and invalid-definition rejection.')
         logger.lifecycle("Procedural art contracts passed (${expected} assets, semantic mapping, fixed colors, alpha, directions, seeds, collisions, PNG/Piskel).")
     }
 }
@@ -1676,6 +1800,10 @@ tasks.register('verifyProceduralArtResources') {
             assert entry != null : 'Procedural provenance missing from JAR'
             assert zip.entries().toList().every { !it.name.endsWith('/buffer_mount.json') } : 'Obsolete mounting model packaged'
             def manifest=new JsonSlurper().parse(zip.getInputStream(entry))
+            assert zip.getEntry('GeometryExport.class')==null : 'Build-only geometry exporter shipped'
+            assert manifest.artworkSha256==MobProceduralArt.hash(new File(proceduralSources.asFile,'drawing.json'))
+            assert manifest.geometryExporterSha256==MobProceduralArt.hash(new File(proceduralSources.asFile,'GeometryExport.java'))
+            assert manifest.geometryContract.units=='model_pixels' && manifest.geometryContract.modelPixelsPerBlock==16
             def bio=new JsonSlurper().parse(new File(proceduralSources.asFile,'biological.json'))
             assert manifest.biologicalRecipeSha256==MobProceduralArt.hash(new File(proceduralSources.asFile,'biological.json'))
             bio.assets.each { a ->
@@ -1784,3 +1912,25 @@ tasks.named('processResources', ProcessResources).configure {
         if (!details.file.toPath().startsWith(generatedRoot) && new File(proceduralOutput.get().asFile, details.path).isFile()) details.exclude()
     }
 }
+
+
+tasks.register('compareProceduralArtBaseline') {
+    group = 'verification'
+    dependsOn generateProceduralArt
+    inputs.file(proceduralSources.file('baseline/pre-extraction.json'))
+    inputs.dir(proceduralOutput)
+    doLast {
+        def baseline=new JsonSlurper().parse(proceduralSources.file('baseline/pre-extraction.json').asFile)
+        def output=proceduralOutput.get().asFile
+        def changed=baseline.assets.findAll { a ->
+            def file=new File(output,a.path)
+            !file.isFile() || MobProceduralArt.hash(file)!=a.sha256
+        }
+        def actual=[]
+        output.eachFileRecurse { f -> if(f.isFile() && !f.path.contains('META-INF'))actual << output.toPath().relativize(f.toPath()).toString().replace('\\','/') }
+        assert actual.toSet()==baseline.assets*.path.toSet() : 'Generated resource set changed'
+        assert changed.empty : 'Baseline output changed: '+changed*.path
+        logger.lifecycle("Baseline byte comparison passed: ${baseline.assets.count { it.path.endsWith('.png') }} PNGs and ${baseline.assets.count { !it.path.endsWith('.png') }} model/resource files.")
+    }
+}
+// Historical extraction evidence: opt-in comparison, so future deliberate art edits remain possible.

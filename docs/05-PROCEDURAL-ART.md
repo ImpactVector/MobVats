@@ -6,7 +6,7 @@ The development generator authors integer-pixel textures and cuboid/mesh models 
 
 The grayscale master maps five channels (`highlight`, `light`, `base`, `shadow`, `deep`) to T1 verdigris copper, T2 iron and T3 bloody iron finishes. Separate wear tokens describe exposed material. T1 base is `#5F8F78`. Fixed functional RGBA pixels bypass material conversion: fluid blue `#168BFA`, item yellow `#E3BC45`, red status, and Controller phosphor greens. T2/T3 remain art/preview variants; current gameplay structural material is T1.
 
-Recipes are declarative named primitives, with integer coordinates in 0..15, explicit seed weathering and exact transparency. No recipe expression is executed. Layers can use panel, fixed_panel, bevel, line, seam, rivet, slot, indicator, socket, overlay and generator-defined material/geometry primitives. Fixed overlays preserve RGBA; material overlays require an explicit ARGB-to-channel map. PNG inputs must be 16×16; supported Piskel inputs select one layer/frame/chunk. Authorship must be declared; an overlay does not acquire valid provenance by being recolored.
+Recipes are declarative named primitives, with integer coordinates in 0..15, explicit seed weathering and exact transparency. No recipe expression is executed. Layers use panels, lines, points, symbol grids, named references, configured weathering and seeded grid scatter. Decorative bevels, rivets, borders and sockets are JSON compositions. Fixed overlays preserve RGBA; material overlays require an explicit ARGB-to-channel map. PNG inputs must be 16×16; supported Piskel inputs select one layer/frame/chunk. Authorship must be declared; an overlay does not acquire valid provenance by being recolored.
 
 ## 5.2 Generator inputs and resource integration
 
@@ -15,7 +15,8 @@ Recipes are declarative named primitives, with integer coordinates in 0..15, exp
 | [recipes.json](../tools/procedural-art/recipes.json) | Casing and socket recipes |
 | [palettes.json](../tools/procedural-art/palettes.json) | Semantic materials and fixed colors |
 | [bindings.json](../tools/procedural-art/bindings.json) | Production model consumers |
-| [geometry.json](../tools/procedural-art/geometry.json) | Conduit/buffer dimensions and preview parameters |
+| [geometry.json](../tools/procedural-art/geometry.json) | Cosmetic model/preview parameters; conduit/buffer widths come from compiled Java export |
+| [drawing.json](../tools/procedural-art/drawing.json) | Industrial PNG layers, shared sprites/markings and weathering profiles |
 | [fixtures.json](../tools/procedural-art/fixtures.json) | Valve, pump and void cores |
 | [machinery.json](../tools/procedural-art/machinery.json) | Controllers, services, Shaft, Impeller and Drives |
 | [biological.json](../tools/procedural-art/biological.json) | Fixed tissue, ivory, eyes and glassware; legacy resource bindings and historical/output fingerprints |
@@ -47,6 +48,9 @@ AI-generated visuals are allowed only as explicit development placeholders. Reco
 
 ## 5.5 Preview and validation
 
+For current schema and extraction details, see [PROCEDURAL_ART.md](PROCEDURAL_ART.md)
+and [PROCEDURAL_ART_VALIDATION.md](PROCEDURAL_ART_VALIDATION.md).
+
 ```powershell
 .\gradlew.bat proceduralArtPreview
 .\gradlew.bat testProceduralArt verifyProceduralArtResources verifyAiPlaceholderDevResources
@@ -59,3 +63,22 @@ AI-generated visuals are allowed only as explicit development placeholders. Reco
 Art contract checks cover determinism, material/fixed-color mapping, geometry, generated hashes, model/item bindings, output collisions, protected base PNGs and placeholder rejection fixtures. Build `check` includes existing art/provenance verification. Minecraft visual acceptance remains operator-controlled; never launch a client as part of routine documentation work.
 
 `biological.png` adds native 16px, 32px inventory, nearest-neighbor ×8 and model UV context views. Individual PNGs and ×8 images are under `biological/`. Cube views use the existing full-cube UV arrangement; flat item views use the existing `item/generated` layer. These offline previews do not reproduce Minecraft lighting. Biological tests pin five output hashes, compare two complete generation runs, check fixed palettes and binary alpha, validate packaged model/atlas bindings and reject historical PNG fingerprints anywhere in the JAR. The AI-placeholder release guard remains intact.
+
+## 5.6 Artwork, algorithms and geometry boundaries
+
+All PNG compositions, colors, sprites, decorative treatment and seeded variation
+live in source-controlled JSON. `drawing.json` supplies industrial texture grids
+and shared patterns; `recipes.json` supplies casing/socket composition and variants;
+`biological.json` supplies fixed biological artwork. Generic rasterization,
+compositing, deterministic variation, validation, previews and PNG encoding remain
+in Gradle/Groovy. Existing 3D generation algorithms remain unchanged.
+
+Gameplay geometry stays authoritative in Java. The build-only `GeometryExport.java`
+reads compiled conduit and buffer contracts and exports explicit model-pixel units.
+Art generation depends on that export without depending on resource processing;
+no Java-source regex, duplicated pipe/buffer width, or player-side JSON parsing is
+involved. Pure artwork edits do not require Java recompilation.
+
+See [PROCEDURAL_ART.md](PROCEDURAL_ART.md) for the schema, inventory, editable
+properties, task graph and preserved SHA-256 baseline, and
+[PROCEDURAL_ART_VALIDATION.md](PROCEDURAL_ART_VALIDATION.md) for current evidence.

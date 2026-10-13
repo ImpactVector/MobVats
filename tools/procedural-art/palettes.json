@@ -1,10 +1,72 @@
 {
-  "channels": ["highlight", "light", "base", "shadow", "deep"],
-  "grayscale": ["#D2D2D2", "#ADADAD", "#858585", "#626262", "#3E3E3E"],
+  "channels": [
+    "highlight",
+    "light",
+    "base",
+    "shadow",
+    "deep"
+  ],
+  "grayscale": [
+    "#D2D2D2",
+    "#ADADAD",
+    "#858585",
+    "#626262",
+    "#3E3E3E"
+  ],
   "tiers": {
-    "t1": {"label": "Copper / verdigris", "metal": ["#B5CBBB", "#83AF99", "#5F8F78", "#416653", "#293F35"], "wear": "#A86D4B"},
-    "t2": {"label": "Iron", "metal": ["#D2D7DC", "#ADB5BD", "#858C94", "#626972", "#3E444C"], "wear": "#ADB5BD"},
-    "t3": {"label": "Bloody Iron", "metal": ["#BB9694", "#916C6C", "#704B4E", "#503337", "#302024"], "wear": "#916C6C"}
+    "t1": {
+      "label": "Copper / verdigris",
+      "metal": [
+        "#B5CBBB",
+        "#83AF99",
+        "#5F8F78",
+        "#416653",
+        "#293F35"
+      ],
+      "wear": "#A86D4B"
+    },
+    "t2": {
+      "label": "Iron",
+      "metal": [
+        "#D2D7DC",
+        "#ADB5BD",
+        "#858C94",
+        "#626972",
+        "#3E444C"
+      ],
+      "wear": "#ADB5BD"
+    },
+    "t3": {
+      "label": "Bloody Iron",
+      "metal": [
+        "#BB9694",
+        "#916C6C",
+        "#704B4E",
+        "#503337",
+        "#302024"
+      ],
+      "wear": "#916C6C"
+    }
   },
-  "fixed": {"fluid": "#168BFA", "item": "#E3BC45", "status": "#BC4949", "center": "#25282B"}
+  "fixed": {
+    "fluid": "#168BFA",
+    "item": "#E3BC45",
+    "status": "#BC4949",
+    "center": "#25282B",
+    "screen_dark": "#071C12",
+    "phosphor_green": "#65F28B",
+    "drive_creative": "#9AEFC7",
+    "drive_combustion": "#FF8A32",
+    "drive_fe": "#49D9ED",
+    "hot_outer": "#A82D16",
+    "hot_mid": "#DF551B",
+    "hot_inner": "#FF942E",
+    "hot_center": "#FFC65B",
+    "combustion_fuel": "#8C3021",
+    "feeder_socket": "#141414",
+    "glass": "#20B8D9CB",
+    "glass_edge": "#30B8D9CB",
+    "buffer_glass": "#30B8D9CB"
+  },
+  "schemaVersion": 1
 }

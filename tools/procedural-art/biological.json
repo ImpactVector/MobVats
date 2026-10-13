@@ -2,11 +2,27 @@
   "authorship": "AUTHORED_PROCEDURAL",
   "inputs": "Integer coordinates and fixed palettes only; no PNG, vanilla, historical mask or overlay inputs",
   "bindings": {
-    "block/vat_head": {"north":"blocks/vat_face", "south":"blocks/vat_head", "east":"blocks/vat_head", "west":"blocks/vat_head", "up":"blocks/vat_head", "down":"blocks/vat_head", "particle":"blocks/vat_head"},
-    "block/vat_flesh": {"all":"blocks/vat_flesh"},
-    "block/hidden": {"particle":"blocks/vat_head"},
-    "item/syringe": {"layer0":"items/item_syringe"},
-    "item/essence": {"layer0":"items/item_essence"}
+    "block/vat_head": {
+      "north": "blocks/vat_face",
+      "south": "blocks/vat_head",
+      "east": "blocks/vat_head",
+      "west": "blocks/vat_head",
+      "up": "blocks/vat_head",
+      "down": "blocks/vat_head",
+      "particle": "blocks/vat_head"
+    },
+    "block/vat_flesh": {
+      "all": "blocks/vat_flesh"
+    },
+    "block/hidden": {
+      "particle": "blocks/vat_head"
+    },
+    "item/syringe": {
+      "layer0": "items/item_syringe"
+    },
+    "item/essence": {
+      "layer0": "items/item_essence"
+    }
   },
   "palettes": {
     "tissue": [
@@ -47,63 +63,93 @@
       "#B99A73"
     ]
   },
-  "primitives": {
-    "tissue_cluster": [
-      "..22.",
-      ".2332",
-      "12341",
-      ".221.",
-      "..0.."
-    ],
-    "ivory_fragment": [
-      ".23..",
-      "1232.",
-      ".2211",
-      "..10."
-    ],
-    "organic_eye": [
-      ".000.",
-      "01210",
-      "02420",
-      "01310",
-      ".000."
-    ],
-    "vessel": [
-      "...00...",
-      "..0220..",
-      "..0220..",
-      ".022220.",
-      "02222220",
-      "02222220",
-      "02222220",
-      "02222220",
-      ".000000."
-    ],
-    "liquid": [
-      ".2222.",
-      "211112",
-      "110011",
-      "110011",
-      ".1111."
-    ],
-    "stopper": [
-      "01110",
-      ".000."
-    ],
-    "barrel": [
-      "000000000",
-      "033222220",
-      "022121210",
-      "000000000"
-    ]
-  },
   "assets": [
     {
       "id": "vat_head",
       "path": "blocks/vat_head",
       "seed": 107,
-      "tissue": true,
-      "layers": [],
+      "layers": [
+        {
+          "primitive": "panel",
+          "bounds": [
+            0,
+            0,
+            15,
+            15
+          ],
+          "token": {
+            "colorRef": "tissue.1"
+          }
+        },
+        {
+          "primitive": "scatter_grid",
+          "pixels": [
+            "..22.",
+            ".2332",
+            "12341",
+            ".221.",
+            "..0.."
+          ],
+          "palette": {
+            ".": null,
+            "0": {
+              "colorRef": "tissue.0"
+            },
+            "1": {
+              "colorRef": "tissue.1"
+            },
+            "2": {
+              "colorRef": "tissue.2"
+            },
+            "3": {
+              "colorRef": "tissue.3"
+            },
+            "4": {
+              "colorRef": "tissue.4"
+            },
+            "5": {
+              "colorRef": "tissue.5"
+            }
+          },
+          "gridMin": [
+            -1,
+            -1
+          ],
+          "gridMax": [
+            3,
+            3
+          ],
+          "spacing": [
+            5,
+            5
+          ],
+          "jitter": [
+            2,
+            2
+          ],
+          "seed": 107
+        },
+        {
+          "primitive": "points",
+          "points": [
+            [
+              3,
+              4
+            ],
+            [
+              11,
+              10
+            ],
+            [
+              6,
+              14
+            ]
+          ],
+          "token": {
+            "colorRef": "tissue.5"
+          }
+        }
+      ],
       "replaces": [
         "Rotten Flesh background"
       ],
@@ -114,23 +160,154 @@
       "id": "vat_face",
       "path": "blocks/vat_face",
       "seed": 107,
-      "tissue": true,
       "layers": [
         {
-          "shape": "organic_eye",
-          "palette": "eye",
+          "primitive": "panel",
+          "bounds": [
+            0,
+            0,
+            15,
+            15
+          ],
+          "token": {
+            "colorRef": "tissue.1"
+          }
+        },
+        {
+          "primitive": "scatter_grid",
+          "pixels": [
+            "..22.",
+            ".2332",
+            "12341",
+            ".221.",
+            "..0.."
+          ],
+          "palette": {
+            ".": null,
+            "0": {
+              "colorRef": "tissue.0"
+            },
+            "1": {
+              "colorRef": "tissue.1"
+            },
+            "2": {
+              "colorRef": "tissue.2"
+            },
+            "3": {
+              "colorRef": "tissue.3"
+            },
+            "4": {
+              "colorRef": "tissue.4"
+            },
+            "5": {
+              "colorRef": "tissue.5"
+            }
+          },
+          "gridMin": [
+            -1,
+            -1
+          ],
+          "gridMax": [
+            3,
+            3
+          ],
+          "spacing": [
+            5,
+            5
+          ],
+          "jitter": [
+            2,
+            2
+          ],
+          "seed": 107
+        },
+        {
+          "primitive": "points",
+          "points": [
+            [
+              3,
+              4
+            ],
+            [
+              11,
+              10
+            ],
+            [
+              6,
+              14
+            ]
+          ],
+          "token": {
+            "colorRef": "tissue.5"
+          }
+        },
+        {
+          "primitive": "pixel_grid",
+          "pixels": [
+            ".000.",
+            "01210",
+            "02420",
+            "01310",
+            ".000."
+          ],
+          "width": 5,
+          "height": 5,
           "at": [
             1,
             3
-          ]
+          ],
+          "palette": {
+            ".": null,
+            "0": {
+              "colorRef": "eye.0"
+            },
+            "1": {
+              "colorRef": "eye.1"
+            },
+            "2": {
+              "colorRef": "eye.2"
+            },
+            "3": {
+              "colorRef": "eye.3"
+            },
+            "4": {
+              "colorRef": "eye.4"
+            }
+          }
         },
         {
-          "shape": "organic_eye",
-          "palette": "eye",
+          "primitive": "pixel_grid",
+          "pixels": [
+            ".000.",
+            "01210",
+            "02420",
+            "01310",
+            ".000."
+          ],
+          "width": 5,
+          "height": 5,
           "at": [
             9,
             3
-          ]
+          ],
+          "palette": {
+            ".": null,
+            "0": {
+              "colorRef": "eye.0"
+            },
+            "1": {
+              "colorRef": "eye.1"
+            },
+            "2": {
+              "colorRef": "eye.2"
+            },
+            "3": {
+              "colorRef": "eye.3"
+            },
+            "4": {
+              "colorRef": "eye.4"
+            }
+          }
         }
       ],
       "replaces": [
@@ -144,31 +321,176 @@
       "id": "vat_flesh",
       "path": "blocks/vat_flesh",
       "seed": 107,
-      "tissue": true,
       "layers": [
         {
-          "shape": "ivory_fragment",
-          "palette": "ivory",
+          "primitive": "panel",
+          "bounds": [
+            0,
+            0,
+            15,
+            15
+          ],
+          "token": {
+            "colorRef": "tissue.1"
+          }
+        },
+        {
+          "primitive": "scatter_grid",
+          "pixels": [
+            "..22.",
+            ".2332",
+            "12341",
+            ".221.",
+            "..0.."
+          ],
+          "palette": {
+            ".": null,
+            "0": {
+              "colorRef": "tissue.0"
+            },
+            "1": {
+              "colorRef": "tissue.1"
+            },
+            "2": {
+              "colorRef": "tissue.2"
+            },
+            "3": {
+              "colorRef": "tissue.3"
+            },
+            "4": {
+              "colorRef": "tissue.4"
+            },
+            "5": {
+              "colorRef": "tissue.5"
+            }
+          },
+          "gridMin": [
+            -1,
+            -1
+          ],
+          "gridMax": [
+            3,
+            3
+          ],
+          "spacing": [
+            5,
+            5
+          ],
+          "jitter": [
+            2,
+            2
+          ],
+          "seed": 107
+        },
+        {
+          "primitive": "points",
+          "points": [
+            [
+              3,
+              4
+            ],
+            [
+              11,
+              10
+            ],
+            [
+              6,
+              14
+            ]
+          ],
+          "token": {
+            "colorRef": "tissue.5"
+          }
+        },
+        {
+          "primitive": "pixel_grid",
+          "pixels": [
+            ".23..",
+            "1232.",
+            ".2211",
+            "..10."
+          ],
+          "width": 5,
+          "height": 4,
           "at": [
             9,
             1
-          ]
+          ],
+          "palette": {
+            ".": null,
+            "0": {
+              "colorRef": "ivory.0"
+            },
+            "1": {
+              "colorRef": "ivory.1"
+            },
+            "2": {
+              "colorRef": "ivory.2"
+            },
+            "3": {
+              "colorRef": "ivory.3"
+            }
+          }
         },
         {
-          "shape": "ivory_fragment",
-          "palette": "ivory",
+          "primitive": "pixel_grid",
+          "pixels": [
+            ".23..",
+            "1232.",
+            ".2211",
+            "..10."
+          ],
+          "width": 5,
+          "height": 4,
           "at": [
             2,
             6
-          ]
+          ],
+          "palette": {
+            ".": null,
+            "0": {
+              "colorRef": "ivory.0"
+            },
+            "1": {
+              "colorRef": "ivory.1"
+            },
+            "2": {
+              "colorRef": "ivory.2"
+            },
+            "3": {
+              "colorRef": "ivory.3"
+            }
+          }
         },
         {
-          "shape": "ivory_fragment",
-          "palette": "ivory",
+          "primitive": "pixel_grid",
+          "pixels": [
+            ".23..",
+            "1232.",
+            ".2211",
+            "..10."
+          ],
+          "width": 5,
+          "height": 4,
           "at": [
             7,
             11
-          ]
+          ],
+          "palette": {
+            ".": null,
+            "0": {
+              "colorRef": "ivory.0"
+            },
+            "1": {
+              "colorRef": "ivory.1"
+            },
+            "2": {
+              "colorRef": "ivory.2"
+            },
+            "3": {
+              "colorRef": "ivory.3"
+            }
+          }
         }
       ],
       "replaces": [
@@ -184,28 +506,118 @@
       "seed": 211,
       "layers": [
         {
-          "shape": "vessel",
-          "palette": "glass",
+          "primitive": "pixel_grid",
+          "pixels": [
+            "...00...",
+            "..0220..",
+            "..0220..",
+            ".022220.",
+            "02222220",
+            "02222220",
+            "02222220",
+            "02222220",
+            ".000000."
+          ],
+          "width": 8,
+          "height": 9,
           "at": [
             4,
             5
-          ]
+          ],
+          "palette": {
+            ".": null,
+            "0": {
+              "colorRef": "glass.0"
+            },
+            "1": {
+              "colorRef": "glass.1"
+            },
+            "2": {
+              "colorRef": "glass.2"
+            },
+            "3": {
+              "colorRef": "glass.3"
+            }
+          }
         },
         {
-          "shape": "liquid",
-          "palette": "liquid",
+          "primitive": "pixel_grid",
+          "pixels": [
+            ".2222.",
+            "211112",
+            "110011",
+            "110011",
+            ".1111."
+          ],
+          "width": 6,
+          "height": 5,
           "at": [
             5,
             9
-          ]
+          ],
+          "palette": {
+            ".": null,
+            "0": {
+              "colorRef": "liquid.0"
+            },
+            "1": {
+              "colorRef": "liquid.1"
+            },
+            "2": {
+              "colorRef": "liquid.2"
+            }
+          }
         },
         {
-          "shape": "stopper",
-          "palette": "cap",
+          "primitive": "pixel_grid",
+          "pixels": [
+            "01110",
+            ".000."
+          ],
+          "width": 5,
+          "height": 2,
           "at": [
             6,
             3
-          ]
+          ],
+          "palette": {
+            ".": null,
+            "0": {
+              "colorRef": "cap.0"
+            },
+            "1": {
+              "colorRef": "cap.1"
+            },
+            "2": {
+              "colorRef": "cap.2"
+            }
+          }
+        },
+        {
+          "primitive": "line",
+          "from": [
+            5,
+            8
+          ],
+          "to": [
+            5,
+            10
+          ],
+          "token": {
+            "colorRef": "glass.3"
+          }
+        },
+        {
+          "primitive": "points",
+          "points": [
+            [
+              10,
+              7
+            ]
+          ],
+          "token": {
+            "colorRef": "glass.3"
+          }
         }
       ],
       "replaces": [
@@ -220,18 +632,37 @@
       "seed": 307,
       "layers": [
         {
-          "shape": "barrel",
-          "palette": "glass",
+          "primitive": "pixel_grid",
+          "pixels": [
+            "000000000",
+            "033222220",
+            "022121210",
+            "000000000"
+          ],
+          "width": 9,
+          "height": 4,
           "at": [
             5,
             6
-          ]
-        }
-      ],
-      "lines": [
+          ],
+          "palette": {
+            ".": null,
+            "0": {
+              "colorRef": "glass.0"
+            },
+            "1": {
+              "colorRef": "glass.1"
+            },
+            "2": {
+              "colorRef": "glass.2"
+            },
+            "3": {
+              "colorRef": "glass.3"
+            }
+          }
+        },
         {
-          "palette": "ivory",
-          "index": 2,
+          "primitive": "line",
           "from": [
             0,
             7
@@ -239,11 +670,13 @@
           "to": [
             4,
             7
-          ]
+          ],
+          "token": {
+            "colorRef": "ivory.2"
+          }
         },
         {
-          "palette": "glass",
-          "index": 1,
+          "primitive": "line",
           "from": [
             13,
             5
@@ -251,11 +684,13 @@
           "to": [
             13,
             10
-          ]
+          ],
+          "token": {
+            "colorRef": "glass.1"
+          }
         },
         {
-          "palette": "cap",
-          "index": 1,
+          "primitive": "line",
           "from": [
             14,
             7
@@ -263,7 +698,10 @@
           "to": [
             15,
             7
-          ]
+          ],
+          "token": {
+            "colorRef": "cap.1"
+          }
         }
       ],
       "replaces": [
@@ -273,5 +711,6 @@
       "historicalSha256": "d1401985de5d10c9382113ee960215daf090382d5304cacc2d6e21e44c161cbb",
       "outputSha256": "69ead9477b43a6aa5b34928c3477dc96b4144a51e776262a5550281c8a05a81b"
     }
-  ]
+  ],
+  "schemaVersion": 1
 }

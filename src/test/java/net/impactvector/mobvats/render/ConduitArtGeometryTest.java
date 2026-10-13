@@ -18,7 +18,10 @@ public final class ConduitArtGeometryTest {
         net.minecraft.SharedConstants.tryDetectVersion(); net.minecraft.server.Bootstrap.bootStrap();
         net.impactvector.mobvats.gamecontent.multiblock.conduit.client.ConduitShellOwnershipTest.verify();
         net.impactvector.mobvats.gamecontent.multiblock.common.client.FixtureModelTest.verify();
-        var config = JsonParser.parseString(Files.readString(Path.of(args[0]))).getAsJsonObject();
+        var descriptor = JsonParser.parseString(Files.readString(Path.of(args[0]))).getAsJsonObject();
+        require(descriptor.get("schemaVersion").getAsInt()==1 && descriptor.get("units").getAsString().equals("model_pixels")
+                && descriptor.get("modelPixelsPerBlock").getAsInt()==16,"Invalid build geometry units/version");
+        var config = descriptor.getAsJsonObject("geometry");
         float width = config.get("nodeWidth").getAsFloat()/16;
         float ratio = config.get("tapEndpointRatio").getAsFloat();
         require(config.get("bufferWidth").getAsInt()==FluidBufferArt.BODY.getXsize()*16,"Generated buffer differs from runtime reservoir");
@@ -76,7 +79,7 @@ public final class ConduitArtGeometryTest {
         require(Math.abs(feedBase.z-(3.0/16+.01))<1e-9,"Feeder anchor moved");
         var feedLink=new net.impactvector.mobvats.gamecontent.multiblock.vat.VatPresentation.Link(feedPort,feedBase,definition.headAnchor(bounds,Direction.NORTH),Direction.SOUTH,true);
         require(net.impactvector.mobvats.gamecontent.multiblock.vat.VatInteractionGeometry.feedCurve(feedLink).points().size()==13,"Physical feeding route changed");
-        var viseRecipe=JsonParser.parseString(Files.readString(Path.of(args[0]).resolveSibling("machinery.json"))).getAsJsonObject().getAsJsonObject("vise");
+        var viseRecipe=JsonParser.parseString(Files.readString(Path.of(args[2]).resolve("machinery.json"))).getAsJsonObject().getAsJsonObject("vise");
         require(viseRecipe.get("width").getAsDouble()==net.impactvector.mobvats.gamecontent.multiblock.vat.client.render.ToolViseArt.WIDTH
             && viseRecipe.get("height").getAsDouble()==net.impactvector.mobvats.gamecontent.multiblock.vat.client.render.ToolViseArt.HEIGHT
             && viseRecipe.get("depth").getAsDouble()==net.impactvector.mobvats.gamecontent.multiblock.vat.client.render.ToolViseArt.DEPTH
@@ -108,7 +111,7 @@ public final class ConduitArtGeometryTest {
         require(mount.equals(net.impactvector.mobvats.gamecontent.multiblock.vat.client.render.ToolViseArt.center(immutableScale,.28,false,false)),"Tool replacement retained a previous grip");
         var restored=net.impactvector.mobvats.gamecontent.multiblock.vat.VatPresentation.load(new net.impactvector.mobvats.gamecontent.multiblock.vat.VatPresentation(List.of(feedLink),List.of()).save());
         require(restored.tools().getFirst().equals(feedLink),"Decoration changed restored assignment/target");
-        var renderSource=Files.readString(Path.of(args[0]).getParent().resolve("../../src/main/java/net/impactvector/mobvats/gamecontent/multiblock/vat/client/render/VatMechanismRenderer.java").normalize());
+        var renderSource=Files.readString(Path.of(args[2]).resolve("../../src/main/java/net/impactvector/mobvats/gamecontent/multiblock/vat/client/render/VatMechanismRenderer.java").normalize());
         require(renderSource.split("renderer.render\\(held",-1).length==2,"Equipped tool is submitted more than once");
         require(renderSource.contains("Axis.YP.rotationDegrees(held.is(Content.SYRINGE.get()) ? 90 : -90)")
             &&renderSource.contains("pose.scale(scale.x(),scale.y(),scale.z())")

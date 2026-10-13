@@ -1,11 +1,5 @@
 {
-  "nodeWidth": 6,
   "tapEndpointRatio": 0.5,
   "cornerLength": 4,
-  "railWidth": 1,
-  "glassColor": "#B8D9CB",
-  "glassAlpha": 32,
-  "glassEdgeAlpha": 48,
-  "bufferWidth": 10,
-  "bufferGlassAlpha": 48
+  "railWidth": 1
 }

@@ -1,25 +1,378 @@
 {
   "size": 16,
-  "finishes": ["t1", "t2", "t3"],
+  "finishes": [
+    "t1",
+    "t2",
+    "t3"
+  ],
   "recipes": [
-    {"id": "casing", "layers": [
-      {"primitive": "panel", "bounds": [0, 0, 15, 15], "channel": "base"},
-      {"primitive": "recessed_border", "bounds": [1, 1, 14, 14]},
-      {"primitive": "material_variation"},
-      {"primitive": "fastener", "at": [3, 3]},
-      {"primitive": "fastener", "at": [12, 3]},
-      {"primitive": "fastener", "at": [3, 12]},
-      {"primitive": "fastener", "at": [12, 12]}
-    ], "weathering": {"profile": "light", "seeds": [17, 43, 89]}},
-    {"id": "socket", "layers": [
-      {"primitive": "panel", "bounds": [0, 0, 15, 15], "channel": "base"},
-      {"primitive": "bevel", "bounds": [0, 0, 15, 15]},
-      {"primitive": "socket", "insets": [3, 5]},
-      {"primitive": "fastener", "at": [2, 2]},
-      {"primitive": "fastener", "at": [13, 2]},
-      {"primitive": "fastener", "at": [2, 13]},
-      {"primitive": "fastener", "at": [13, 13]},
-      {"primitive": "fixed_panel", "bounds": [6, 6, 9, 9], "color": "center"}
-    ], "ports": {"resources": ["fluid", "item"], "directions": ["none", "inward", "outward"]}}
-  ]
+    {
+      "id": "casing",
+      "layers": [
+        {
+          "primitive": "panel",
+          "bounds": [
+            0,
+            0,
+            15,
+            15
+          ],
+          "token": "base"
+        },
+        {
+          "primitive": "line",
+          "from": [
+            1,
+            1
+          ],
+          "to": [
+            14,
+            1
+          ],
+          "token": {
+            "material": "base",
+            "toward": "shadow",
+            "eighths": 3
+          }
+        },
+        {
+          "primitive": "line",
+          "from": [
+            1,
+            1
+          ],
+          "to": [
+            1,
+            14
+          ],
+          "token": {
+            "material": "base",
+            "toward": "shadow",
+            "eighths": 3
+          }
+        },
+        {
+          "primitive": "line",
+          "from": [
+            1,
+            14
+          ],
+          "to": [
+            14,
+            14
+          ],
+          "token": {
+            "material": "base",
+            "toward": "shadow",
+            "eighths": 3
+          }
+        },
+        {
+          "primitive": "line",
+          "from": [
+            14,
+            1
+          ],
+          "to": [
+            14,
+            14
+          ],
+          "token": {
+            "material": "base",
+            "toward": "shadow",
+            "eighths": 3
+          }
+        },
+        {
+          "primitive": "reference",
+          "recipe": "material_variation"
+        },
+        {
+          "primitive": "points",
+          "points": [
+            [
+              3,
+              3
+            ]
+          ],
+          "token": "shadow"
+        },
+        {
+          "primitive": "points",
+          "points": [
+            [
+              12,
+              3
+            ]
+          ],
+          "token": "shadow"
+        },
+        {
+          "primitive": "points",
+          "points": [
+            [
+              3,
+              12
+            ]
+          ],
+          "token": "shadow"
+        },
+        {
+          "primitive": "points",
+          "points": [
+            [
+              12,
+              12
+            ]
+          ],
+          "token": "shadow"
+        }
+      ],
+      "weathering": {
+        "profile": "light",
+        "seeds": [
+          17,
+          43,
+          89
+        ]
+      }
+    },
+    {
+      "id": "socket",
+      "layers": [
+        {
+          "primitive": "panel",
+          "bounds": [
+            0,
+            0,
+            15,
+            15
+          ],
+          "token": "base"
+        },
+        {
+          "primitive": "line",
+          "from": [
+            0,
+            0
+          ],
+          "to": [
+            15,
+            0
+          ],
+          "token": "light"
+        },
+        {
+          "primitive": "line",
+          "from": [
+            0,
+            0
+          ],
+          "to": [
+            0,
+            15
+          ],
+          "token": "light"
+        },
+        {
+          "primitive": "line",
+          "from": [
+            0,
+            15
+          ],
+          "to": [
+            15,
+            15
+          ],
+          "token": "deep"
+        },
+        {
+          "primitive": "line",
+          "from": [
+            15,
+            0
+          ],
+          "to": [
+            15,
+            15
+          ],
+          "token": "deep"
+        },
+        {
+          "primitive": "line",
+          "from": [
+            3,
+            3
+          ],
+          "to": [
+            12,
+            3
+          ],
+          "token": "light"
+        },
+        {
+          "primitive": "line",
+          "from": [
+            3,
+            3
+          ],
+          "to": [
+            3,
+            12
+          ],
+          "token": "light"
+        },
+        {
+          "primitive": "line",
+          "from": [
+            3,
+            12
+          ],
+          "to": [
+            12,
+            12
+          ],
+          "token": "deep"
+        },
+        {
+          "primitive": "line",
+          "from": [
+            12,
+            3
+          ],
+          "to": [
+            12,
+            12
+          ],
+          "token": "deep"
+        },
+        {
+          "primitive": "line",
+          "from": [
+            5,
+            5
+          ],
+          "to": [
+            10,
+            5
+          ],
+          "token": "light"
+        },
+        {
+          "primitive": "line",
+          "from": [
+            5,
+            5
+          ],
+          "to": [
+            5,
+            10
+          ],
+          "token": "light"
+        },
+        {
+          "primitive": "line",
+          "from": [
+            5,
+            10
+          ],
+          "to": [
+            10,
+            10
+          ],
+          "token": "deep"
+        },
+        {
+          "primitive": "line",
+          "from": [
+            10,
+            5
+          ],
+          "to": [
+            10,
+            10
+          ],
+          "token": "deep"
+        },
+        {
+          "primitive": "points",
+          "points": [
+            [
+              2,
+              2
+            ]
+          ],
+          "token": "shadow"
+        },
+        {
+          "primitive": "points",
+          "points": [
+            [
+              13,
+              2
+            ]
+          ],
+          "token": "shadow"
+        },
+        {
+          "primitive": "points",
+          "points": [
+            [
+              2,
+              13
+            ]
+          ],
+          "token": "shadow"
+        },
+        {
+          "primitive": "points",
+          "points": [
+            [
+              13,
+              13
+            ]
+          ],
+          "token": "shadow"
+        },
+        {
+          "primitive": "panel",
+          "bounds": [
+            6,
+            6,
+            9,
+            9
+          ],
+          "token": {
+            "colorRef": "fixed.center"
+          }
+        }
+      ],
+      "ports": {
+        "resources": [
+          "fluid",
+          "item"
+        ],
+        "directions": [
+          "none",
+          "inward",
+          "outward"
+        ],
+        "markings": {
+          "none": "port_none",
+          "inward": "port_inward",
+          "outward": "port_outward"
+        },
+        "resourceColors": {
+          "fluid": {
+            "colorRef": "fixed.fluid"
+          },
+          "item": {
+            "colorRef": "fixed.item"
+          }
+        },
+        "colorParameter": "marking"
+      }
+    }
+  ],
+  "schemaVersion": 1
 }

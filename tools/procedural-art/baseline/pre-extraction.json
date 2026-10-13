@@ -1,0 +1,2751 @@
+{
+  "schemaVersion": 1,
+  "generatorVersion": "1.13.0",
+  "revision": "6fa092550e14028eec533de883b5ef71bd67cb38",
+  "assets": [
+    {
+      "path": "assets/mobvats/blockstates/blender.json",
+      "sha256": "40e038cc361bc2a3d727fae0aff4a54e4e1681a7051172f70a41be402ade5912"
+    },
+    {
+      "path": "assets/mobvats/blockstates/feed_port.json",
+      "sha256": "29697f5027f5b74b405b40d523c8c539929a1a013bf8d45f421b2ee6ef2056d9"
+    },
+    {
+      "path": "assets/mobvats/blockstates/fluid_port.json",
+      "sha256": "8c1d01f34694b88dc426d4b04366aa5acb08241832c3f9fa53c7370e1d2c6cd7"
+    },
+    {
+      "path": "assets/mobvats/blockstates/item_port.json",
+      "sha256": "d409024ff779399007a915376cb43e8f019b1ce1ed6cbd74df8b06f9b2e92cab"
+    },
+    {
+      "path": "assets/mobvats/blockstates/tool_port.json",
+      "sha256": "eb2621692c71a9bc5a61a62814e77fa9db638f3dde31de83a6ec427d6efb7239"
+    },
+    {
+      "path": "assets/mobvats/conduit_preview.json",
+      "sha256": "08d7ce6870745b5e388ae74dd93a7df64324c3b183e9140e5e80453e3476ad70"
+    },
+    {
+      "path": "assets/mobvats/fixture_mesh.json",
+      "sha256": "632b4c39474de720996252a1ca2bde3f7356644e5f8b1926511ec002af279d15"
+    },
+    {
+      "path": "assets/mobvats/models/block/blender.json",
+      "sha256": "80ee88372b00f2187596fa25dd6038be1050938a2a59f55b505f070aa8df6cc0"
+    },
+    {
+      "path": "assets/mobvats/models/block/casing_fluid_buffer.json",
+      "sha256": "bb89fd3b2d81c2191b8f2851ef83f99dc529744da9f65f65ea1b6ecdfe8bd371"
+    },
+    {
+      "path": "assets/mobvats/models/block/casing_fluid_conduit_tap.json",
+      "sha256": "a3f7e7781ea39b7a33ea643979e798222c434d08c807ddc0df064e13fc58e35b"
+    },
+    {
+      "path": "assets/mobvats/models/block/casing_fluid_conduit_trunk.json",
+      "sha256": "3930c768a8c3cf653c967c86cc94163cf0014f0242957f9108960696214144a4"
+    },
+    {
+      "path": "assets/mobvats/models/block/casing_item_conduit_tap.json",
+      "sha256": "aaab30256744028151fa72aaff884562d86693c3c6f4041c9403ae7169cc7a68"
+    },
+    {
+      "path": "assets/mobvats/models/block/casing_item_conduit_trunk.json",
+      "sha256": "2638a73886e92bff5e01f903b41cdf2ff2e8f12f44164cc8bde71afb7ae79d7f"
+    },
+    {
+      "path": "assets/mobvats/models/block/casing_material.json",
+      "sha256": "b0d5ca03f0a67642b800f8454fe9350ead6021ac990ee4ff0f9d51fc53dbd089"
+    },
+    {
+      "path": "assets/mobvats/models/block/creative_drive.json",
+      "sha256": "78a92b3e61c0e32606ee64c677df3a7712f0df5f8b048db5631673d7c9e493d0"
+    },
+    {
+      "path": "assets/mobvats/models/block/drain_valve.json",
+      "sha256": "e0f2ec2bdeed8493152796358f53f3d84c0285bc23f52dbf31966302576c0974"
+    },
+    {
+      "path": "assets/mobvats/models/block/feed_port.json",
+      "sha256": "0b374d6423ee0d5dca60db951e64b7d3cc43494588f255cb9d44aef97687b858"
+    },
+    {
+      "path": "assets/mobvats/models/block/fill_valve.json",
+      "sha256": "ef77e99691ee3288397a0d01bbf28249c837fd121bae971929db1b4308b1cead"
+    },
+    {
+      "path": "assets/mobvats/models/block/fluid_buffer.json",
+      "sha256": "f550df05906f848ca5036e0f4ce9e415b80fe83eaa8145f89a8da699dc0031ba"
+    },
+    {
+      "path": "assets/mobvats/models/block/fluid_conduit_tap.json",
+      "sha256": "53247b4db5e9c4f805a0452c1635a1e7b9a40d98ab937832f038491d29b505ef"
+    },
+    {
+      "path": "assets/mobvats/models/block/fluid_conduit_trunk.json",
+      "sha256": "da486ddf84eb11fa8569d386654adef1d94754cb7bc7021dd18d6040b506700b"
+    },
+    {
+      "path": "assets/mobvats/models/block/fluid_port_inward.json",
+      "sha256": "f2a36ca00a2838a128017fbf90afea19d376660828f203ebece1f17d4c750e89"
+    },
+    {
+      "path": "assets/mobvats/models/block/fluid_port_outward.json",
+      "sha256": "ca594923d635939842fc15d586bf4422076051d0633eecb3b4748347a8b32162"
+    },
+    {
+      "path": "assets/mobvats/models/block/fluid_port.json",
+      "sha256": "7aac2f63c2032d8b596fe34a63f7f9411ed040b1024d15b5743df562f68cd373"
+    },
+    {
+      "path": "assets/mobvats/models/block/fluid_void.json",
+      "sha256": "386ba3f1c59cb385c518124a3d9674f8211bd9a1c544edd327a5988f4f7c0312"
+    },
+    {
+      "path": "assets/mobvats/models/block/formed_glass_material.json",
+      "sha256": "8e9a0dc1ee3ba40294d305e253c446a01f95fbf0d541f935b52cc9b6fcf0bda7"
+    },
+    {
+      "path": "assets/mobvats/models/block/glass_fluid_buffer.json",
+      "sha256": "8d21f27675780470b014e7af6c9f4016760e61788e03deb673d1558702b14d30"
+    },
+    {
+      "path": "assets/mobvats/models/block/glass_fluid_conduit_tap.json",
+      "sha256": "c5fc20aa639b2793c31925f175c0a273f21c16c7f6c42495b3154d4e8130bde7"
+    },
+    {
+      "path": "assets/mobvats/models/block/glass_fluid_conduit_trunk.json",
+      "sha256": "1ad08745070f1b4a619180afe118bf9998c1c6948456c9870eca83aa17ed6223"
+    },
+    {
+      "path": "assets/mobvats/models/block/glass_item_conduit_tap.json",
+      "sha256": "d4dfe3b61d42ee8c4b5a62264999c9edd079ff0d0677911933cc5ef5c0774fb4"
+    },
+    {
+      "path": "assets/mobvats/models/block/glass_item_conduit_trunk.json",
+      "sha256": "4e9f0e76f06883ae07edd0b03c82f8997b8743ddae1dc233ec4d9176f8b6bb0a"
+    },
+    {
+      "path": "assets/mobvats/models/block/item_conduit_tap.json",
+      "sha256": "cb6e6aca2beea323b7294cd06f3cd195af8f997318061e3fbcda42f0f35d7108"
+    },
+    {
+      "path": "assets/mobvats/models/block/item_conduit_trunk.json",
+      "sha256": "3781414b3b138af2c6dfaa28b172feb450bb4ac32fb2cbb6a64ccf19bbe4c301"
+    },
+    {
+      "path": "assets/mobvats/models/block/item_port_inward.json",
+      "sha256": "d161539d2b9e551ab2a1f1f622003795c0f481e4ba18ad68392fd93a48d4121a"
+    },
+    {
+      "path": "assets/mobvats/models/block/item_port_outward.json",
+      "sha256": "a517fb1e846322575e074d49e39fd3e68d19af4eb2c0bc11747a61634fd39440"
+    },
+    {
+      "path": "assets/mobvats/models/block/item_port.json",
+      "sha256": "1c18477c3cacad63ffd275d0ab0c4ef120a3f405333320348f9e42f429103d2b"
+    },
+    {
+      "path": "assets/mobvats/models/block/item_void.json",
+      "sha256": "6fd5b33c7f34cd85fbf3413c6caf2f652aabd2b9e6466d5329ce17de643171ef"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/blender_mixer_t1_casing.json",
+      "sha256": "5bd75e5c83b0857fdd4853dac9425223e1f7af658bff92c04b2e018b85e3093f"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/blender_mixer_t1_glass.json",
+      "sha256": "ae4cdc1753155b55656283a0c18d483f8ccb4f0b7e816ea67b6253870edf8fb0"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/blender_none.json",
+      "sha256": "1c28f5d6ba27a940fa1e4a8b47159d9e716135a58341d0ae40c0030432b1f802"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/blender_vat_t1_casing.json",
+      "sha256": "b5c61aee6f2b038332fad32f2193cd30be01a88370edb29f5e8e41a193e11a83"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/blender_vat_t1_glass.json",
+      "sha256": "06301cf8d37a31df71208d8dd3b1d41b02d817eefa6c68ba40c19fda1543d61d"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/feed_port_mixer_t1_casing.json",
+      "sha256": "15f6be7a80ce8e0eaae88dc0531b470d99c4967d026a738398d3b42a9e776559"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/feed_port_mixer_t1_glass.json",
+      "sha256": "49a019f25b45da9c28f5635f1e13f38519b11baaf511a7e56cc6f86c7d4cbffa"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/feed_port_none.json",
+      "sha256": "483b17caa27eaf4c90d82dbefb99a3d13829a0736a9e6ca28a1087d4572e5031"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/feed_port_vat_t1_casing.json",
+      "sha256": "338b9acf523666950212fa5c2daba049a85f85122f8cdeb81cea8c1d3f45a195"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/feed_port_vat_t1_glass.json",
+      "sha256": "0e882f1d44b81a3268ab35f85313d4b51b9920dea7c0252cdce208bccea8fd40"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/fluid_port_mixer_t1_casing_inward.json",
+      "sha256": "79b9c7d90355d4a46373461d581423b4d18bdd5ce1d4f8042c9f82d4ad9778f9"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/fluid_port_mixer_t1_casing_outward.json",
+      "sha256": "f054dc118b1761f5a64f424f02c81caee9ab4e1c6ebb394f40ef935a2b510b1c"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/fluid_port_mixer_t1_glass_inward.json",
+      "sha256": "60ce47405421381f9a205f8c2df11fb64a6a4090d1057659537c9e08ee3ec57d"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/fluid_port_mixer_t1_glass_outward.json",
+      "sha256": "f2c1c0c438c7eaf088dbca6a2845c5f0658e7194492ceccfb74b05249c23acca"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/fluid_port_none_inward.json",
+      "sha256": "7aac2f63c2032d8b596fe34a63f7f9411ed040b1024d15b5743df562f68cd373"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/fluid_port_none_outward.json",
+      "sha256": "0398a9fe06a50643cae33fb2306780ccda7b7209f702ca28a5c45da12a07afd1"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/fluid_port_vat_t1_casing_inward.json",
+      "sha256": "da1970c23ad713d5bdf5262ff3b14b3b28e4555ec777eee5425fe73f736f42cd"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/fluid_port_vat_t1_casing_outward.json",
+      "sha256": "36da766fe4b46b5a31cad805fb9096a7eb63f87a5a17747ce8d70efd5a088edf"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/fluid_port_vat_t1_glass_inward.json",
+      "sha256": "1919c50e345a1f53ca6a14ce9514836eb08ecf8967c2523454fbde65ffea6fe5"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/fluid_port_vat_t1_glass_outward.json",
+      "sha256": "f90828e9035aa62c2b80b0a436bf1d1c9a58a734bc0066a8c4fbd0a5d0a92ac6"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/item_port_mixer_t1_casing_inward.json",
+      "sha256": "16518dbe3fdf6a329631f3fc4147f71550c49c8301a43109780176b54371154a"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/item_port_mixer_t1_casing_outward.json",
+      "sha256": "f4da0a52f7ca6a282004ea11d08bb292bd9ee4b0755036d20ef8175aa6908fcb"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/item_port_mixer_t1_glass_inward.json",
+      "sha256": "c9da1ca78715b4cc5cb318d47f54b1b908296256b8094008f22f5bb6f70731d7"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/item_port_mixer_t1_glass_outward.json",
+      "sha256": "f02bbd595d53183a9e53bd6203e1e2152517d2699e37b7c873c7cc0e1138aa03"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/item_port_none_inward.json",
+      "sha256": "1c18477c3cacad63ffd275d0ab0c4ef120a3f405333320348f9e42f429103d2b"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/item_port_none_outward.json",
+      "sha256": "d7261340627429a44f03ad5e1c6a638fcf35611d553bf3314af5b71e8f526a60"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/item_port_vat_t1_casing_inward.json",
+      "sha256": "eb00fa4484a9dd952a4b4c578d9edbab459b087444dc4c5aea022b83f3531566"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/item_port_vat_t1_casing_outward.json",
+      "sha256": "4e7fab5e4055c2248f286771ea8c2d8ea269af83692c1932471c5711051abd76"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/item_port_vat_t1_glass_inward.json",
+      "sha256": "fcd6e0bb1e14a58a6a52fa66976db2bdd1e73e2ece1b6d723cc49f97ce666fdb"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/item_port_vat_t1_glass_outward.json",
+      "sha256": "9fbe97c8ab9ad3bc8d640d589802197416e9464aae8cb7ee5a41cda83906036e"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/tool_port_mixer_t1_casing.json",
+      "sha256": "96f2d6a98d85cfbfccb7aadc00f56200f29ff248fbc122c1c404857341204fa2"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/tool_port_mixer_t1_glass.json",
+      "sha256": "ac0137a43fac325be27d249e08936680ac6d5d2470f63bcf08f9411ed79fc079"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/tool_port_none.json",
+      "sha256": "bae54102311263ba03d854fe5270dcafcbcec03b354ef78890dbfe9b30a3a5d5"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/tool_port_vat_t1_casing.json",
+      "sha256": "337a5e6e541acbe15b6eb32156b7635dd493cd1ead73aaf2cb3e6397e624bcda"
+    },
+    {
+      "path": "assets/mobvats/models/block/mechanical/tool_port_vat_t1_glass.json",
+      "sha256": "099f4d6485dd20be24c970d021f7f4f0674cd208b2a48add731a0d7a6943f0d7"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_casing_fluid_buffer.json",
+      "sha256": "e727851c4fce44dd964fc3c56790f13a39c8b3f414c7c11e38d8e306dea6fe5f"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_casing_fluid_conduit_tap.json",
+      "sha256": "e377e2ba3ede00a6523678b8ea324fec1902d61d34267e3c502a4ddc656c11cd"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_casing_fluid_conduit_trunk.json",
+      "sha256": "08fde2ad8f41f3ce1fe80cd15692f1ac0f6d05a0c17be2819b0f523252302ad0"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_casing_item_conduit_tap.json",
+      "sha256": "3e5f8553a9a00b8fae8098b07f8b049686bf23b74fab9a587f8a40dd3272de31"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_casing_item_conduit_trunk.json",
+      "sha256": "b91f1d2c918a556e0192f3a583c3108fe2e07d0e131e15b42951be26ce7ec456"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_casing.json",
+      "sha256": "05acd7ee1e345d4fb4425523b282fcc87c815cb2af4ae61b399673c0d63fdc34"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_combustion_drive.json",
+      "sha256": "4dfbe8bdbba9365df436dfc3b9b9323ff521e6670b61f1643691c444dc575a55"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_controller.json",
+      "sha256": "03c9f93568c6515d818748eaa5c14fc7c4fe562de422599be64514bab9e112e4"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_fe_drive.json",
+      "sha256": "b6c69c591212bab58b1d0bba8f2919ef2446d6dafc835203c36f12f72dafac2b"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_formed_glass_material.json",
+      "sha256": "2cf04a88902be2e1bcafa4412a0e4757ad7cdc229597fd005e6dcffd9c44188f"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_glass_fluid_buffer.json",
+      "sha256": "84294ffee2d32dd2f9d08859ea36865a2dca7e04f0289a3c33d036f213ee68a6"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_glass_fluid_conduit_tap.json",
+      "sha256": "05b522475f6fdba48dbff7f71889effd19cdb76825ac18f294d8f33460f7efc0"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_glass_fluid_conduit_trunk.json",
+      "sha256": "11f330cc7bfe1257b12e11a7365390188621a51410245351cd0e31cee6331c86"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_glass_item_conduit_tap.json",
+      "sha256": "1aecb3d64f2a2446fff20f1821790b8f6f4764c012302037551d8714748ca4be"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_glass_item_conduit_trunk.json",
+      "sha256": "33eec2a0dc6cd0f03a8a276a6dc6f4ec8b5a005040309483954d43c4d81df48e"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_glass.json",
+      "sha256": "f6e38465a7708bc274712c44f4f660a064064cfeed6cc2481605de962af465e0"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_impeller.json",
+      "sha256": "0b62f8d459a2dbd5001495f319736dce866f477b0c42c1d9d3165613c2ac49aa"
+    },
+    {
+      "path": "assets/mobvats/models/block/mixer_shaft.json",
+      "sha256": "d0672ac3b5368d43a5608e971d8fde3909df61b74154086be74000c3ac7836b1"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/blender.json",
+      "sha256": "9c5092758076fbb144b7c34c032b704d7cdab202a59ee3c70e3cc44cf254ba55"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/buffer_extension.json",
+      "sha256": "80bdebb150df170015fdc47f1e1ceb21b1a285813e832b3a9340e3b56bd0bf03"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/buffer_reservoir.json",
+      "sha256": "53b528737438cd1d13ee971fe03cf8d9779f30d5948eab3c3cef5ce1d41dcfef"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/casing_fluid_buffer_frame.json",
+      "sha256": "7582c287beb5e186620285e3a810ef208f9a05dc32e374cfc0ef4019cbc3a087"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/casing_fluid_buffer.json",
+      "sha256": "bb6efeaed98b3202dc62c52a9adc718d2dd4584adc25c50502583ec67abb7da0"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/casing_fluid_conduit_tap.json",
+      "sha256": "538811afc9765a7e17282bdbee20d13dba82c6f12ceb34070d218d926b7d2d24"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/casing_fluid_conduit_trunk.json",
+      "sha256": "538811afc9765a7e17282bdbee20d13dba82c6f12ceb34070d218d926b7d2d24"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/casing_item_conduit_tap.json",
+      "sha256": "54047772c9381f62d77adc78b87b6f096dfce420a7e591e22eb2bed3444a75da"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/casing_item_conduit_trunk.json",
+      "sha256": "54047772c9381f62d77adc78b87b6f096dfce420a7e591e22eb2bed3444a75da"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/creative_drive.json",
+      "sha256": "453934a7f0a71fd84449d196aeba92774ce16be041d0c13af52fbd6ef21d6510"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/drain_valve_core.json",
+      "sha256": "08e6ce80d424235daa9465a23266d2aed90d28c4999ede20168054aaa9ae7a2c"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/feed_port.json",
+      "sha256": "c952b5f6d87742c5f8b621a5fc7fbc0b14ba11328517088f5e800e2ab479fef8"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/fill_valve_core.json",
+      "sha256": "74767c0d6fd717a231bf15951171ece5781199504c7a305828f75c8d91661089"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/fluid_buffer_frame.json",
+      "sha256": "a1a79e24b10a464fef57f3edea927543167e738b9b249ea317391c07c37f1306"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/fluid_buffer.json",
+      "sha256": "8569718e03c11317a69c61769c144a6d60f048fb6efeeaf4e79726e27fa6b464"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/fluid_conduit_tap.json",
+      "sha256": "7de6abbdf83a9f12a6fdc4c9f61fc2e3a8cb5f54cd1c635bf8f87b7fa794a16e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/fluid_conduit_trunk.json",
+      "sha256": "7de6abbdf83a9f12a6fdc4c9f61fc2e3a8cb5f54cd1c635bf8f87b7fa794a16e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/fluid_void_core.json",
+      "sha256": "1ecfb29ec0a63ddf8cbd5cb8e1e239357be6c241247b55665c9a24e2c4c841c4"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/glass_fluid_buffer_frame.json",
+      "sha256": "1019d828095affbe9063987251be198526d513c9d7a34e00a58a4b358aa5a85e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/glass_fluid_buffer.json",
+      "sha256": "bb98b8afc3cce4116c6505c9033a55cbd8f7039d1a62622ddcca8264a57b3d9e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/glass_fluid_conduit_tap.json",
+      "sha256": "4641fd8772d9b2aef38dd496487d48c3fdccfaca391ada816192a250732a5d29"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/glass_fluid_conduit_trunk.json",
+      "sha256": "4641fd8772d9b2aef38dd496487d48c3fdccfaca391ada816192a250732a5d29"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/glass_item_conduit_tap.json",
+      "sha256": "92b685a454d95e344867b88a3801b947fbc7f2fee978251c02af2f3586e1eee0"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/glass_item_conduit_trunk.json",
+      "sha256": "92b685a454d95e344867b88a3801b947fbc7f2fee978251c02af2f3586e1eee0"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/item_conduit_tap.json",
+      "sha256": "082eed30afb1826f06f9c780804da256cb7179857f3d7edfa2f3d2b9069f0267"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/item_conduit_trunk.json",
+      "sha256": "082eed30afb1826f06f9c780804da256cb7179857f3d7edfa2f3d2b9069f0267"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/item_void_core.json",
+      "sha256": "8cac049a87883faa5e030f8807a921cd46ee9583568c032d31ceda83dee9c85b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_bare_fluid_void.json",
+      "sha256": "a9f8420c59ec53e912243ccb26202dfc25318c5d33bb2f64591b599b2dfa08c3"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_bare_pull_pump.json",
+      "sha256": "d2471a88d7183b12bfcaa818662efec44a0766494e8caeb518a9813a9341a7ab"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_bare_push_pump.json",
+      "sha256": "7506ad237af8f4f6d414cc5eb61c885a6acae7a65920d5329fefec54a4846d6a"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_casing_fluid_buffer_frame.json",
+      "sha256": "f0b41827a81f21e36a8fb09ad75d63acc31047c5ac5c5167989569709d79568e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_casing_fluid_buffer.json",
+      "sha256": "27d87f5c1c5f0962e06ac7b203c0b41911e5be1013687b00e1a81d4de1bfa6a1"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_casing_fluid_conduit_tap.json",
+      "sha256": "6b077226d5a2af13ffb92a6882ec474de35cf98038f0142c091599939bc51740"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_casing_fluid_conduit_trunk.json",
+      "sha256": "6b077226d5a2af13ffb92a6882ec474de35cf98038f0142c091599939bc51740"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_casing_fluid_void.json",
+      "sha256": "62bc4248e7eb08a49eb1c297b44f52856e34dd076de44d93261dbefc8f112931"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_casing_item_conduit_tap.json",
+      "sha256": "47e775d84cc5963dd4cd53c696a8e434459f8fba9e3293fd18fd0429859bf64b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_casing_item_conduit_trunk.json",
+      "sha256": "47e775d84cc5963dd4cd53c696a8e434459f8fba9e3293fd18fd0429859bf64b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_casing_pull_pump.json",
+      "sha256": "06e07a85ad81116733295efa17c71aa7c55706473d18d55476a6c19b8224aba6"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_casing_push_pump.json",
+      "sha256": "17e1d848a6722ff388a883f35026e8e7896069a04c9b1a8f914c30cc0e796c00"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_casing.json",
+      "sha256": "21284bcb4bce3811815685c2f30e0d57b4dcb2c6bd192d06295faa7c1bd1aa67"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_combustion_drive.json",
+      "sha256": "201c67b7f23bf531a827395e17b563cc2e32eb490a26361f55ec6f79c0da7504"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_controller.json",
+      "sha256": "30e8927d6967e3f0a16811f5faec1cabb12f85955d10824d5216afe520f3a6f9"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_fe_drive.json",
+      "sha256": "019d5b002d240452afe70864ce1d42110813eb48be4802d6bc029b3bb60231c6"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_glass_fluid_buffer_frame.json",
+      "sha256": "942e4fca951d6420d18b4c41bb21d6d2ea04f8fee0d26cc0f37b75a8681a10fd"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_glass_fluid_buffer.json",
+      "sha256": "6ad10546e327715d9445b83a220629e1edea01a91c2c0709761b776e81da8878"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_glass_fluid_conduit_tap.json",
+      "sha256": "3a07d0314be9b1162c6275538c7a9b16a0c5d30a80e1eb15c6a956ed68da321e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_glass_fluid_conduit_trunk.json",
+      "sha256": "3a07d0314be9b1162c6275538c7a9b16a0c5d30a80e1eb15c6a956ed68da321e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_glass_fluid_void.json",
+      "sha256": "12429993947d45e7a66355f653d78a58c2a34713d895c3345b1e22499571d244"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_glass_item_conduit_tap.json",
+      "sha256": "f30e819440674d87a56a3caae85cba2e389d3c7fe4e1ca94f37ad8daf92007b5"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_glass_item_conduit_trunk.json",
+      "sha256": "f30e819440674d87a56a3caae85cba2e389d3c7fe4e1ca94f37ad8daf92007b5"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_glass_pull_pump.json",
+      "sha256": "1037b9e1437186f2895433820331dfdd2769db4a65f0144d3915782e85a9a024"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_glass_push_pump.json",
+      "sha256": "ccee3a3ea9e342d5b4baca8f33d87dbef40c2fe3cf82226fe3e871cd983dd265"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_glass.json",
+      "sha256": "95cc8a358a67f5a25437fab8ab753df60c76749b2a3761aadd436216d79069a0"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_impeller.json",
+      "sha256": "34051630170abc5aa43c3ec764961abba23df67835dbebe396dc8d1806f479bc"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/mixer_shaft.json",
+      "sha256": "cf7fe6c866d0c313920be834b86fa4ae3ddde06a6d782fbaefc81f860ffdb688"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/pull_pump_core.json",
+      "sha256": "a438ffdc22c281b96513565b3a692dc811293204b9be87af90ad99038dd6862b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/pull_pump_sleeve.json",
+      "sha256": "ffc17739b41dd06376680f49b4d3c31694b10f69c291dae8d3459f2b7b75f2d9"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/push_pump_core.json",
+      "sha256": "a79bb4ce049ea2a951465d0ec78fdd89f1bdaf8473be764b7a36f728107c2f4c"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/push_pump_sleeve.json",
+      "sha256": "eacf6b32ef79d635c66e948bc5643185e5aee5258e1bc33f7778116b99051fbc"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/tool_port.json",
+      "sha256": "112e3e1fb82b12f92aeebd73981fc06ec93402ec3c12e8b8d63b8f0bc3b4e828"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/tool_vise.json",
+      "sha256": "baf3992deb0e39e0513301389752e30109dcf10bb789570ab936fb02f24253ff"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_bare_drain_valve.json",
+      "sha256": "1a1cf704bbe9b2192e3f426285842a4e1d6b1e00c68768e1b0ae096d0bb3c2ad"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_bare_fill_valve.json",
+      "sha256": "a00c9c83ba57fa985b6327fc14302a3d6260cca8eac650878f4c7a231fb85f4a"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_bare_fluid_void.json",
+      "sha256": "336537452b7372b6352e899136913c0a1f039a02ed752c273589e370f31b9999"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_bare_item_void.json",
+      "sha256": "462fa3d7cb8c65fa0905ac594a26a17ee7abc1e9c2c0691aa474f5f0d353dca5"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_bare_pull_pump.json",
+      "sha256": "e9f1f5545e1ff24f558f47a31939d4136cce9612d6cb203007d430e0ccb9ebbf"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_bare_push_pump.json",
+      "sha256": "9681405e6633edf633f54348563005631e31207463831c711b3f1212f5be94b3"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_casing_drain_valve.json",
+      "sha256": "434d93745129ec8ec18e46731e304ebde183b3a5f38c9a7cdb7abf268c1613cd"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_casing_fill_valve.json",
+      "sha256": "dc920aa87a970213c61176a481fa9253242cd507374efc95473b9409fe775a0c"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_casing_fluid_void.json",
+      "sha256": "24cc4777bbebca2767920eea394364a2b0168d2be0d1e5d72e73d22ea60b2195"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_casing_item_void.json",
+      "sha256": "c0442aba1690dd6ddf2edfe159ec2932162a6e1eb5bbf00c6692c78e9ec41a8d"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_casing_pull_pump.json",
+      "sha256": "6b8c5b165063197b96e712150070fe720e99d8c202deab7ac705bf01a05845a8"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_casing_push_pump.json",
+      "sha256": "f2e897e1c9891c98b337bc9347f785753c0c7326a8c0ef26e956f26010c0a575"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_controller.json",
+      "sha256": "de7a8714d92df3d4d6908ba70808fda29b490b45a1f441106fcc9bca5cefd89d"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_drain.json",
+      "sha256": "64d37618c7d408d967e894f389de487025dfd22f0acad665662b2adbf46fe061"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_glass_drain_valve.json",
+      "sha256": "1fe86671b098fb8ffb48c3df0121e6c226c4361ce925d8ff3fca307e8e1e8db2"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_glass_fill_valve.json",
+      "sha256": "4bbd9854ce3a79ce9093e9f4e2cb0ee7cbba57d89942ccac77f595a6f8e1abed"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_glass_fluid_void.json",
+      "sha256": "2100020a7d6ab6fe3bb06b45a055b550a5fc2763ec3e072359b5088fa47815ed"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_glass_item_void.json",
+      "sha256": "70e4f06aa5b01f9828133f7cd42d34e173bc17dd4a0dfb8ddeab39e67fe85da4"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_glass_pull_pump.json",
+      "sha256": "11bbb20b6fd4c160c262063542ce95a1776fe09f1d2ca707a1b592fe33e7d399"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_glass_push_pump.json",
+      "sha256": "f480dbbcb4de153d74b043e559c4a6ba83ece967abe267dcf0f24b6dc3f0e672"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_glass.json",
+      "sha256": "4fea3712f6d5ce0f5ea6586b058076d27f08102fdcac12069e62bf29224592ee"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/master/vat_harness.json",
+      "sha256": "32f816b71a9c8874f2d9713992314ae9dc98378e58b6de7f09037e63b90c2080"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/blender.json",
+      "sha256": "4b5ce6ed54d658f52cfcbcbb118099ae538f1844a5ed85fd89f7d191b6655b70"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/buffer_extension.json",
+      "sha256": "597e1bae9381de9383aa03e1b37c14ee18d689bfdc741c8963e214be6d42eedd"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/buffer_reservoir.json",
+      "sha256": "d22acf0263e764396ef0ed3e9b432af282ef529ea08eb6f38b83bcb5ba27dff1"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/casing_fluid_buffer_frame.json",
+      "sha256": "d764e879e2468c5530e0e988b99823142c7a62b667e4d7a9120c07319c85761a"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/casing_fluid_buffer.json",
+      "sha256": "fb231ea2dcad0a606e2579b8bbcf647c988918cdf8e6381d9cc458181552c576"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/casing_fluid_conduit_tap.json",
+      "sha256": "c361223354460dce9f5e68b63f2b9a1c0c939846dd49ff2b30a755dcc7b8fd28"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/casing_fluid_conduit_trunk.json",
+      "sha256": "c361223354460dce9f5e68b63f2b9a1c0c939846dd49ff2b30a755dcc7b8fd28"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/casing_item_conduit_tap.json",
+      "sha256": "842232a46deda193769f2f8edc4b01220e8dca2905806fe7fc85cba777ba8870"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/casing_item_conduit_trunk.json",
+      "sha256": "842232a46deda193769f2f8edc4b01220e8dca2905806fe7fc85cba777ba8870"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/creative_drive.json",
+      "sha256": "6b9446b3e51d59ed4447884e25f56ac0b3b21e799ea6e574a1dda7ece11b6218"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/drain_valve_core.json",
+      "sha256": "88a5617a584e0812cd98fe284ff2caf0fb36334424ee0c32c0f965482144146d"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/feed_port.json",
+      "sha256": "f7ec098d8563aea2890746c3eafc79ca3d258aef5040e8ff83e3c84c64d9cf70"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/fill_valve_core.json",
+      "sha256": "d63bb5051e296f0db7f3cacc7fbc39cac09b883f1fb1b76a236f20350aeeb340"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/fluid_buffer_frame.json",
+      "sha256": "6ecf96ed925a2464f7926cc616f824c21b562130733ee217bdec8a790196df45"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/fluid_buffer.json",
+      "sha256": "c6ddfb351246eb0a34134396be15564b9877d50e65ccb725992c24be1bd4d61c"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/fluid_conduit_tap.json",
+      "sha256": "82840e45b401459b1b8237878f33962bbee8d8f1dfa72390f85672f1b28c8e0d"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/fluid_conduit_trunk.json",
+      "sha256": "82840e45b401459b1b8237878f33962bbee8d8f1dfa72390f85672f1b28c8e0d"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/fluid_void_core.json",
+      "sha256": "5e6af7821f82f88f7eea5e167cc099483de57ebe70a88b376744e6c2a9b79838"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/glass_fluid_buffer_frame.json",
+      "sha256": "3478d4a032aa049e3307fc642c8ca9188a537bc7b7ea558046b6b0c296bbb2de"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/glass_fluid_buffer.json",
+      "sha256": "daa853bcf2c70976bcb91fe601a77553ff1bb5e7ab3d918f7cabbef48bb97e35"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/glass_fluid_conduit_tap.json",
+      "sha256": "ac9c78d463e7fc32c5a4a8bb55389965ec5907ac6fafdf1160f4514285190241"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/glass_fluid_conduit_trunk.json",
+      "sha256": "ac9c78d463e7fc32c5a4a8bb55389965ec5907ac6fafdf1160f4514285190241"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/glass_item_conduit_tap.json",
+      "sha256": "439328e042f143265ee59554e5dbcc3e0468304358d5bf6d8595d4cf0d93d779"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/glass_item_conduit_trunk.json",
+      "sha256": "439328e042f143265ee59554e5dbcc3e0468304358d5bf6d8595d4cf0d93d779"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/item_conduit_tap.json",
+      "sha256": "bde5fe8b27a87af08816000b6621b2318652fdbcb8e0ff120ae3a35f306988fd"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/item_conduit_trunk.json",
+      "sha256": "bde5fe8b27a87af08816000b6621b2318652fdbcb8e0ff120ae3a35f306988fd"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/item_void_core.json",
+      "sha256": "73509ab0c90f13120171da58142de5d150132d208e000e75cd2052f676bddb9a"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_bare_fluid_void.json",
+      "sha256": "bfb2360b23514c45df6dac30d06afba27d8e9cbe23d15ef4c275e9bcf60486ad"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_bare_pull_pump.json",
+      "sha256": "087927beaafbb87737df0ba5dbbfd48be4f07a593814071644cd60c2bb4a414e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_bare_push_pump.json",
+      "sha256": "9210881287eb68555f420536f170023a4837a95ba71b618d323cf5b22a242eb3"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_casing_fluid_buffer_frame.json",
+      "sha256": "37c8f0dfbd6bd97ab8c3c9da25c78cbfc9c261570528f6bd01e0c0b0bacde994"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_casing_fluid_buffer.json",
+      "sha256": "54047bf554a33986ca99fc9246b33f68e6f58e7a4a4ea484683fc8b6f95decc0"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_casing_fluid_conduit_tap.json",
+      "sha256": "6aefcfd1039f840c3558226141feeae0ad1a2ac6ed741cb82439cba2170181f7"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_casing_fluid_conduit_trunk.json",
+      "sha256": "6aefcfd1039f840c3558226141feeae0ad1a2ac6ed741cb82439cba2170181f7"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_casing_fluid_void.json",
+      "sha256": "594d323f12274c00f93e22dc78d17561bdea95a5326f5ef7cddf74fef45dbaca"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_casing_item_conduit_tap.json",
+      "sha256": "10e586a14f72e0f6421dff0d35a34edaf467ce0654f52c98b3fafc9dd85d7d8d"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_casing_item_conduit_trunk.json",
+      "sha256": "10e586a14f72e0f6421dff0d35a34edaf467ce0654f52c98b3fafc9dd85d7d8d"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_casing_pull_pump.json",
+      "sha256": "2abd6feb5c4ea28117349a89991ea91c624d6a772cf3813b5d3240b93dd9b36d"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_casing_push_pump.json",
+      "sha256": "35c7b855cfca39a48c1962a85c6dc265a742c8553030e0bb45807fa8a66cfb5a"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_casing.json",
+      "sha256": "61d5193261c5fe2c46d675d1af1e63b181a3800e130c0d5dfa0d8bdcacb958f8"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_combustion_drive.json",
+      "sha256": "f75b441eca48b00ccbc67297e6dec4dd6033a29590e100196917a517147a8b48"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_controller.json",
+      "sha256": "5213d1db39bee18b704c2e92893207ce59a8c15273347bd66f3e91424c8a5aee"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_fe_drive.json",
+      "sha256": "d40c73229741c8415ff92d324897bf9541ddba9592ad23dea72cc0c56d306a73"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_glass_fluid_buffer_frame.json",
+      "sha256": "af1dc5093f560e3892aa6ed503f6d73d655c9690c7004c96608417d73fe21541"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_glass_fluid_buffer.json",
+      "sha256": "ffa1c409a446239913338f4b49595e7efc546c186fa5e336ff6824796a81c280"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_glass_fluid_conduit_tap.json",
+      "sha256": "6c9a5aec8683ab2fd2c12f36725f10060c12689c264abe9316cb15034212935c"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_glass_fluid_conduit_trunk.json",
+      "sha256": "6c9a5aec8683ab2fd2c12f36725f10060c12689c264abe9316cb15034212935c"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_glass_fluid_void.json",
+      "sha256": "e106c76449a4d5f7271de4f2f6386575db65d582e11fbcad281654bd59fb47cf"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_glass_item_conduit_tap.json",
+      "sha256": "666841b6c68d5b4ecced2f3bd5412e54a6d556ad6c6a7e28558c8c1d1652b08f"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_glass_item_conduit_trunk.json",
+      "sha256": "666841b6c68d5b4ecced2f3bd5412e54a6d556ad6c6a7e28558c8c1d1652b08f"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_glass_pull_pump.json",
+      "sha256": "b7a95bee677f6db1cfa4161a4d3fc37e8111d128f56bb6311369dac623128d80"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_glass_push_pump.json",
+      "sha256": "5d7b13a9e20a36b77e4a9cda61ccb00126fd18b968c20b8a9b9a0353df7b92d9"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_glass.json",
+      "sha256": "811bda73c166b1bccd27da72cd716b1cecf8ab23a595722fe95681a9f8512bf8"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_impeller.json",
+      "sha256": "cc297fc9e613729bc3ba239a7326fa10bcd3f5884de2791eff1377932dc9bca2"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/mixer_shaft.json",
+      "sha256": "f7a1ead047b5c2b8e25a302dcae53ae9664e06941a89ad92c7bfe8f251f301a0"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/pull_pump_core.json",
+      "sha256": "bdfe453003a3dd755a6ef5dde25b090b97b082c2557ac15a76e614b1fa086049"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/pull_pump_sleeve.json",
+      "sha256": "9705d230ccdd0a28cd1348a6d18ac8718ac3f41679a6931a5e298844b93dafb5"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/push_pump_core.json",
+      "sha256": "47e34f2140746a6d005e3909ac78b7ad88620df4812e666d6fa566b9213acc41"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/push_pump_sleeve.json",
+      "sha256": "8747f237bd68099e88da0dc0aa6dd5d09b9db4f4fd334be44e4cdf03908d29cf"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/tool_port.json",
+      "sha256": "eb2e4bf61c7b909d26fbd98a875065a5f089274daffef4b9acb925e958826bf9"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/tool_vise.json",
+      "sha256": "6a1ee4631ffe69d45afeb0c8e4f214787ee8e629ca2d387306887d41feaf6e1b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_bare_drain_valve.json",
+      "sha256": "e769a1b279e8c51918c7b09ea2273a3f6141a61244df9ff2fbaa16965351e857"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_bare_fill_valve.json",
+      "sha256": "38508822f7a5e234897fa24e6729dcb92629efbd7161235a6180f726f6df020b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_bare_fluid_void.json",
+      "sha256": "79885d2e359ad50220f7453577720079b029dd703ade6a1a037e0bfdf1e713fd"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_bare_item_void.json",
+      "sha256": "b5f572591bf90bd95b44a877376115bb2ca292ebe354b552000d6769bc327f51"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_bare_pull_pump.json",
+      "sha256": "e032c92ead7ae437b508d9468c68d9de14f2f90cc769ec6d05c6e521e0b4e6a5"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_bare_push_pump.json",
+      "sha256": "61c93a51e7fccf03a42e595c4a5cce1b426ceb2b9ebf984d9349e0e0f23b6a7e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_casing_drain_valve.json",
+      "sha256": "3d596b285ecaa98378d757c9029d14ab2aa958142f5a6ac6eb66b3b31cb2ef3d"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_casing_fill_valve.json",
+      "sha256": "2327875adf046e3b59b18e9f9ec0b3be4697ba3f79e4fdc5289ff925e66e099a"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_casing_fluid_void.json",
+      "sha256": "aea7397b62d5b931566990aed3eff1e698ba63c581684e5e210d1a8e47576b41"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_casing_item_void.json",
+      "sha256": "daf8f79f4826b88c386d24576c65cb36407e9d12d03d4f67cb90351ffa93a300"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_casing_pull_pump.json",
+      "sha256": "680447a241c4cfa574d9e94581ff1e3467eacd23ce9c415fdfc6dafbe6da28be"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_casing_push_pump.json",
+      "sha256": "8feb1a3c3d34b5b4181f6a9aac49cb818b8834f0dfb4dda6be7d566174c66e5e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_controller.json",
+      "sha256": "64345193224cfb61d565602b6cfe500c34603cef801d3fcf9f381d3d25f254a3"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_drain.json",
+      "sha256": "4b1e419a7605de5d3febd762a0f4febf4395c6c899545e92a8fb6d20329adbfd"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_glass_drain_valve.json",
+      "sha256": "2915fa9838b7fa7e0fed848a275c00f94f0ed9eab9a3030e94691f856934c22e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_glass_fill_valve.json",
+      "sha256": "175d3dc814cfedd7323fda55b2ac28e1c6cd4d26607148bcc31ddfa3056f0566"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_glass_fluid_void.json",
+      "sha256": "48be30283f5c69c96014fa947cccfaab469542ab0b5e28c47e501fa4fa437a91"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_glass_item_void.json",
+      "sha256": "6c452bf7acb69e7c62fea7f945af059e6682f01dd40164d0d2a1796f06d24997"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_glass_pull_pump.json",
+      "sha256": "e5e12dc9c1ff6ef48b8ce083877d9626e574d2c30996f3f9e09e8e22d352a0c3"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_glass_push_pump.json",
+      "sha256": "334192e4b45865f537485fc604b36ca8da1b96858b0a4fe924eb2ac0289e871c"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_glass.json",
+      "sha256": "3a4087520ff8d7688cc77028595da8c08a472f9433a3c83f033bb2b1edfe8564"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t1/vat_harness.json",
+      "sha256": "5d0565f9d72a5a02d46c29d9a898d94747ed4e49299a140932ceb8ebb82f09db"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/blender.json",
+      "sha256": "3a096920cd1d11edcb6ff3a16c110022208478114974130cab677159f50228f7"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/buffer_extension.json",
+      "sha256": "a3d5f7e908f8d0920b05d77e7e934ac91757ceea5f8d44bcc4922c674dc79644"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/buffer_reservoir.json",
+      "sha256": "4fe0222810431a1bb7c382770dbc6542206da8760ba0b861e72f48e8d81c02fd"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/casing_fluid_buffer_frame.json",
+      "sha256": "0f76191ebb3b7140e142d37024a351e9f3551da97b91505c9ccbfc24b27a6419"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/casing_fluid_buffer.json",
+      "sha256": "7e09933e12224c25f80e0d929d65efeb951626ad4055f123767016341a64e1fe"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/casing_fluid_conduit_tap.json",
+      "sha256": "4906ea7747d31b3fbb94d9a569340da32c1d48b69ea87e1f90a9fb8195e05f8e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/casing_fluid_conduit_trunk.json",
+      "sha256": "4906ea7747d31b3fbb94d9a569340da32c1d48b69ea87e1f90a9fb8195e05f8e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/casing_item_conduit_tap.json",
+      "sha256": "e8fcdf8ba5666a10b450b88f50e3ae3f3c84d46ef476923384028eed9ecf77ca"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/casing_item_conduit_trunk.json",
+      "sha256": "e8fcdf8ba5666a10b450b88f50e3ae3f3c84d46ef476923384028eed9ecf77ca"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/creative_drive.json",
+      "sha256": "bf2c30f85708e0757677573208349201fba77246e9dffba00b34a9d8f698234f"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/drain_valve_core.json",
+      "sha256": "351b90e4b42cda2806a9c812b7768de912d85f4f353af924243f60f69a11c221"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/feed_port.json",
+      "sha256": "64bcb0f7d1006df98c645b3d888a5176f59f8f82035eed75d80ec6db10377f41"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/fill_valve_core.json",
+      "sha256": "5ed7f1ca0946452a6f3e1140dfe68adee5f9c0d5f881f1709be956cadddfac4e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/fluid_buffer_frame.json",
+      "sha256": "57c3e0d7ec5580d1a5898e45afa30f243969566012beee20d546a88009a536c4"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/fluid_buffer.json",
+      "sha256": "bffc3e601ff6ff1bb74ecaeb1e980ba4e5551173992791cb0c20a7605d4e6fa2"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/fluid_conduit_tap.json",
+      "sha256": "f8efd986d23d31f66a234bf3a2b23af8378e60e65c0ba7e2fdff86a15be9f440"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/fluid_conduit_trunk.json",
+      "sha256": "f8efd986d23d31f66a234bf3a2b23af8378e60e65c0ba7e2fdff86a15be9f440"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/fluid_void_core.json",
+      "sha256": "a15630145bfff842387fb0614ab05cc786b703c8ade3e740dd2a2f55e2c91c6f"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/glass_fluid_buffer_frame.json",
+      "sha256": "d05a7999d273221aa9ede59b3938d05690f0fdb03adac701786abf3e395176e8"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/glass_fluid_buffer.json",
+      "sha256": "88dd6057fb4cd6b98f5dfe052b8dd2cb300f6afc32482dcf942d6aa6dedbe225"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/glass_fluid_conduit_tap.json",
+      "sha256": "29a3e60180b3c07466e31d86e8a6cd5dbc6c0ab56b539551b39c2672cbe1c57b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/glass_fluid_conduit_trunk.json",
+      "sha256": "29a3e60180b3c07466e31d86e8a6cd5dbc6c0ab56b539551b39c2672cbe1c57b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/glass_item_conduit_tap.json",
+      "sha256": "dc812950dad3c43321885d67794629473bf0686c10fae74184663f19eb08ba66"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/glass_item_conduit_trunk.json",
+      "sha256": "dc812950dad3c43321885d67794629473bf0686c10fae74184663f19eb08ba66"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/item_conduit_tap.json",
+      "sha256": "efaa93034cb7f0018e4c2e17e98e501be0cc70833762b95c884a7dd7c706efc7"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/item_conduit_trunk.json",
+      "sha256": "efaa93034cb7f0018e4c2e17e98e501be0cc70833762b95c884a7dd7c706efc7"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/item_void_core.json",
+      "sha256": "efd1e8403dce1887e4f6c55827590a581572fbffb41f5839d4eedf446a95ec54"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_bare_fluid_void.json",
+      "sha256": "a22ee75b5a03973f85966bfb9c9c793d70b438add7986fbb5f3033c47925e13a"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_bare_pull_pump.json",
+      "sha256": "394488c2178242b703389f1fb8ffcab2f2c7a2649963231794027ccda3f7b954"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_bare_push_pump.json",
+      "sha256": "abd2dd5f1bd4f24a42975a0df884091980c37ebbe8af0f5b516c6dadf71a6d9e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_casing_fluid_buffer_frame.json",
+      "sha256": "7870b314bd066890402507812bcf9325516992a105618f8bcf4259450a017c6f"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_casing_fluid_buffer.json",
+      "sha256": "c3f2e227baa653ffaf329d4ff4400c9be7af9561abc6b28bbe01fc0bb7c6522c"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_casing_fluid_conduit_tap.json",
+      "sha256": "a14b758cbd82834aefbfca3237df2b4ae4a6f9fa44b9ea2f59f50674f5a14a4f"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_casing_fluid_conduit_trunk.json",
+      "sha256": "a14b758cbd82834aefbfca3237df2b4ae4a6f9fa44b9ea2f59f50674f5a14a4f"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_casing_fluid_void.json",
+      "sha256": "9ae2dadedb51d4f2a0d55b14a174dde759fd1bb1ad86a48e54723b73be08430a"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_casing_item_conduit_tap.json",
+      "sha256": "e03eb7318bdc93a8041e6e86840d8c07f19aefd5e63d139c7db8943926f928e1"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_casing_item_conduit_trunk.json",
+      "sha256": "e03eb7318bdc93a8041e6e86840d8c07f19aefd5e63d139c7db8943926f928e1"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_casing_pull_pump.json",
+      "sha256": "1d812a2b974549eb7218ed1bfa55bf21b751b9094bbee0ac4aab170389b8d8d1"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_casing_push_pump.json",
+      "sha256": "96893ad230ab8015fb16f215e13dc802ef409b042cd314f85a017aef7aaf5b1d"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_casing.json",
+      "sha256": "e8903634feacb189b90115fb65fc2609e88c32008e18678b7dd0c5b22f3bbdab"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_combustion_drive.json",
+      "sha256": "f511ed59b5c0f59a1ba36a54883ec43ca05a59dfb4d6847111ed33339be52124"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_controller.json",
+      "sha256": "da6d7298d91210f048ac33db291946fd3ea7f80a86cac7b5f6fffad1a1a2d514"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_fe_drive.json",
+      "sha256": "c66432b506073cd7dbe1e6e540ee51c6d28f4d5038473f76c85eb3178c7e3a2b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_glass_fluid_buffer_frame.json",
+      "sha256": "bc439bdef6534f58f51d6fabe5e25f2d5471a4982dc39c2a8faed93b44f62a3d"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_glass_fluid_buffer.json",
+      "sha256": "cc637d502a78fa7270d1f2be9335857ffa3a88d26ee1c0e3bcce0b53466fd5b5"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_glass_fluid_conduit_tap.json",
+      "sha256": "4478c4f0eb99b230800b409c1de8be70082e3cbd89d53b473b602e64a484b532"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_glass_fluid_conduit_trunk.json",
+      "sha256": "4478c4f0eb99b230800b409c1de8be70082e3cbd89d53b473b602e64a484b532"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_glass_fluid_void.json",
+      "sha256": "4b767583061876d199ed768d10c3e47ecde36476327a1c805b9ec4f6c7818a16"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_glass_item_conduit_tap.json",
+      "sha256": "90e648f10b5aa2e8b39f4a96f3baa6e73b1f92550f204fc42748d2af5bb979a6"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_glass_item_conduit_trunk.json",
+      "sha256": "90e648f10b5aa2e8b39f4a96f3baa6e73b1f92550f204fc42748d2af5bb979a6"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_glass_pull_pump.json",
+      "sha256": "c8fe8f44c474839c216c322c47f143ae91312a64668414a8c689736955fc0cc1"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_glass_push_pump.json",
+      "sha256": "daad7254f319f8154610a56ae858f2c828456e41d9aef0301a35fd5fff08571e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_glass.json",
+      "sha256": "23178fe89c2ef3966c9abaa8ebef4380e3ed445442e4ac905c96b61db29e811a"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_impeller.json",
+      "sha256": "217b8d124ad1e4ab1765f34ebba3bb779070645c2022cdd53ded433e92254ba5"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/mixer_shaft.json",
+      "sha256": "2d408b171c0aaa58e3f4491e616ded211adf790a9c1d84cdd5e6a74f64e2e04a"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/pull_pump_core.json",
+      "sha256": "97066928a092adfbad9955650c1f4833cb936e20ec45721099412d2f23186fd4"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/pull_pump_sleeve.json",
+      "sha256": "8b7a0e2f348315acaff3e3584b9a7c5733e66640c6da85a0d505ee01812772a8"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/push_pump_core.json",
+      "sha256": "15cdec42ab2368f742fbd0288284745287300e64b1023e21d35db0e4574fe39b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/push_pump_sleeve.json",
+      "sha256": "dfe8779708d9a0da710eb4f4bdf9793bc408e77f88ff619ae4cad679c16a7e45"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/tool_port.json",
+      "sha256": "1b2327f089ff7552fa4ce8261a7a568835e927ca8bc49d7fa7753f693506b204"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/tool_vise.json",
+      "sha256": "3b30ec234ba4e6ae28b9de24d8051a414229b78f7ff64152ee24480299175404"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_bare_drain_valve.json",
+      "sha256": "9c0e9606889eae5650c3d849ea947dd3cba09264bb8508b7526c2d70664c0414"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_bare_fill_valve.json",
+      "sha256": "2027643e4ff4c6052ad5d26393a422aa29690d662a239ed671252d74e4878625"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_bare_fluid_void.json",
+      "sha256": "8f37f9354099720d9a542fde13c44f8e7f195abf2f00233d28f7a15969fd4e74"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_bare_item_void.json",
+      "sha256": "87a373180dc331a9b36e1a87a86599f7aad0bd97f053e1661a3906a3a85c6733"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_bare_pull_pump.json",
+      "sha256": "3aae21240f2fdad14311ae5c5799c18e541ab810e0d8fdea3c20c1e82a952a9b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_bare_push_pump.json",
+      "sha256": "2e85e421b140bdb8b3a9c35dba52c4b8ea92915085a87b4f3b49d488e098a486"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_casing_drain_valve.json",
+      "sha256": "3453005af1a9e31f2b5088c299cc314673560d294d22fd1fef8adcd143998071"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_casing_fill_valve.json",
+      "sha256": "3a0aea7d20bc702fa0060c58aac61a54ac0c16103a36dff3d9e6cc80cfe7536a"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_casing_fluid_void.json",
+      "sha256": "d0247ac48eaed4cdf92e46a671226471a28d29590fc2900823db7b3ae105be23"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_casing_item_void.json",
+      "sha256": "d7fc6a0b21db83bd0d517b14c9b91dd7d25587353c34c5170cc31e95abab7a54"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_casing_pull_pump.json",
+      "sha256": "00dd7fa12f6234f85875500bb2f9b139cc8e9361b641715cb6ecee83b1fda63f"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_casing_push_pump.json",
+      "sha256": "4362cb07d0d435458f6e5fb356e2299e196ea6a89953ccb201b213a303bccfd1"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_controller.json",
+      "sha256": "bd696980d80f2f939bc4cddc85e044015447bf8879bc994ee0d256f0ade233f0"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_drain.json",
+      "sha256": "f7d677f4e68ccf5806a68947df1e9b58a19fbc030f0612ca79bb67bf38ca7825"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_glass_drain_valve.json",
+      "sha256": "742fbcf6d3e6a147b4c8ab835e42c14df607ea0fdf29968b4f812bc85c7c7012"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_glass_fill_valve.json",
+      "sha256": "a4644851adb811529bc8fa9d632d93571e0c0d66a9fe046bda694bb369facf6b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_glass_fluid_void.json",
+      "sha256": "98cb3def607aa503015f1aaa3be11b428f25e1ae069bc34f6a32fe029f0e0c87"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_glass_item_void.json",
+      "sha256": "57e2ae2f1acb8444afd1ea348aab49819daee71a38f5d31e37f7909105534e07"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_glass_pull_pump.json",
+      "sha256": "f5acb2e01923cee2d674bcfc91e1db8d89a5eca9dde6fa99a85e03cf0c8e1318"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_glass_push_pump.json",
+      "sha256": "9247a30bdb8cbaf720531db8b559dbcb39e4d2cf7ce01dfc48ae744fb4c9fea2"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_glass.json",
+      "sha256": "64b3694a901529370e6dd913cc1ee159163f96a9e223e44116743cfe46959d53"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t2/vat_harness.json",
+      "sha256": "1882b95e5e9f7ab513c77e8246101c8d968a3f25d5cb5aed875e8559d9fa6c9b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/blender.json",
+      "sha256": "97cee29f19af722126b1f9cd0adf66e450c0fbd10af57e28c03b29aa4019534d"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/buffer_extension.json",
+      "sha256": "b8f395549a3e5fdcb2a6532455c4f0be15fbd8664ca650688a7980add5e9d7aa"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/buffer_reservoir.json",
+      "sha256": "7b8d0a4c340738d2d92f12bcf15a73a0f8caa6a07f73069adc87b78b2f4bc12a"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/casing_fluid_buffer_frame.json",
+      "sha256": "e187e0815c9e801983cdd8e2bae12f79d077e21803b8dbdc3f4d28b911591971"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/casing_fluid_buffer.json",
+      "sha256": "f286c5d73c66b5c7c678972dddcf284b7898484a3664586bb85a1709d1a9c7d4"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/casing_fluid_conduit_tap.json",
+      "sha256": "5ba332e5307505ebae6088b17e8e0e44eee9be548a3e1a23f2e22dd5b0de97fe"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/casing_fluid_conduit_trunk.json",
+      "sha256": "5ba332e5307505ebae6088b17e8e0e44eee9be548a3e1a23f2e22dd5b0de97fe"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/casing_item_conduit_tap.json",
+      "sha256": "a1f51f0c4b30a428a184859309384d80a4adc734ffb33e468cfa767529e5096c"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/casing_item_conduit_trunk.json",
+      "sha256": "a1f51f0c4b30a428a184859309384d80a4adc734ffb33e468cfa767529e5096c"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/creative_drive.json",
+      "sha256": "083aa6b45cb1c82e1d229d1eab302eebc0146175e667482b5bccc1caaa7e83f8"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/drain_valve_core.json",
+      "sha256": "79478e0f75691620dd02efb27040d77b113271cfbb2e07b689f42846ecc53637"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/feed_port.json",
+      "sha256": "15e327b4e137e30fad2c2aefb642407933c730be60d482d1a1501b41fb82ebda"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/fill_valve_core.json",
+      "sha256": "ac1c2379dcb8356156a30822b48cdd5beb80e70fd8eb98390a079cea17a4dc6f"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/fluid_buffer_frame.json",
+      "sha256": "f9283b095e5bd027e1b76d811a5299b50cd62af1382010f4176c9361cbbea25b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/fluid_buffer.json",
+      "sha256": "3c5dd92ee6100547adbb64e53b1f402ab0ea8a32c08d6fbd5a0c2e69dc9c615f"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/fluid_conduit_tap.json",
+      "sha256": "2ae5adde471392979b37e469b2e485b426fbea21fcbac168c0c0afb42c94ab88"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/fluid_conduit_trunk.json",
+      "sha256": "2ae5adde471392979b37e469b2e485b426fbea21fcbac168c0c0afb42c94ab88"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/fluid_void_core.json",
+      "sha256": "321558d615a87c6d543047ae0c587a56ea5a4e28fd1600f86d70eff2c67148d2"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/glass_fluid_buffer_frame.json",
+      "sha256": "b8fb7e7d17dea2cede601b722c7c449663b56b1d30d3cc64268d3a17b5e71348"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/glass_fluid_buffer.json",
+      "sha256": "7e50c09a22d3016d19095b3ee98bb3193219f6dae92e139e9d4153a7f68792b3"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/glass_fluid_conduit_tap.json",
+      "sha256": "ecdd298fc7c6ccb9f2c1966031206bd14f3113ccc37095f681325dc8968fc08e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/glass_fluid_conduit_trunk.json",
+      "sha256": "ecdd298fc7c6ccb9f2c1966031206bd14f3113ccc37095f681325dc8968fc08e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/glass_item_conduit_tap.json",
+      "sha256": "2e308f80fef4c6f2508139899dd15fa85481a5455571efab6ad46f5b706b9c1e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/glass_item_conduit_trunk.json",
+      "sha256": "2e308f80fef4c6f2508139899dd15fa85481a5455571efab6ad46f5b706b9c1e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/item_conduit_tap.json",
+      "sha256": "489bad41e3db5e7ae0f423b43c2f943b34fb23575a4bc7ae24a7c1a3940db543"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/item_conduit_trunk.json",
+      "sha256": "489bad41e3db5e7ae0f423b43c2f943b34fb23575a4bc7ae24a7c1a3940db543"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/item_void_core.json",
+      "sha256": "fc9492fb23fe12c5a80a822d5ef1d2f28cfebb5b75a4fee55f9a554cedd33196"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_bare_fluid_void.json",
+      "sha256": "88cd64d3e1eeda02a63ad9b22a3a0b1426ea2a0b9a9db3c831a826b9ff54b1dc"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_bare_pull_pump.json",
+      "sha256": "11dd127b192d179d8b92babbee5dde1563bb3a2960aa9b9dad55b3f9ca47a2a9"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_bare_push_pump.json",
+      "sha256": "efdb2d759448c3db86064d452cb57efdea3fde64cccd887c45a72ec7f7b7ffc8"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_casing_fluid_buffer_frame.json",
+      "sha256": "31b8265c0f9c5e47faed243b2803d8b35b24e7c5b55ed184c3a92a3c78806026"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_casing_fluid_buffer.json",
+      "sha256": "9b05f499cbee41a4f2276e97343b3a364eecb55267696f2a2a3a8c498854e1fc"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_casing_fluid_conduit_tap.json",
+      "sha256": "0e3b82deb6e9999b3e9c213f3ec81cff5aedc5347cccb039949223cf292812e1"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_casing_fluid_conduit_trunk.json",
+      "sha256": "0e3b82deb6e9999b3e9c213f3ec81cff5aedc5347cccb039949223cf292812e1"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_casing_fluid_void.json",
+      "sha256": "b95bf94e6cd5318fd552a6e678756668f917936f267cc29f625fa54b94d4576e"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_casing_item_conduit_tap.json",
+      "sha256": "8c2e1a0eee7f530f5b80f4520587525990e7c60ddd61c5ec86a3a03b8c1341d2"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_casing_item_conduit_trunk.json",
+      "sha256": "8c2e1a0eee7f530f5b80f4520587525990e7c60ddd61c5ec86a3a03b8c1341d2"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_casing_pull_pump.json",
+      "sha256": "e86ba7bba112f0109e474c1526c9094daa1cd27814e7c1bcb7362d1f5d10ff0f"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_casing_push_pump.json",
+      "sha256": "ebd63bbcb984a253fda8d9bc28d1d508631bd361d33c2967db04a842916d6b96"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_casing.json",
+      "sha256": "0a960735fcc533e9fb733ea0c01214398aa56f9fba4b3745ca4c668c0714c739"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_combustion_drive.json",
+      "sha256": "5cb4b7bd69886e2066ec8523a88758459436b80f6d076c0264d93b0f75b695f7"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_controller.json",
+      "sha256": "e60a55d98fc60305098c10067088484f3039bd83b1b8d242d943690f77d134fa"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_fe_drive.json",
+      "sha256": "61ad587da84f2a7093c4d6ed38620a2da10c8bad9858d7b0d4cf346351be2660"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_glass_fluid_buffer_frame.json",
+      "sha256": "ceae6f7b5022095e08b87954ca8a34cceadb18644ae8b2d64ffa40bbe59b6105"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_glass_fluid_buffer.json",
+      "sha256": "23987d3672f7fc7a50c4c361611bea6b8c2ad66732324b61338327e8db77cf24"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_glass_fluid_conduit_tap.json",
+      "sha256": "df6e7c7bb283ac58516c8379b4743dc1df66d4cd17e2992f2212ad09f1e18702"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_glass_fluid_conduit_trunk.json",
+      "sha256": "df6e7c7bb283ac58516c8379b4743dc1df66d4cd17e2992f2212ad09f1e18702"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_glass_fluid_void.json",
+      "sha256": "074e0934cbf8db5aeefa0ba248431f8d9c8b1b955d31512a313517514ef95ab3"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_glass_item_conduit_tap.json",
+      "sha256": "27be94d6e1b9a3de1eb2541028660430765f152dbd71e5c158d1b1b5de3e49ad"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_glass_item_conduit_trunk.json",
+      "sha256": "27be94d6e1b9a3de1eb2541028660430765f152dbd71e5c158d1b1b5de3e49ad"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_glass_pull_pump.json",
+      "sha256": "5c568a640a3fcb38892465484aa2d2b21ef1d46c0d7a9801a1a377d692b96e46"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_glass_push_pump.json",
+      "sha256": "6531e896de2e628503a8a5b7ab080db2a5b2daaed1afd743c10b16521360e87b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_glass.json",
+      "sha256": "600d7a9c8a99503fd17e56e984faeab23f683d9aa9ce7fc4374a9c1aadc01ace"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_impeller.json",
+      "sha256": "9b0ea0c07bd8751f37d5c257627a048a3ababba51b55d2b3f159c55277bb9616"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/mixer_shaft.json",
+      "sha256": "565879deca00ed1168f56a2424ca38d00f2e5dd848037c936d2531a2d6fd599b"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/pull_pump_core.json",
+      "sha256": "292208f848f07aef81e3a90cee0a911ed84cd3fc356e2d78fb55a9250c8b6445"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/pull_pump_sleeve.json",
+      "sha256": "2bacd2d38ec8c19a82a2d28ef775526c0e09d52d75cfedb4a6121359f16c8b83"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/push_pump_core.json",
+      "sha256": "8991c2d0b226741dfe1023562bb6cca1f3b4af7ef4dc9ff5bb6d12c4ad852dc5"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/push_pump_sleeve.json",
+      "sha256": "ab3fef230269800aaf1925f4dcae9a2c58fd12515005eb5bc188487054196790"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/tool_port.json",
+      "sha256": "0400bc7d15caf446f659e787cc1d005287d822fa700064d83006fc8819912dee"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/tool_vise.json",
+      "sha256": "8e9d372ac6f7931d56de07ed149032c6cd1d1cff62a356408b4c66477e2206c8"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_bare_drain_valve.json",
+      "sha256": "31eeff1d80278278e644607dacf5b855e939ea1b39c19a32691d7eb79d1b6d76"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_bare_fill_valve.json",
+      "sha256": "567587ea6fe4fca5a11fc0ad847d4d3c7d24cf846ed334d26de45e4c7e3b57b3"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_bare_fluid_void.json",
+      "sha256": "850d0d60da974e71a154aac0ab82b93b14781392a9b916cfe5730634ba98d65f"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_bare_item_void.json",
+      "sha256": "ea1c0b872222487ba372327e586c487de0e7d9a3e02ec6628c1f3e633d8ed6d3"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_bare_pull_pump.json",
+      "sha256": "91fc39868e0ebb92560898c2fdd90704411a18c2af6f4d90e1e5ca759287b864"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_bare_push_pump.json",
+      "sha256": "c9b8641524beeb3168ec9ec3b6d9ef69b0357608b71f9b1128b41f724f74e5d9"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_casing_drain_valve.json",
+      "sha256": "ac2633837ad497875eeefdee7027373206e53294d3779fcc29be30ab1d631a76"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_casing_fill_valve.json",
+      "sha256": "57c4dd905a653261546dba4ae57b1a9d280ca483193e5960c71af79a27f545f4"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_casing_fluid_void.json",
+      "sha256": "3e92aa20da49aa1722e7109cf736c6510938c61152d94037237aa57e5c888b47"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_casing_item_void.json",
+      "sha256": "89788659ca5e9fc10203f3af2fafd05f1987aa796dfa34421f20c257fe858dfa"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_casing_pull_pump.json",
+      "sha256": "30fa064d7073855c76010ee3fabfd2f4b55458056b35c2a30eae038500c7be16"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_casing_push_pump.json",
+      "sha256": "d21d11e8483f4ecb7ad28de1bccdf292ca219b19d409dfb68175e4fec9120d0c"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_controller.json",
+      "sha256": "438bc061d3e4f6a822efecf5f7f6c8e25d422ae61475a1a3dbdaaece41bb128c"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_drain.json",
+      "sha256": "fb337f7ce2e1b9ba57d88a16e8253c7f64f72026d7e38e30f2edc1bbdcfc4bcd"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_glass_drain_valve.json",
+      "sha256": "08a9a60b6fd7011422d0ee5de5a042b1f84d86e3021acfc9ab1d808ad1465aed"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_glass_fill_valve.json",
+      "sha256": "4f5bf8867734ce64eba655192d6bef28b4b13257a45d62e562855ea2b818837f"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_glass_fluid_void.json",
+      "sha256": "38c2fd770a26ecdbef840d19ad6d91a1725076e7bf551175a3353c8db3bf8da3"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_glass_item_void.json",
+      "sha256": "f27243bb7b8f7ad15ffd1729f6d1c4ac2492baf8b2cd0e5b9b09b2305c437af5"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_glass_pull_pump.json",
+      "sha256": "962a2569624eae8690dbb6fad1cf4e2283f1805162874d909e742bab632663ea"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_glass_push_pump.json",
+      "sha256": "70664b353e2fcd12eeb2745cf6cf2baa8a381c153e443658208e83f0342e90e0"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_glass.json",
+      "sha256": "0298450965fe6d6c5c9dba8c4917cd5ad88614bc8db832baaff0dd1e0109702d"
+    },
+    {
+      "path": "assets/mobvats/models/block/procedural/t3/vat_harness.json",
+      "sha256": "0a02d3279b10598d6e88962c6c8426e0f38adcaa90e8cc1a48263546c22a1718"
+    },
+    {
+      "path": "assets/mobvats/models/block/pull_pump.json",
+      "sha256": "db53df011c9e5e0b38e9e8fd60381e83017d0f3898ba66a48964f6890f32ae26"
+    },
+    {
+      "path": "assets/mobvats/models/block/push_pump.json",
+      "sha256": "bc8f098fdb0d2541dbf80de467fdb74a72cfea31c0268306b0c64dd7c4b35906"
+    },
+    {
+      "path": "assets/mobvats/models/block/tool_port.json",
+      "sha256": "5373f5f56ac7c74ac06ede457546d5e3fb057f9fa1494397b5186bedc686adf2"
+    },
+    {
+      "path": "assets/mobvats/models/block/vat_casing.json",
+      "sha256": "ea756ca50192888afe1bca435b2d5d17c60c08061631d99bdf1d0e9a97575319"
+    },
+    {
+      "path": "assets/mobvats/models/block/vat_controller.json",
+      "sha256": "2345d4a7b586b3f7f5b3c80c4a6d3da91a2cee03a3e645b0dbf2e8bcf48aa95a"
+    },
+    {
+      "path": "assets/mobvats/models/block/vat_drain.json",
+      "sha256": "143c7bfbe7640176b56febc844cc4cb4e2fc4bd1c31b35271a2d43695be3841a"
+    },
+    {
+      "path": "assets/mobvats/models/block/vat_glass.json",
+      "sha256": "d390b37c2194378c6190c590fdbe912fa0ddcd5e14d6f9662c4704ac5b398843"
+    },
+    {
+      "path": "assets/mobvats/models/block/vat_harness.json",
+      "sha256": "c0fd6d9f3b149c111afcd599f1b3481bdf09b7f575c0fcfe93ebb8c58b571b09"
+    },
+    {
+      "path": "assets/mobvats/models/item/blender.json",
+      "sha256": "912e2860319c016c4def4646948e349565ac8efef19c17295f231faaff1570c2"
+    },
+    {
+      "path": "assets/mobvats/models/item/creative_drive.json",
+      "sha256": "5ac8b43e7153193ca2851eb450f49f35bc4ffbb89f49aa83ca6b7029a03d47fd"
+    },
+    {
+      "path": "assets/mobvats/models/item/drain_valve.json",
+      "sha256": "ab8630304bd085b323dbbe7497fcc3b9b27c7a92f0228681d0991bcbbba00940"
+    },
+    {
+      "path": "assets/mobvats/models/item/feed_port.json",
+      "sha256": "5db2f7c02ae9a409c90cec1cedaff6c1071838c90eecb393ffb2601bdde4b2a1"
+    },
+    {
+      "path": "assets/mobvats/models/item/fill_valve.json",
+      "sha256": "0544eeb9442247cf3188d8c5dbeeeb14f86c5cd2950c35edb5faced74b701065"
+    },
+    {
+      "path": "assets/mobvats/models/item/fluid_buffer.json",
+      "sha256": "c9d8c4701539a67a3311275e84ced9908366fea4a032b25c4b149c2608941ac3"
+    },
+    {
+      "path": "assets/mobvats/models/item/fluid_conduit_tap.json",
+      "sha256": "74bad476ec3c7e9094671d1a9190873ad248af3daeaaf6307e616919a5c04739"
+    },
+    {
+      "path": "assets/mobvats/models/item/fluid_conduit.json",
+      "sha256": "610ec46f9bc1fab95e7517444012f72413327a9cd4e16cbc09bdddc9427f9bc6"
+    },
+    {
+      "path": "assets/mobvats/models/item/fluid_void.json",
+      "sha256": "f3422ca978a0b31668a739faa0ed8ab1db28ac0f1020669a782083d680f15767"
+    },
+    {
+      "path": "assets/mobvats/models/item/item_conduit_tap.json",
+      "sha256": "adbce0df582f1b04c50e9e90fb5e88230c44cfddaeda8e11d550de9499b836a9"
+    },
+    {
+      "path": "assets/mobvats/models/item/item_conduit.json",
+      "sha256": "7883d4fccf903d0b8403d8852316c5fb3b3946b7ced15a518d18dd3ec47b6950"
+    },
+    {
+      "path": "assets/mobvats/models/item/item_void.json",
+      "sha256": "25bb1c897844ef9214b9d3c40f78c1c0a06235709f8eda8a0c8e0f8ab0a9253e"
+    },
+    {
+      "path": "assets/mobvats/models/item/mixer_combustion_drive.json",
+      "sha256": "94454086f5741cf4c76cb85e15e0e971a83ca2bb996501a1cc8cbec1cdd6903a"
+    },
+    {
+      "path": "assets/mobvats/models/item/mixer_controller.json",
+      "sha256": "b0655af592a40575d855abe600d44a50bd37e5883340d211ed70bc82fefc1c35"
+    },
+    {
+      "path": "assets/mobvats/models/item/mixer_fe_drive.json",
+      "sha256": "6d8f32045a29a6ce5d4df0156bce3bda883714f1461e80aefe25b4a453576838"
+    },
+    {
+      "path": "assets/mobvats/models/item/mixer_impeller.json",
+      "sha256": "abae4fefc016fe30c7ecf7f0fd1d730550d098deb9f0ad581408d483db778189"
+    },
+    {
+      "path": "assets/mobvats/models/item/mixer_shaft.json",
+      "sha256": "c5b3dfc2c500601400f402fd0a278a34e74c64ddbd26a4cf4066ce2b5bd8a3ee"
+    },
+    {
+      "path": "assets/mobvats/models/item/pull_pump.json",
+      "sha256": "e86a470e18699bf6282ec5dbd489d121bb3bf6e86b8773df80ae0e252fdf1662"
+    },
+    {
+      "path": "assets/mobvats/models/item/push_pump.json",
+      "sha256": "ee617580ee4ec5e4165c6e481bf784e054e648e2ead10fc63fe33556954db7a9"
+    },
+    {
+      "path": "assets/mobvats/models/item/tool_port.json",
+      "sha256": "5006ec1c6f54657de054c0467e2eb72bd38951c846fcc4e96994dd375164b7bc"
+    },
+    {
+      "path": "assets/mobvats/models/item/vat_controller.json",
+      "sha256": "2405650a0375b464a20c842e5fc6ae36024421153612876182e4b2161cee3c04"
+    },
+    {
+      "path": "assets/mobvats/models/item/vat_drain.json",
+      "sha256": "c4e56e870fee69cbfc3d40f09141837133510e65bb509fd185e84df737abbd5a"
+    },
+    {
+      "path": "assets/mobvats/models/item/vat_harness.json",
+      "sha256": "3a39c83f83ef76d6198df4d94ff0cef27639a8d557709f9fddf4e0cd7bd5d497"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/buffer_glass.png",
+      "sha256": "b73fedf9d6b08c50623ce762a06c7d9ee69f8f36e6ca2fc435dfb0d38053309e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/buffer_metal.png",
+      "sha256": "2fc0c15460f8122a1d63182d7997c913548477e015311075997bf116c4f2a5d6"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/casing_clean.png",
+      "sha256": "86301a55cd7080dae9566ff95c7b93263f07926a00bebce2fa2867007426fbf7"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/casing_weather_17.png",
+      "sha256": "d5d8530eba0d6f6914fcbd3e227a6d9a982d9550a81bbd18f32005d2c1609dab"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/casing_weather_43.png",
+      "sha256": "16e64327a98ab0455a40641f20f775c064d2b5546340fd4912734a2cd7bc7318"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/casing_weather_89.png",
+      "sha256": "697d0a9f09fcb88fb63e71747419da1b441628ad527e48d21feb2c038c22e4f8"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/conduit_node_fluid.png",
+      "sha256": "5b63487e290eb90c557cf5aa584e0bdb20fc242ce3829bdd9ea3032cd93d118b"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/conduit_node_item.png",
+      "sha256": "52d537d4420ee0d072d9b5c2b621740d07c554da3fb40a7b3f80fbf8dd6fe92c"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/conduit_pipe_fluid.png",
+      "sha256": "2d0e13bafb50e83951658ea5c4d02ae86aa52cc8561463d43365b1cf7387eef5"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/conduit_pipe_item.png",
+      "sha256": "06aae90a0d079e1608caaedafbb4743d024046d965b58ca78dd57d0fc27d205b"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/feeder_connection.png",
+      "sha256": "37d6b840ceb1641abe2777151dc4f12546de323618f2a4e9893a723faa2f36fa"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/feeder_hose.png",
+      "sha256": "1e08c7001e3b71e5641a9a1ec4425b2558ef94f7a972a05e29ca02bde8234915"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/feeder_socket.png",
+      "sha256": "efdd63ec110d18d5d9e2deed4d4a5d033b67f1ea5ee862855359fe45b9fa4f14"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/fixture_auger.png",
+      "sha256": "02fc72a3b51090a8131cc2b7bea9e5dbd1391411fbe6926454bcd9d71afef3ce"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/fixture_drain_valve.png",
+      "sha256": "c89c73294c93a630231e5fa90568f1a8da9af824ddb2c2f1cec0d95188b1f9b4"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/fixture_fill_valve.png",
+      "sha256": "8ffc5ce8210c97bc48acb6b5ab9a2763325d38fca0a8d2b9e76ead6ca4c36ffc"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/fixture_fluid_void.png",
+      "sha256": "f15b2f77a7ca6629525e37a5f521b093e985a191f3dd08bd66ebaba4380e9078"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/fixture_grate.png",
+      "sha256": "cece24fe690e0c583c1cfae1703236e063408c75362b9deae80be293b81ea405"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/fixture_hot.png",
+      "sha256": "704b045fbf6b3b88411be7d1e20a2043ea478a316d3ce194dfad15ef500273bb"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/fixture_item_void.png",
+      "sha256": "1e468d93c8287240380f05243971e48f12c5dccb13eed4d4b03d36b7396ce411"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/fixture_metal.png",
+      "sha256": "37d6b840ceb1641abe2777151dc4f12546de323618f2a4e9893a723faa2f36fa"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/fixture_pull_pump.png",
+      "sha256": "ecd888ea08afb366ff89a9a82b5c0967643d9aba58845ce0cfaf455c9b064b49"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/fixture_push_pump.png",
+      "sha256": "36d9d1afbfd9993d3efa97e95bfacb7552981c2e4915417be1b55421acdad8f4"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/greenscreen_rotor.png",
+      "sha256": "c74b4e2d98b93840c744e1276f8260029fe60f432f62be42abb18008fa2b2d94"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/greenscreen_skull.png",
+      "sha256": "8833a4faacd27f790b434d55371867e93c88ce2ff84b31c9701acd42372c419e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/machinery_bezel.png",
+      "sha256": "cc202d3942c2da82cf818507fd3c21752d38025bfcfbf9f66bdd8d5b472bc04e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/machinery_channels.png",
+      "sha256": "7962806405ca90c6a5b99f4a758a87d0e0ea7e681707e3580f7878f30fba0a67"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/machinery_controls.png",
+      "sha256": "0d2267a73dcc22a028694f63e50e9bb36f979958f2155c2e2176bbf8ea9a5385"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/machinery_fastener.png",
+      "sha256": "cc202d3942c2da82cf818507fd3c21752d38025bfcfbf9f66bdd8d5b472bc04e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/machinery_metal.png",
+      "sha256": "082eb5ffdf9bc350aaf18ae95eec44084a7de0b873b8fce77f3f2807adc90eb1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/machinery_recess.png",
+      "sha256": "730fe6c776d0b8dca69f4fce28b20fd5cb5bbf1f952b421b39f9b797253da523"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/machinery_vise_metal.png",
+      "sha256": "d186260c06beecf68c3faff0bf09289dc785d172ad5569cdb73bb49bbb13a702"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/machinery_vise_pad.png",
+      "sha256": "730fe6c776d0b8dca69f4fce28b20fd5cb5bbf1f952b421b39f9b797253da523"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/mixer_accent.png",
+      "sha256": "b73fedf9d6b08c50623ce762a06c7d9ee69f8f36e6ca2fc435dfb0d38053309e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/mixer_bearing.png",
+      "sha256": "c32f74635ddd97e21da88f2f4d50fa8793462a115ceef95cfc60ac18d6148486"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/mixer_combustion.png",
+      "sha256": "148b6f2d14140170c7b76d8af4d1ef0cd32ad054413d6afaa57641036b9989be"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/mixer_creative.png",
+      "sha256": "71ff918704643c81e4c82a27258c33cb477d6309b874bef6a4fbfeb80414a038"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/mixer_fe.png",
+      "sha256": "68600740478cb7f414b012a12e540c84aa78ecff99dd868f156f2be5d717aa1e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/mixer_frame.png",
+      "sha256": "93c63c88295b341cb2ff1f46cc54e1c41be5e1385a56de668658177e3f55f6c1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/mixer_glass.png",
+      "sha256": "44ebf294b9efdbb1717d0bbadcba18286b7bb9e12eb344ac2345b868fdd4ab24"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/mixer_housing.png",
+      "sha256": "6ff677ae8d48550c2657f43d329cf0685d4d261148651bc42c7ee1a0909e635b"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/mixer_paddle.png",
+      "sha256": "4c01627b1e7ad30ddcbc49d63a3cd8684793386850641838cc2acddded7b05f9"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/mixer_shaft.png",
+      "sha256": "4bdf48f0004db327bd2b4025b4ce1f507e09a33805dd26fab62c627b56078058"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/mixer_surface.png",
+      "sha256": "2f6c37eb821d4b77eb4896f53e047faf65c91fbe5e73201dc7508a01968419a1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/mixer_trim.png",
+      "sha256": "ac83c155f34e6d0296b83284ea3b81ad31f6768755ad7e2fdd2812a7a3f09782"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/socket_clean.png",
+      "sha256": "44e20c7d6b54244a6076af457f8188cd4ae7df1239599f2db1b5afc1c5d52404"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/socket_fluid_inward.png",
+      "sha256": "36d8cd716fc9b0473211dafb1f8e360542e8443217cf83baf487237735c8be8e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/socket_fluid_none.png",
+      "sha256": "a1ea66e0a6b39ed94b50576c4ae653a50fcf06735cce05282a2898491c8871a5"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/socket_fluid_outward.png",
+      "sha256": "fd43c06952ca98fa264a34a55ec99a77a2d2c2e1034531fcfef43e974a3a2de0"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/socket_item_inward.png",
+      "sha256": "02e1ea0ce34476a9969b6c29f15fd6798036f9ba280fb59e79199060e125f966"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/socket_item_none.png",
+      "sha256": "32d7b8b30cd417ab77d9b03cfcc837f1a3d56c3af0ef31988e8aa39858ecb61c"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/socket_item_outward.png",
+      "sha256": "c93c941b3626ded7409e7c1b58b1af77024503d43d4a38e06922006b80595dd5"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/vat_accent.png",
+      "sha256": "b73fedf9d6b08c50623ce762a06c7d9ee69f8f36e6ca2fc435dfb0d38053309e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/vat_frame.png",
+      "sha256": "84a9ee915a5fecc97f3a38965b44486f96ecbcd38c635cf1b29bb74ee41e4553"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/vat_glass.png",
+      "sha256": "1125480d0fad226206cf6d1db1c6784466dfadc26002851839cf5e4b62f568ec"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/vat_surface.png",
+      "sha256": "2f6c37eb821d4b77eb4896f53e047faf65c91fbe5e73201dc7508a01968419a1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/master/vat_trim.png",
+      "sha256": "7ab9d467fa8cec483dc4a3a78a0656c5fc0dfe523bae3d7802e6f16467ba70e6"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/buffer_glass.png",
+      "sha256": "b73fedf9d6b08c50623ce762a06c7d9ee69f8f36e6ca2fc435dfb0d38053309e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/buffer_metal.png",
+      "sha256": "2e4c36a4555ca062e0ebe269bd6333779cdd83e55337e028e5d7852991e63fa3"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/casing_clean.png",
+      "sha256": "73b9287f61e5c019bb62d6fce62f7f6215006b4639aea9e2f890065594708e4e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/casing_weather_17.png",
+      "sha256": "e7a04256950c6d79d24546679ce58998bd893f15cb75c802359518638d55ed7f"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/casing_weather_43.png",
+      "sha256": "f9f1f33dfef585e2e24089620f9e31ea62f0a2428131240620986720abe2f692"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/casing_weather_89.png",
+      "sha256": "b88cedcb6c490ff725ab0b69a7dba2391f4e120eb57e05dd6811e08ae3073cd4"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/conduit_node_fluid.png",
+      "sha256": "93b0954fe7cd0b4b2b7492d51411cc46669ef04bc26bc070d86f679f03e80a22"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/conduit_node_item.png",
+      "sha256": "e86c23d502fb3cd6751541004926276c5b5f8a767c8c7338809da2bb5cf9a39d"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/conduit_pipe_fluid.png",
+      "sha256": "e7b29bdfadcada650d765d8ed90934c28d612f7ed7b4fb20c571505df2e37e08"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/conduit_pipe_item.png",
+      "sha256": "f5683e6ea295435e035d6e1ece239d264b36f3712fc9bbe5ff65a3c8faa3dac7"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/feeder_connection.png",
+      "sha256": "1cdf52443bb51ad6665625476d6a73dce80e00c2914597ea870e33e20dd8ab1d"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/feeder_hose.png",
+      "sha256": "a3769af8c63f18c9c23cda87b5e195687d66035b7714e3d15674d720a2a04f32"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/feeder_socket.png",
+      "sha256": "6a7c0106f1eb0e169f46e3fd6a81376f42285fa9ca5fbb336d7aff68fdff10c7"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/fixture_auger.png",
+      "sha256": "c69932bdf145d7eeeed4a2a091a9451c0ba547cc45d6b1de3a49f4cb22bc931c"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/fixture_drain_valve.png",
+      "sha256": "02e39799b2af296d89fd8bda8ebfc7c60166071349a5b4dde7fcdce6b6c1903e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/fixture_fill_valve.png",
+      "sha256": "49a6f722b7319752200549eb8070d3c1850288e5c55d2c371b100002e67f0eb8"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/fixture_fluid_void.png",
+      "sha256": "98c8f3679e0bec2aee29a54758c476b3392a32dfabbb1d8ccb52f66b9f197dfc"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/fixture_grate.png",
+      "sha256": "a6bb089587e323bee5fcf7f7603a03238a9ec57a478ec7a623cb7ca7555680d0"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/fixture_hot.png",
+      "sha256": "704b045fbf6b3b88411be7d1e20a2043ea478a316d3ce194dfad15ef500273bb"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/fixture_item_void.png",
+      "sha256": "2eb1f30d314d115fa4c03b084338f83b262ba999af9e93768b3021afe9870809"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/fixture_metal.png",
+      "sha256": "1cdf52443bb51ad6665625476d6a73dce80e00c2914597ea870e33e20dd8ab1d"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/fixture_pull_pump.png",
+      "sha256": "7c384ff595901448ca7d4396fdca806dde562b0da9d9c16265054ed7992af48c"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/fixture_push_pump.png",
+      "sha256": "77875ef486566bddd7436627601f6a1683d68fb189235bf2a3f9191a115bc084"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/greenscreen_rotor.png",
+      "sha256": "c74b4e2d98b93840c744e1276f8260029fe60f432f62be42abb18008fa2b2d94"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/greenscreen_skull.png",
+      "sha256": "8833a4faacd27f790b434d55371867e93c88ce2ff84b31c9701acd42372c419e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/machinery_bezel.png",
+      "sha256": "514f1dffcad4b1345e357aaaa5bab2d8bd8fb8d68a94d0e687a965f2a942f884"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/machinery_channels.png",
+      "sha256": "1d9a315ad258124ab5c4cd4286d1c2ccc1bad2bd902d204435479d1861f85456"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/machinery_controls.png",
+      "sha256": "a41280a77e3ec8d60971bf93eea0120df5797bab2f161137ac8a928d2c25974d"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/machinery_fastener.png",
+      "sha256": "514f1dffcad4b1345e357aaaa5bab2d8bd8fb8d68a94d0e687a965f2a942f884"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/machinery_metal.png",
+      "sha256": "050324b046a5d7508b7bb0d37a4fa37f5735cf3b99038d1b25c84668b04c0afb"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/machinery_recess.png",
+      "sha256": "f99dad785bf6a8bb3fdc51892018e7011d38b0588b2c7624778688a47a9a9ee1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/machinery_vise_metal.png",
+      "sha256": "a33782c24aa66adc9def1f1ea0aa986945e16e175d689e8160b6036b53d07329"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/machinery_vise_pad.png",
+      "sha256": "f99dad785bf6a8bb3fdc51892018e7011d38b0588b2c7624778688a47a9a9ee1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/mixer_accent.png",
+      "sha256": "b73fedf9d6b08c50623ce762a06c7d9ee69f8f36e6ca2fc435dfb0d38053309e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/mixer_bearing.png",
+      "sha256": "4ce518b7a43626f512fd3f8abfc113e952c0c6c0cd5545399be5c5c8689dd462"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/mixer_combustion.png",
+      "sha256": "5fd7d3b26872db68c4e0be47cbeeacb7219f78c626acfb6c96bf7226acb8611d"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/mixer_creative.png",
+      "sha256": "ccd9f633f6b990189732d2ad8f0570d4740771f4b979bf4939b87224f1c3a26a"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/mixer_fe.png",
+      "sha256": "182ff61c905c2cc7a129d87656f4440f7bc15e114922a9a4368ad7be5afae4f7"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/mixer_frame.png",
+      "sha256": "04ddbcb4921eeba2d0b79fddce4cea0a17443c15687ec87ff36e403f2dc93b0c"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/mixer_glass.png",
+      "sha256": "b3ce836b4e30d71a58d2eeafee085dfb0f3c5f49e56d0f6cdd7e00adb63d24d7"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/mixer_housing.png",
+      "sha256": "365ce34fae4defa14cb788a40a5aa90b0b192f9939bfe5589ff6463aebe40a24"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/mixer_paddle.png",
+      "sha256": "c7b23c027d331500d2639e5b7c79a0a60de34b59717d002c692bc516ec963e03"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/mixer_shaft.png",
+      "sha256": "536eac9eb02bdce8e860417a150b00295e6df1af4f77a2c97a49edad3d5a1472"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/mixer_surface.png",
+      "sha256": "2f6c37eb821d4b77eb4896f53e047faf65c91fbe5e73201dc7508a01968419a1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/mixer_trim.png",
+      "sha256": "d8a4c75635d2349a1d4329d370de15065791634c39f2df6cbd6671f447fe4fb9"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/socket_clean.png",
+      "sha256": "737bf9fd12ccb2011a297e8995a1feee366979dec9732f0b4c1e303694f114bc"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/socket_fluid_inward.png",
+      "sha256": "174f533e1f270895d77b4233f165c5b50f8c3ee2f4f89ac67cba4d5a0476a5ea"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/socket_fluid_none.png",
+      "sha256": "7f09d0da6b59dc53eb6b66dfdad2e484204fdc174bdc729cb943bcf69f7963c6"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/socket_fluid_outward.png",
+      "sha256": "094cfc8d1bfd45071e3357bd1bf47238a80fc513996d0f010caa1da34a4f2b25"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/socket_item_inward.png",
+      "sha256": "af9e7d38227f0461a9a3daf84c8dd0fa6bb5bbd3e1f5cf2585854aa66f3cf0e5"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/socket_item_none.png",
+      "sha256": "74c885c8b3a202bcc3f22675a2a440cef0b89399cdb8fdb066ffc69b2a8adc97"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/socket_item_outward.png",
+      "sha256": "e23470eaea38e918351b3a0278a1f2dfdfe72a9de4d76bffa15daf3b25efca0d"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/vat_accent.png",
+      "sha256": "b73fedf9d6b08c50623ce762a06c7d9ee69f8f36e6ca2fc435dfb0d38053309e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/vat_frame.png",
+      "sha256": "d53f64dbfbac9eef7bcdb804846c07dcdcd1fe6609c8eb49c16ff49a3421ed02"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/vat_glass.png",
+      "sha256": "452945b48d5fa97a7167b1657a617ac51d7cd857517d68d2cc65ba777ff5a2f5"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/vat_surface.png",
+      "sha256": "2f6c37eb821d4b77eb4896f53e047faf65c91fbe5e73201dc7508a01968419a1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t1/vat_trim.png",
+      "sha256": "4efab806f56842636f96aef38a8e75d3da4c9ad91dee74401ffeda61a38ed500"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/buffer_glass.png",
+      "sha256": "b73fedf9d6b08c50623ce762a06c7d9ee69f8f36e6ca2fc435dfb0d38053309e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/buffer_metal.png",
+      "sha256": "32d5ac9b0ecd418655a7d5ae57d6958ca7505944f85bc0d03b2e3f0c33a2a17e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/casing_clean.png",
+      "sha256": "54bebdd5a782e68c885e910638a596aff60561c4c618a5981029f27ba6a76bf8"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/casing_weather_17.png",
+      "sha256": "9d29d47b0a85b72513e5b9cf855dc17fd9766daa94ecb75ac5b5078e0f814019"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/casing_weather_43.png",
+      "sha256": "2d7fa14d78fb8ed8bb13878e7af7d337d4a2d12dad947f3df28ed6c917121395"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/casing_weather_89.png",
+      "sha256": "a90e2ca8c173178ccaa8354a38a16312b9e7565a0fd307dedf326872828442d6"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/conduit_node_fluid.png",
+      "sha256": "c65b04eb3ae0b186e504019a6a8cff582da5ae0eb1c613a052a0632404171fa5"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/conduit_node_item.png",
+      "sha256": "1769d52e7007a7e6a118c957a9d20f4a5c4530a77c4298e92ea899b78379447b"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/conduit_pipe_fluid.png",
+      "sha256": "df67382b114b713fa686da010d5728d74a97f2250278f955b799f167f3ce9ed2"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/conduit_pipe_item.png",
+      "sha256": "51a9fa547145ff0fe178a9a803207f35edd3e2c21661de08d5a42822ad2f5811"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/feeder_connection.png",
+      "sha256": "74e6f8f5307d199f9d5ee450f56666167447c739d7f935f549e1166b1be2cfdf"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/feeder_hose.png",
+      "sha256": "ba7049073b6f7c9c17eedbf666306b60e93f341c1abb87baa0d5df34652d8b10"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/feeder_socket.png",
+      "sha256": "b11e051079654322eb86f0084a4660bf65c777f5409cfd65b16f68ac160eacbe"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/fixture_auger.png",
+      "sha256": "42cb8922f060b0c52261e65de2255416d2d23e6ca6427b0eecdf9f38b6ee7f2b"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/fixture_drain_valve.png",
+      "sha256": "797e3ae2f28e0948e4db09b1128689c123651e47072093d18b24914f8d7f9e65"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/fixture_fill_valve.png",
+      "sha256": "282ed8cf6f386d0e8043160da22e903b0a26fb336f676a37223116294b81b71c"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/fixture_fluid_void.png",
+      "sha256": "7fbaa6df5947ce05a6b3e76134d12bddb867e0fa2caf836f5c2a60e956cec79d"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/fixture_grate.png",
+      "sha256": "36ed9afb319b399e3bf143d901cce9972a89823246acf615376121085f50f37a"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/fixture_hot.png",
+      "sha256": "704b045fbf6b3b88411be7d1e20a2043ea478a316d3ce194dfad15ef500273bb"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/fixture_item_void.png",
+      "sha256": "23bddff062f568b15b5785dc9c34d2a98f8f39a63944d5f039af12f0ba698f73"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/fixture_metal.png",
+      "sha256": "74e6f8f5307d199f9d5ee450f56666167447c739d7f935f549e1166b1be2cfdf"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/fixture_pull_pump.png",
+      "sha256": "f2549532c08eeb9020335fe94234b2e61c2d535242cf1e4515313f2da099c1b6"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/fixture_push_pump.png",
+      "sha256": "c851e252be1dddf8a3bc72c564e4db7c3349ed709acfc0dee68d1a4c6b33b3eb"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/greenscreen_rotor.png",
+      "sha256": "c74b4e2d98b93840c744e1276f8260029fe60f432f62be42abb18008fa2b2d94"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/greenscreen_skull.png",
+      "sha256": "8833a4faacd27f790b434d55371867e93c88ce2ff84b31c9701acd42372c419e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/machinery_bezel.png",
+      "sha256": "8f3c0a9ef5b7b2f84b8861e89730c4bce9ad72f62a8935360f0872f67548d86e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/machinery_channels.png",
+      "sha256": "5d6c8fc2ffa3437bc686092100a620475027e893f3f8848846f933119d090602"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/machinery_controls.png",
+      "sha256": "ea9eb813ab32ad29e4426448043c0539b4e41fc8c7ab414f0f6096dcc6820831"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/machinery_fastener.png",
+      "sha256": "8f3c0a9ef5b7b2f84b8861e89730c4bce9ad72f62a8935360f0872f67548d86e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/machinery_metal.png",
+      "sha256": "1b3ae06be4353132b1a35290310c9014003671169dd2fe1a157e750e7d1dda64"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/machinery_recess.png",
+      "sha256": "8d2bf3534dc3d6b08eedbfd7319e82623e9702d81001bce428cf0f7c164f629a"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/machinery_vise_metal.png",
+      "sha256": "a95582ab51ed8ad6d28528fef9bfc74ed798f63db3ce0e449615783067d6fcec"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/machinery_vise_pad.png",
+      "sha256": "8d2bf3534dc3d6b08eedbfd7319e82623e9702d81001bce428cf0f7c164f629a"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/mixer_accent.png",
+      "sha256": "b73fedf9d6b08c50623ce762a06c7d9ee69f8f36e6ca2fc435dfb0d38053309e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/mixer_bearing.png",
+      "sha256": "d0cab5b92f95e18c8b1ae4c6b94c1b5414722fb489bc37742b0de3d4af13444c"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/mixer_combustion.png",
+      "sha256": "6c5757ae737a351a63ac50a641b4aae9bab34c89fbf4eb64dc0ae24d85299e62"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/mixer_creative.png",
+      "sha256": "788f33b8d1c88597370a247b45ec40f01eba6a8d37f103aa1a578a36df21a239"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/mixer_fe.png",
+      "sha256": "8b0d07706271b4fba43679398306942341237fd2de919e404d44fd479ad770d9"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/mixer_frame.png",
+      "sha256": "bbabb437892cce5e92888524b6aac883035588f2d9458b0eb9b06ac951a4297f"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/mixer_glass.png",
+      "sha256": "6a88831c5425eb2b6c476bd8b005254b07d24ad8ca9f11e6dcf8a5d70e1c8bca"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/mixer_housing.png",
+      "sha256": "397bec3083e4b5ac4614f94a340bb51a52dc277966cc30ff1062bd23fc4e8eb4"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/mixer_paddle.png",
+      "sha256": "6000bcdb0392fd9eeb985759b00b915226ad37c3821c40276460d23c12c79181"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/mixer_shaft.png",
+      "sha256": "d06b6e5657a74eb6c3476124f10313e5c10135107bad460b63efe7c5a56889c0"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/mixer_surface.png",
+      "sha256": "2f6c37eb821d4b77eb4896f53e047faf65c91fbe5e73201dc7508a01968419a1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/mixer_trim.png",
+      "sha256": "e5422f737fc89aebbc33dcfd00ffa2d2ee4bb213ce0677a74df65a977754c3cc"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/socket_clean.png",
+      "sha256": "8cba5c07077b8c650aca5b8d232093ac8f08dc75aef60d80bcfbcfd752c0bc33"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/socket_fluid_inward.png",
+      "sha256": "c85fccaf2670d202489cf29e3f95dad369441950ed4c1206d7b5ef2830264a14"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/socket_fluid_none.png",
+      "sha256": "fd91f980ed44ad5eea9bba56403942bad0a087681ff3d83a3ded6c9173b59a5b"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/socket_fluid_outward.png",
+      "sha256": "b3f9bd48975fd9d4181cc06c8540f47b0930f3d2451ef30a6a4602740d65dec8"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/socket_item_inward.png",
+      "sha256": "507954ce238b62a46b6981fc9f86e5ede2eb3729c9704a462fad81acde8ce20f"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/socket_item_none.png",
+      "sha256": "07981a64ce6d026d1626be4aed590906b9647da8a444c9f24dd04357365bde46"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/socket_item_outward.png",
+      "sha256": "274b49b9ac405120af517ceb93305978424125f3ee4d1c7b5a69d47cb6fbe6ff"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/vat_accent.png",
+      "sha256": "b73fedf9d6b08c50623ce762a06c7d9ee69f8f36e6ca2fc435dfb0d38053309e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/vat_frame.png",
+      "sha256": "3e1f696ca3f06d2842d68ce11e42b81bc73e253e9ff08a20891d54dd0bd83c8a"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/vat_glass.png",
+      "sha256": "dab728221f520e68e2e8feb9eae225cec0c5536e462879ea0b727f8ce90cbd27"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/vat_surface.png",
+      "sha256": "2f6c37eb821d4b77eb4896f53e047faf65c91fbe5e73201dc7508a01968419a1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t2/vat_trim.png",
+      "sha256": "52383ca74dedc4f6bb155bea1805ba035515888707b75a67a49c44b5a8b4add8"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/buffer_glass.png",
+      "sha256": "b73fedf9d6b08c50623ce762a06c7d9ee69f8f36e6ca2fc435dfb0d38053309e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/buffer_metal.png",
+      "sha256": "4a8fbea9194eb9d7f0114f2d47cf1c001a0635d50fc6753e92903dbfa776f8cc"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/casing_clean.png",
+      "sha256": "c92a5d4761d885b47d2fb18cd7aae858ff2112e34278cca3968a545422bd9df2"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/casing_weather_17.png",
+      "sha256": "373baa19398c6a82a1c8f267edaac7944015f1f966246217701b07fbc5dc6d24"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/casing_weather_43.png",
+      "sha256": "f5081f1722692e0a966cbe0b97e7002ddf54264ae9b52549edae44430137f53f"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/casing_weather_89.png",
+      "sha256": "23eb5996150582ad728f46477fb932b0e73d15715e7ec95daba7b320036c714a"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/conduit_node_fluid.png",
+      "sha256": "599f00caec6357cb0b39acd15524d2c510967cb6043e749cee36c68f1ecaeaa1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/conduit_node_item.png",
+      "sha256": "e48b6d6d657334719d1ba9b1b5153e965710ae53012b53f381d69b9f93044326"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/conduit_pipe_fluid.png",
+      "sha256": "66a4dde2dcc6af365bd7793c64b4e14c2908efaaf40acffb369408f6d0f230cb"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/conduit_pipe_item.png",
+      "sha256": "28e9a9943b6d0f2cf7b7aec05851f3a6fd6c4cc58a2746589ee312dbe550f792"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/feeder_connection.png",
+      "sha256": "621c82093ab660339d8f8e54589e6262a12f767875dbdf6b36518b8be7781b45"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/feeder_hose.png",
+      "sha256": "e9f4f00f736e963b63f9a8d328dc6242f934ecf43d997119845feee5248f71b1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/feeder_socket.png",
+      "sha256": "ffc39d9776c087277ce3a67b7a97e594394bb44c9eaa8ff7f0b53f94d76c0844"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/fixture_auger.png",
+      "sha256": "1706adb88897afa16bff9259d78d0d4cf598afa7ca2339a02c3f42c1379b79fa"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/fixture_drain_valve.png",
+      "sha256": "f355544fcad70dc56317b8b17ca92d9dbe0bdacc6087b869b7e85848e07f6d24"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/fixture_fill_valve.png",
+      "sha256": "7223f46ab2becb6c65f3777b7761a197a4f51610d61bf12b7eab0a62537cbc22"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/fixture_fluid_void.png",
+      "sha256": "db0e76f934fa1b266cacc85dd68903c21dc62746d1415068791ec2efd36924f4"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/fixture_grate.png",
+      "sha256": "0d6469026b6cb4317b93ffb6573811637d721b87e46f22934fce371fbfc7abba"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/fixture_hot.png",
+      "sha256": "704b045fbf6b3b88411be7d1e20a2043ea478a316d3ce194dfad15ef500273bb"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/fixture_item_void.png",
+      "sha256": "6e7271903064a12d2e55cd0b1e416774e11aeea98d520b1ba4a1d46d534f347d"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/fixture_metal.png",
+      "sha256": "621c82093ab660339d8f8e54589e6262a12f767875dbdf6b36518b8be7781b45"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/fixture_pull_pump.png",
+      "sha256": "b44d809536f049c8424fd4f168a5f4db79aa3e61716cba99caacf4f8a2fd8831"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/fixture_push_pump.png",
+      "sha256": "ee613322cc8c8f79ae8e8a69c5bba5d6d50a9aa2a80481c5e39298993b7b2e4c"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/greenscreen_rotor.png",
+      "sha256": "c74b4e2d98b93840c744e1276f8260029fe60f432f62be42abb18008fa2b2d94"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/greenscreen_skull.png",
+      "sha256": "8833a4faacd27f790b434d55371867e93c88ce2ff84b31c9701acd42372c419e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/machinery_bezel.png",
+      "sha256": "c8488448dd904cc17be7b7dbe62306cad9d48aa2df7bc37fc077ea0e6b73884d"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/machinery_channels.png",
+      "sha256": "9cf16b1a01e54c301b02c5cfd7855fc3f9653725afd98aa8c853031f9a481ee1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/machinery_controls.png",
+      "sha256": "015d17bdcda0237d523aba0310ac5f5452d8b9f7916a102154b8d48e612b63af"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/machinery_fastener.png",
+      "sha256": "c8488448dd904cc17be7b7dbe62306cad9d48aa2df7bc37fc077ea0e6b73884d"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/machinery_metal.png",
+      "sha256": "df0616735607b1420499a29357a784ee0c2a611f4c615a880bfb55ba234b0c95"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/machinery_recess.png",
+      "sha256": "7a95cc38fe329cf6d28d260207d0784e38ec6cbfb2e8c8bfb750abce5af2acde"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/machinery_vise_metal.png",
+      "sha256": "360c3f37e65613dc0e66cd0af36f14e6cb9b70ea942329bdfd3928a5b9989dbf"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/machinery_vise_pad.png",
+      "sha256": "7a95cc38fe329cf6d28d260207d0784e38ec6cbfb2e8c8bfb750abce5af2acde"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/mixer_accent.png",
+      "sha256": "b73fedf9d6b08c50623ce762a06c7d9ee69f8f36e6ca2fc435dfb0d38053309e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/mixer_bearing.png",
+      "sha256": "2d1befeac221f0036a75af0e5b16b8fd784cae0d6a0e83381435a3507746b15c"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/mixer_combustion.png",
+      "sha256": "5ea85d790e154dc7139cda8fc82b01fa343796f9b5045b073567f4687b3c39e1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/mixer_creative.png",
+      "sha256": "b5e104bc001d18af98ffe7f40112166d6504c78ba74173fbdf5941761f88a6d0"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/mixer_fe.png",
+      "sha256": "c5812bd93f842387b12c69b5916c8b936896331fb414aeb96130fd943f47f4fb"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/mixer_frame.png",
+      "sha256": "aaaa5a5f4118755fee0b50762e6430b13c314e794763b05e63c0b6d92c4c8735"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/mixer_glass.png",
+      "sha256": "9accae5ad4ead50b1a5b41446343541862b5a0d0e4702b20be57afc6d8e48475"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/mixer_housing.png",
+      "sha256": "5ed654afe54226c87bfdb2e799ec40f80dd05b73c83f359d543b52319135c775"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/mixer_paddle.png",
+      "sha256": "967ec0a84cb754c103fd67b0050950ed4d1b0107564996190f2668b7af933695"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/mixer_shaft.png",
+      "sha256": "b44e588ca4841929964b6d695500652e112fcb2c3c8dca047b277e90fb35876d"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/mixer_surface.png",
+      "sha256": "2f6c37eb821d4b77eb4896f53e047faf65c91fbe5e73201dc7508a01968419a1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/mixer_trim.png",
+      "sha256": "c92b0670700e915aeef2dd41504a2353f0325b8b182dd3372949800d8a59d445"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/socket_clean.png",
+      "sha256": "8f815737258fde1fcb9694b11ad885fc50160e16921adf7d657201a00a67e637"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/socket_fluid_inward.png",
+      "sha256": "d715bde28fba52aac3383c566fc96ffb00e1c81f537d40b69ea25082df872bb5"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/socket_fluid_none.png",
+      "sha256": "6025f779b3045c95ebc4cc6307b215906927ffc837599782a3e24120389cc528"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/socket_fluid_outward.png",
+      "sha256": "215cf31c28ea647678817d66ff80e125f04e92f94239f9376b72c6d782584fae"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/socket_item_inward.png",
+      "sha256": "6ba471f7b027a8d1d2419a70e1dc45a6015cedd5ac3eb63b324d15b99ba63585"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/socket_item_none.png",
+      "sha256": "208caaa66efad214bdc7184e520bdaaee213256420ce3dcfb1cbd2d00826ab08"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/socket_item_outward.png",
+      "sha256": "6e807560a1ee69bd84161b475dd1b3d7a6c51b68f5e63dfad5cb8fc3fde6402b"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/vat_accent.png",
+      "sha256": "b73fedf9d6b08c50623ce762a06c7d9ee69f8f36e6ca2fc435dfb0d38053309e"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/vat_frame.png",
+      "sha256": "0eadde4c4e56c68fd67fa6784884115602cce24625bad49d48b1c2a03676b225"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/vat_glass.png",
+      "sha256": "d7ecb89d8360ed245a3ccf4bdcee1593ee52c525378b61043fe3e5bba3261241"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/vat_surface.png",
+      "sha256": "2f6c37eb821d4b77eb4896f53e047faf65c91fbe5e73201dc7508a01968419a1"
+    },
+    {
+      "path": "assets/mobvats/textures/block/procedural/t3/vat_trim.png",
+      "sha256": "e07340c829e58c713c9a55323c0d3f87eb8dc4b212788bca51e96ce0cfdaa425"
+    },
+    {
+      "path": "assets/mobvats/textures/blocks/vat_face.png",
+      "sha256": "8a0738576c1048d5d5b55a122532e71881f9b4160faefb0bf66fc110c904ec9e"
+    },
+    {
+      "path": "assets/mobvats/textures/blocks/vat_flesh.png",
+      "sha256": "a49a19c01109dd6856fc8196cc2f3bd8c11832eab4ddc116b1926543ed409513"
+    },
+    {
+      "path": "assets/mobvats/textures/blocks/vat_head.png",
+      "sha256": "b75f38b3a50f3ef8295a670d1c3a7310816bcb05ee4206b965a9d989da9810fd"
+    },
+    {
+      "path": "assets/mobvats/textures/items/item_essence.png",
+      "sha256": "241c992e35669626cef113ae7bafc6a483410d561db4cd909175c39881676cca"
+    },
+    {
+      "path": "assets/mobvats/textures/items/item_syringe.png",
+      "sha256": "69ead9477b43a6aa5b34928c3477dc96b4144a51e776262a5550281c8a05a81b"
+    }
+  ]
+}

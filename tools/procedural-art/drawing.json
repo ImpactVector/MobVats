@@ -1,0 +1,2077 @@
+{
+  "schemaVersion": 1,
+  "units": "texture_pixels",
+  "authorship": "AUTHORED_PROCEDURAL",
+  "patterns": {
+    "port_none": {
+      "primitive": "points",
+      "points": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          4
+        ]
+      ],
+      "token": {
+        "parameter": "marking"
+      },
+      "reflectCorners": true,
+      "defaults": {
+        "marking": "base"
+      }
+    },
+    "port_inward": {
+      "primitive": "points",
+      "points": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          3
+        ]
+      ],
+      "token": {
+        "parameter": "marking"
+      },
+      "reflectCorners": true,
+      "defaults": {
+        "marking": "base"
+      }
+    },
+    "port_outward": {
+      "primitive": "points",
+      "points": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          1
+        ]
+      ],
+      "token": {
+        "parameter": "marking"
+      },
+      "reflectCorners": true,
+      "defaults": {
+        "marking": "base"
+      }
+    },
+    "material_variation": {
+      "primitive": "points",
+      "points": [
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          9,
+          9
+        ],
+        [
+          10,
+          9
+        ],
+        [
+          10,
+          10
+        ]
+      ],
+      "token": {
+        "material": "base",
+        "toward": "light",
+        "eighths": 1
+      }
+    },
+    "controller_skull": {
+      "primitive": "pixel_grid",
+      "at": [
+        0,
+        0
+      ],
+      "width": 16,
+      "height": 16,
+      "palette": {
+        ".": null,
+        "#": {
+          "colorRef": "fixed.phosphor_green"
+        }
+      },
+      "pixels": [
+        "................",
+        "................",
+        ".....######.....",
+        "....########....",
+        "...##########...",
+        "...##..##..##...",
+        "...##..##..##...",
+        "...##########...",
+        "....###..###....",
+        ".....######.....",
+        ".....#.##.#.....",
+        ".....######.....",
+        "................",
+        "................",
+        "................",
+        "................"
+      ]
+    },
+    "controller_rotor": {
+      "primitive": "pixel_grid",
+      "at": [
+        0,
+        0
+      ],
+      "width": 16,
+      "height": 16,
+      "palette": {
+        ".": null,
+        "#": {
+          "colorRef": "fixed.phosphor_green"
+        }
+      },
+      "pixels": [
+        "................",
+        "................",
+        ".......###......",
+        ".......####.....",
+        ".......####.....",
+        ".......###......",
+        ".......##.......",
+        "......####......",
+        "..##########....",
+        "..#####..####...",
+        "...###....####..",
+        "...........###..",
+        "............##..",
+        "................",
+        "................",
+        "................"
+      ]
+    }
+  },
+  "weathering": {
+    "light": {
+      "candidates": [
+        [
+          4,
+          6
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          5,
+          10
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          9,
+          7
+        ]
+      ],
+      "scratchCount": 2,
+      "scratch": [
+        {
+          "at": [
+            0,
+            0
+          ],
+          "token": "shadow"
+        },
+        {
+          "at": [
+            1,
+            0
+          ],
+          "token": "wear"
+        },
+        {
+          "at": [
+            2,
+            -1
+          ],
+          "token": {
+            "material": "base",
+            "toward": "light",
+            "eighths": 2
+          }
+        }
+      ],
+      "edgeOffsetMin": 5,
+      "edgeOffsetCount": 5,
+      "edgeTurns": 4,
+      "edge": [
+        {
+          "at": [
+            0,
+            1
+          ],
+          "token": {
+            "material": "base",
+            "toward": "light",
+            "eighths": 1
+          }
+        },
+        {
+          "at": [
+            1,
+            1
+          ],
+          "token": "wear"
+        },
+        {
+          "at": [
+            2,
+            0
+          ],
+          "token": {
+            "material": "base",
+            "toward": "light",
+            "eighths": 1
+          }
+        }
+      ]
+    }
+  },
+  "textures": {
+    "buffer_glass": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": {
+              "colorRef": "fixed.buffer_glass"
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "buffer_metal": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "base",
+            "B": {
+              "material": "base",
+              "toward": "shadow",
+              "eighths": 3
+            },
+            "C": "shadow"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "ABBBBBBBBBBBBBBA",
+            "ABAAAAAAAAAAAABA",
+            "ABACAAAAAAAACABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABACAAAAAAAACABA",
+            "ABAAAAAAAAAAAABA",
+            "ABBBBBBBBBBBBBBA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        },
+        {
+          "primitive": "weather",
+          "profile": "light",
+          "seed": 29
+        }
+      ]
+    },
+    "conduit_node_fluid": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": {
+              "colorRef": "fixed.fluid"
+            },
+            "C": "deep",
+            "D": "base"
+          },
+          "pixels": [
+            "AAAAAABBBBAAAAAC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "CCCCCCBBBBCCCCCC"
+          ]
+        }
+      ]
+    },
+    "conduit_node_item": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": {
+              "colorRef": "fixed.item"
+            },
+            "C": "deep",
+            "D": "base"
+          },
+          "pixels": [
+            "AAAAAABBBBAAAAAC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "ADDDDDBBBBDDDDDC",
+            "CCCCCCBBBBCCCCCC"
+          ]
+        }
+      ]
+    },
+    "conduit_pipe_fluid": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": {
+              "colorRef": "fixed.fluid"
+            },
+            "C": "deep",
+            "D": "base"
+          },
+          "pixels": [
+            "AAAAAAABBAAAAAAC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "CCCCCCCBBCCCCCCC"
+          ]
+        }
+      ]
+    },
+    "conduit_pipe_item": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": {
+              "colorRef": "fixed.item"
+            },
+            "C": "deep",
+            "D": "base"
+          },
+          "pixels": [
+            "AAAAAAABBAAAAAAC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "ADDDDDDBBDDDDDDC",
+            "CCCCCCCBBCCCCCCC"
+          ]
+        }
+      ]
+    },
+    "feeder_connection": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": "base"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        }
+      ]
+    },
+    "feeder_hose": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "deep",
+            "B": "shadow"
+          },
+          "pixels": [
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA",
+            "ABBABBABBABBABBA"
+          ]
+        }
+      ]
+    },
+    "feeder_socket": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": "base",
+            "D": {
+              "colorRef": "fixed.feeder_socket"
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCDDDDDDCCCCB",
+            "ACCCCDDDDDDCCCCB",
+            "ACCCCDDDDDDCCCCB",
+            "ACCCCDDDDDDCCCCB",
+            "ACCCCDDDDDDCCCCB",
+            "ACCCCDDDDDDCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        }
+      ]
+    },
+    "fixture_auger": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "shadow"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        }
+      ]
+    },
+    "fixture_drain_valve": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": "base",
+            "D": {
+              "material": "base",
+              "toward": "shadow",
+              "eighths": 3
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ADDDDDDDDDDDDDDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCBCBCBCBCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCBCBCBCBCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCBCBCBCBCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCBCBCBCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADDDDDDDDDDDDDDB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        },
+        {
+          "primitive": "reference",
+          "recipe": "port_inward",
+          "parameters": {
+            "marking": {
+              "colorRef": "fixed.fluid"
+            }
+          }
+        }
+      ],
+      "resource": "fluid",
+      "direction": "inward"
+    },
+    "fixture_fill_valve": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": "base",
+            "D": {
+              "material": "base",
+              "toward": "shadow",
+              "eighths": 3
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ADDDDDDDDDDDDDDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCBCBCBCBCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCBCBCBCBCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCBCBCBCBCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCBCBCBCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADDDDDDDDDDDDDDB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        },
+        {
+          "primitive": "reference",
+          "recipe": "port_outward",
+          "parameters": {
+            "marking": {
+              "colorRef": "fixed.fluid"
+            }
+          }
+        }
+      ],
+      "resource": "fluid",
+      "direction": "outward"
+    },
+    "fixture_fluid_void": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "base",
+            "B": {
+              "colorRef": "fixed.fluid"
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAABAAAAAAAABAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAABAAAAAAAABAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ],
+      "resource": "fluid",
+      "direction": "none"
+    },
+    "fixture_grate": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": {
+              "material": "base",
+              "toward": "shadow",
+              "eighths": 3
+            },
+            "B": "shadow"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "ABBBBBBBBBBBBBBA",
+            "ABBBBBBBBBBBBBBA",
+            "ABBBBBBBBBBBBBBA",
+            "ABBBBBBBBBBBBBBA",
+            "ABBBBBBBBBBBBBBA",
+            "ABBBBBBBBBBBBBBA",
+            "ABBBBBBBBBBBBBBA",
+            "ABBBBBBBBBBBBBBA",
+            "ABBBBBBBBBBBBBBA",
+            "ABBBBBBBBBBBBBBA",
+            "ABBBBBBBBBBBBBBA",
+            "ABBBBBBBBBBBBBBA",
+            "ABBBBBBBBBBBBBBA",
+            "ABBBBBBBBBBBBBBA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "fixture_hot": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": {
+              "colorRef": "fixed.hot_outer"
+            },
+            "B": {
+              "colorRef": "fixed.hot_mid"
+            },
+            "C": {
+              "colorRef": "fixed.hot_inner"
+            },
+            "D": {
+              "colorRef": "fixed.hot_center"
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AABBBBBBBBBBBBAA",
+            "AABBBBBBBBBBBBAA",
+            "AABBCCCCCCCCBBAA",
+            "AABBCCCCCCCCBBAA",
+            "AABBCCDDDDCCBBAA",
+            "AABBCCDDDDCCBBAA",
+            "AABBCCDDDDCCBBAA",
+            "AABBCCDDDDCCBBAA",
+            "AABBCCCCCCCCBBAA",
+            "AABBCCCCCCCCBBAA",
+            "AABBBBBBBBBBBBAA",
+            "AABBBBBBBBBBBBAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "fixture_item_void": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "base",
+            "B": {
+              "colorRef": "fixed.item"
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAABAAAAAAAABAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAABAAAAAAAABAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ],
+      "resource": "item",
+      "direction": "none"
+    },
+    "fixture_metal": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": "base"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        }
+      ]
+    },
+    "fixture_pull_pump": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": "base",
+            "D": {
+              "material": "base",
+              "toward": "shadow",
+              "eighths": 3
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ADDDDDDDDDDDDDDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADDDDDDDDDDDDDDB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        },
+        {
+          "primitive": "reference",
+          "recipe": "port_inward",
+          "parameters": {
+            "marking": {
+              "colorRef": "fixed.fluid"
+            }
+          }
+        }
+      ],
+      "resource": "fluid",
+      "direction": "inward"
+    },
+    "fixture_push_pump": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": "base",
+            "D": {
+              "material": "base",
+              "toward": "shadow",
+              "eighths": 3
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ADDDDDDDDDDDDDDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADCCCCCCCCCCCCDB",
+            "ADDDDDDDDDDDDDDB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        },
+        {
+          "primitive": "reference",
+          "recipe": "port_outward",
+          "parameters": {
+            "marking": {
+              "colorRef": "fixed.fluid"
+            }
+          }
+        }
+      ],
+      "resource": "fluid",
+      "direction": "outward"
+    },
+    "greenscreen_rotor": {
+      "layers": [
+        {
+          "primitive": "panel",
+          "bounds": [
+            0,
+            0,
+            15,
+            15
+          ],
+          "token": {
+            "colorRef": "fixed.screen_dark"
+          }
+        },
+        {
+          "primitive": "reference",
+          "recipe": "controller_rotor"
+        }
+      ]
+    },
+    "greenscreen_skull": {
+      "layers": [
+        {
+          "primitive": "panel",
+          "bounds": [
+            0,
+            0,
+            15,
+            15
+          ],
+          "token": {
+            "colorRef": "fixed.screen_dark"
+          }
+        },
+        {
+          "primitive": "reference",
+          "recipe": "controller_skull"
+        }
+      ]
+    },
+    "machinery_bezel": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "shadow"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "machinery_channels": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "base",
+            "B": {
+              "material": "base",
+              "toward": "shadow",
+              "eighths": 3
+            },
+            "C": "deep"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "ABBBBBBBBBBBBBBA",
+            "ABCAAAAAAAAAACBA",
+            "ABACAAAAAAAACABA",
+            "ABAACAAAAAACAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAACAAAAAACAABA",
+            "ABACAAAAAAAACABA",
+            "ABCAAAAAAAAAACBA",
+            "ABBBBBBBBBBBBBBA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "machinery_controls": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "deep",
+            "B": {
+              "colorRef": "fixed.status"
+            },
+            "C": "light"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAABBA",
+            "AAAAAAAAAAAAABBA",
+            "AACCCACCCACCCBBA",
+            "AACCCACCCACCCAAA",
+            "AACCCACCCACCCAAA",
+            "AACCCACCCACCCAAA",
+            "AACCCACCCACCCAAA",
+            "AACCCACCCACCCAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "machinery_fastener": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "shadow"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "machinery_metal": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "base",
+            "B": {
+              "material": "base",
+              "toward": "shadow",
+              "eighths": 3
+            },
+            "C": "shadow"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "ABBBBBBBBBBBBBBA",
+            "ABAAAAAAAAAAAABA",
+            "ABACAAAAAAAACABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABAAAAAAAAAAAABA",
+            "ABACAAAAAAAACABA",
+            "ABAAAAAAAAAAAABA",
+            "ABBBBBBBBBBBBBBA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "machinery_recess": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "deep"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "machinery_vise_metal": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "base"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "machinery_vise_pad": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "deep"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "mixer_accent": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": {
+              "colorRef": "fixed.glass_edge"
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "mixer_bearing": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": "shadow",
+            "D": "highlight",
+            "E": {
+              "material": "base",
+              "toward": "shadow",
+              "eighths": 3
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ACDCCCCCCCCCCDCB",
+            "ACBCCCCCCCCCCBCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCEEEEEEEECCCB",
+            "ACCCECCCCCCECCCB",
+            "ACCCECBBBBCECCCB",
+            "ACCCECBBBBCECCCB",
+            "ACCCECBBBBCECCCB",
+            "ACCCECBBBBCECCCB",
+            "ACCCECCCCCCECCCB",
+            "ACCCEEEEEEEECCCB",
+            "ACDCCCCCCCCCCDCB",
+            "ACBCCCCCCCCCCBCB",
+            "ACCCCCCCCCCCCCCB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        }
+      ]
+    },
+    "mixer_combustion": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": "base",
+            "D": "highlight",
+            "E": "shadow",
+            "F": {
+              "colorRef": "fixed.combustion_fuel"
+            },
+            "G": {
+              "colorRef": "fixed.drive_combustion"
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ACDCCCCCCCCCCDCB",
+            "ACBCCCCCCCCCCBCB",
+            "ACCCBBBBBBBBCCCB",
+            "ACCCBEBEBEBBCCCB",
+            "ACCCBEBEBEBBCCCB",
+            "ACCCBEBEBEBBCCCB",
+            "ACCCBBBBBBBBCCCB",
+            "ACCCBFFFFFFBCCCB",
+            "ACCCBFGGGGFBCCCB",
+            "ACCCBFFFFFFBCCCB",
+            "ACCCBBBBBBBBCCCB",
+            "ACDCBBBBBBBBCDCB",
+            "ACBCCCCCCCCCCBCB",
+            "ACCCCCCCCCCCCCCB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        }
+      ]
+    },
+    "mixer_creative": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": "base",
+            "D": "highlight",
+            "E": {
+              "colorRef": "fixed.drive_creative"
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ACDCCCCCCCCCCDCB",
+            "ACBCCCCCCCCCCBCB",
+            "ACCCBBBBBBBBCCCB",
+            "ACCCBBBEBBBBCCCB",
+            "ACCCBBBEBBBBCCCB",
+            "ACCCBEBEBBEBCCCB",
+            "ACCCBEBEBBEBCCCB",
+            "ACCCBEBEBBEBCCCB",
+            "ACCCBEBBBBEBCCCB",
+            "ACCCBEBBBBEBCCCB",
+            "ACCCBBEEEEBBCCCB",
+            "ACDCBBBBBBBBCDCB",
+            "ACBCCCCCCCCCCBCB",
+            "ACCCCCCCCCCCCCCB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        }
+      ]
+    },
+    "mixer_fe": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": "base",
+            "D": "highlight",
+            "E": "shadow",
+            "F": {
+              "colorRef": "fixed.drive_fe"
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ACDCCCCCCCCCCDCB",
+            "ACBCCCCCCCCCCBCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCEEEEEEEECCCB",
+            "ACCCEFFFFFFECCCB",
+            "ACCCEFBBBBFECCCB",
+            "ACCCEFBBBBFECCCB",
+            "ACCCEFBBBBFECCCB",
+            "ACCCEFBBBBFECCCB",
+            "ACCCEFFFFFFECCCB",
+            "ACCCEEEEEEEECCCB",
+            "ACDCCCCCCCCCCDCB",
+            "ACBCCCCCCCCCCBCB",
+            "ACCCCCCCCCCCCCCB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        }
+      ]
+    },
+    "mixer_frame": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": "base",
+            "D": "shadow"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ACCCCCCCCCCCCCCB",
+            "ACBBBBBBBBBBBBCB",
+            "ACCDCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCDCCB",
+            "ACBBBBBBBBBBBBCB",
+            "ACCCCCCCCCCCCCCB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        }
+      ]
+    },
+    "mixer_glass": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "base",
+            "C": {
+              "colorRef": "fixed.glass"
+            },
+            "D": "deep",
+            "E": "shadow"
+          },
+          "pixels": [
+            "AAAABBBBBBBBAAAA",
+            "ACCCCCCCCCCCCCCA",
+            "ACDDDDDDDDDDDDCA",
+            "ACCECCCCCCCCCCCA",
+            "BCCCCCCCCCCCCCCB",
+            "BCCCCCCCCCCCCCCB",
+            "BCCCCCCCCCCCCCCB",
+            "BCCCCCCCCCCCCCCB",
+            "BCCCCCCCCCCCCCCB",
+            "BCCCCCCCCCCCCCCB",
+            "BCCCCCCCCCCCCCCB",
+            "BCCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCECCA",
+            "ACDDDDDDDDDDDDCA",
+            "ACCCCCCCCCCCCCCA",
+            "AAAABBBBBBBBAAAA"
+          ]
+        }
+      ]
+    },
+    "mixer_housing": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": {
+              "material": "base",
+              "toward": "shadow",
+              "eighths": 3
+            },
+            "D": "base",
+            "E": "shadow",
+            "F": "highlight"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ACCCCCCCCCCCCCCB",
+            "ACBDDDDDDDDDDBCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDEEEEEEEEDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACFDDDDDDDDDDFCB",
+            "ACBDDDDDDDDDDBCB",
+            "ACCCCCCCCCCCCCCB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        }
+      ]
+    },
+    "mixer_paddle": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "base",
+            "B": "light",
+            "C": "deep"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "BBBBBBBBBBBBBBBB",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "CCCCCCCCCCCCCCCC",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "mixer_shaft": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "shadow",
+            "B": "light",
+            "C": "base",
+            "D": "deep"
+          },
+          "pixels": [
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA",
+            "AABCCCDDDDCBCDAA"
+          ]
+        }
+      ]
+    },
+    "mixer_surface": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": {
+              "colorRef": "fixed.glass"
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "mixer_trim": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": "shadow"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ACCCCCCCCCCCCCCB",
+            "ACBBBBBBBBBBBBCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACBBBBBBBBBBBBCB",
+            "ACCCCCCCCCCCCCCB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        }
+      ]
+    },
+    "vat_accent": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": {
+              "colorRef": "fixed.glass_edge"
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "vat_frame": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": {
+              "material": "base",
+              "toward": "shadow",
+              "eighths": 3
+            },
+            "D": "base",
+            "E": "shadow"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ACCCCCCCCCCCCCCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDEDDDDDDDDDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACDDDDDDDDDDEDCB",
+            "ACDDDDDDDDDDDDCB",
+            "ACCCCCCCCCCCCCCB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        }
+      ]
+    },
+    "vat_glass": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "base",
+            "C": {
+              "colorRef": "fixed.glass"
+            }
+          },
+          "pixels": [
+            "AAAABBBBBBBBAAAA",
+            "ACCCCCCCCCCCCCCA",
+            "ACCCCCCCCCCCCCCA",
+            "ACCCCCCCCCCCCCCA",
+            "BCCCCCCCCCCCCCCB",
+            "BCCCCCCCCCCCCCCB",
+            "BCCCCCCCCCCCCCCB",
+            "BCCCCCCCCCCCCCCB",
+            "BCCCCCCCCCCCCCCB",
+            "BCCCCCCCCCCCCCCB",
+            "BCCCCCCCCCCCCCCB",
+            "BCCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCA",
+            "ACCCCCCCCCCCCCCA",
+            "ACCCCCCCCCCCCCCA",
+            "AAAABBBBBBBBAAAA"
+          ]
+        }
+      ]
+    },
+    "vat_surface": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": {
+              "colorRef": "fixed.glass"
+            }
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA",
+            "AAAAAAAAAAAAAAAA"
+          ]
+        }
+      ]
+    },
+    "vat_trim": {
+      "layers": [
+        {
+          "primitive": "pixel_grid",
+          "at": [
+            0,
+            0
+          ],
+          "width": 16,
+          "height": 16,
+          "palette": {
+            "A": "light",
+            "B": "deep",
+            "C": "shadow"
+          },
+          "pixels": [
+            "AAAAAAAAAAAAAAAB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "ACCCCCCCCCCCCCCB",
+            "BBBBBBBBBBBBBBBB"
+          ]
+        }
+      ]
+    }
+  }
+}
