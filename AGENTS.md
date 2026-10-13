@@ -13,11 +13,11 @@ are unavailable; retain the testing restrictions in `README.md`.
 ## Java formatting
 
 Follow `docs/CODE_STYLE.md`. Spotless 8.10.4 / Palantir Java Format 2.102.0
-currently apply/check only the seven enrolled paths in `gradle/spotless-trial.txt`.
-Use a Java 21 Gradle runtime. For authorized Java changes, enroll only the touched
-file or approved batch, run `spotlessApply`, inspect the mechanical diff, run
-`spotlessCheck`, then compile/test. Do not format the full repository or mix
-semantic refactoring with formatting. Full enforcement follows baseline migration.
+apply/check all authored Java, including tests, benchmarks and the geometry
+exporter. Use a Java 21 Gradle runtime. For authorized Java changes, run
+`spotlessApply`, inspect the mechanical diff, run `spotlessCheck`, then
+compile/test. Do not mix semantic refactoring with formatting. `check` and `build`
+enforce formatting without rewriting source.
 
 ## AI PLACEHOLDER ART — HARD RELEASE BLOCKER
 

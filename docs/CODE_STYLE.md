@@ -1,29 +1,16 @@
-# Java formatting and staged adoption
+# Java formatting
 
-Spotless **8.10.4** runs Palantir Java Format **2.102.0**, explicitly using the
-`PALANTIR` style. Versions are pinned in `build.gradle` and
-`gradle/spotless.gradle`. The supported and tested combination is Java 21,
-Gradle wrapper 9.2.1, ModDev 2.0.148, Minecraft 1.21.1 and NeoForge 21.1.252.
-ZeroCore2 remains the published 1.21.1-2.4.18 dependency.
+Repository-wide adoption completed October 13, 2026: all **322 authored Java
+files** follow Spotless **8.10.4** with Palantir Java Format **2.102.0**, `PALANTIR`
+style and Javadoc reformatting disabled. Versions remain pinned in `build.gradle`
+and `gradle/spotless.gradle`. Use Java 21 to run the Gradle 9.2.1 wrapper.
+Minecraft 1.21.1, NeoForge 21.1.252, ModDev 2.0.148 and ZeroCore2 2.4.18 are
+unchanged. Full build and procedural-preview validation passed after the
+user-authorized removal of source-text assertions from one CPU test.
 
-Run Gradle itself on Java 21 for formatting, as well as compiling with the Java
-21 toolchain. A Java 17 launcher can build with the downloaded compiler but does
-not establish Java 21 formatter support. This workspace used Temurin
-21.0.12.1+1 at the following local path; other machines should use their own
-Java 21 installation:
+## Commands and enforcement
 
-```powershell
-$env:JAVA_HOME='C:/Projects/MobVats/.codex/gradle/jdks/eclipse_adoptium-21-amd64-windows.2'
-$env:GRADLE_USER_HOME='C:/Projects/MobVats/.codex/gradle'
-```
-
-The first invocation needs access to Gradle Plugin Portal and Maven Central to
-resolve the pinned dependencies. Once cached, the validated commands work
-offline. Do not commit machine-specific Java/cache paths.
-
-## Commands and current enforcement
-
-From the source repository (`C:/Projects/MobVats/src` in this workspace):
+From the source repository:
 
 ```powershell
 .\gradlew.bat spotlessApply
@@ -34,117 +21,97 @@ From the source repository (`C:/Projects/MobVats/src` in this workspace):
 git diff --check
 ```
 
-Until migration is complete, **apply and check cover exactly the seven paths in
-[spotless-trial.txt](../gradle/spotless-trial.txt)**. The normal `check`/`build`
-gate checks this enrolled set only. Build never applies formatting.
+`spotlessApply` is an explicit developer action. `check` depends on
+`spotlessCheck`, so `build` enforces formatting and never applies it. Failures
+identify offending paths and show the required formatting diff. A deliberate
+whitespace violation was rejected; restoring the original bytes passed. Task
+graphs confirm both `check` and `build` include the formatter check, with no
+apply task. The former `spotlessScope` property and full-apply guard are removed.
 
-| Trial file (under `net/impactvector/mobvats`) | Representative coverage |
-| --- | --- |
-| `src/main/java/.../gamecontent/mob/CapturedSpecimen.java` | Record, compact constructor, annotations, NBT strings and Javadocs |
-| `src/main/java/.../gamecontent/fluid/compound/CultureFouling.java` | Java 21 `List.getFirst()`, generics, method reference, exception handling |
-| `src/main/java/.../gamecontent/multiblock/conduit/ConduitGeometry.java` | Records, compact constructors, switch expressions, lambdas, geometry |
-| `src/main/java/.../gamecontent/multiblock/conduit/FluidBufferEntity.java` | Block entity, NeoForge tank subclass, lifecycle methods, method reference |
-| `src/main/java/.../gamecontent/multiblock/vat/VatPortCapabilities.java` | Long capability declarations, NeoForge annotations and lambdas |
-| `src/main/java/.../gametest/ConduitGeometryGameTests.java` | GameTest discovery, Java 21 first/last list access, ZeroCore API usage |
-| `src/test/java/.../render/ConduitArtGeometryTest.java` | CPU tests, nested loops, generic collections and geometry verification |
+## Coverage and exclusions
 
-Read-only diagnostics for the eventual full scope:
+The positive target roots are `src/**/*.java`, `benchmarks/src/**/*.java`, and
+`tools/procedural-art/GeometryExport.java`. They match all 322 tracked Java files:
 
-```powershell
-.\gradlew.bat spotlessCheck -PspotlessScope=all
-```
+| Authored source group | Files |
+| --- | ---: |
+| Main production, including client and integrations | 237 |
+| Main development GameTests and acceptance builders | 71 |
+| CPU tests (`src/test/java`) | 7 |
+| Independent benchmark main (`benchmarks/src/main/java`) | 6 |
+| Custom JavaCompile geometry exporter | 1 |
+| `manualClient` | 0 currently |
 
-This is expected to fail on unmigrated files. It is not a mandatory gate yet.
-Full-scope apply tasks explicitly reject execution during adoption. Do not use
-an init script or edit the configuration to bypass that restriction for a mass
-pass. Expand the trial manifest only for an authorized, reviewable batch.
+Future authored source sets under `src` are covered. A new authored source root
+outside these positive paths requires a configuration update. The root wrapper
+checks benchmark formatting; the independent benchmark build does not add its
+own Spotless plugin. Both main and benchmark compilation passed.
 
-## Scope and exclusions
+Directories named `generated` inside the target roots are excluded. Build output
+and generated Java (`build/generated`, `build/tmp`, `build/moddev`), caches
+(`.gradle`, `.cache`, `.codex`), downloaded XR2/ZeroCore references, `examples`,
+external dependencies, generated resources and JSON artwork are outside the
+positive Java targets. There are no legacy-source or file-specific exclusions.
+The seven-file trial manifest remains only as historical evidence; Gradle no
+longer reads it. `CODE_STYLE_REMAINING.txt` records the completed historical
+315-file inventory and is not an exclusion list.
 
-The eventual formatter targets authored Java under `src/**/*.java` and
-`benchmarks/src/**/*.java`, plus `tools/procedural-art/GeometryExport.java`.
-This covers `main` (including development GameTests), `test`, any authored
-`manualClient` Java, future custom source sets under `src`, the independent
-benchmark build, and the custom JavaCompile geometry exporter. Benchmark
-formatting is driven from the root wrapper; its standalone build does not
-currently enforce the root policy.
+## Mechanical policy
 
-Directories named `generated` within those trees are excluded. Build-generated
-sources (`build/generated/**`, `build/tmp/**`, `build/moddev/**`), all other build
-outputs, `.gradle`, `.cache`, external `.codex` caches/references, `examples`, and
-downloaded repositories are outside the positive target roots. New authored
-source roots outside these paths require an explicit configuration update.
-JSON artwork and generated Minecraft resource/model JSON are never targets.
+Palantir controls four-space indentation, its 120-column wrapping policy,
+statement layout, whitespace, existing braces and lambda formatting. It can
+wrap line comments; long indivisible strings/comments can exceed the preferred
+width. Do not manually add missing braces or refactor during formatting work.
+Sources use UTF-8 and LF. Javadoc reformatting remains disabled.
 
-## Mechanical formatting policy
+The pinned Spotless integration inherently sorts imports and removes unused
+imports. This migration removed 28 unused/redundant imports, added no imports
+and expanded no wildcards. No extra import-order, cleanup, fully qualified type
+shortening or static-analysis steps are configured. A broader import policy
+requires a separate change.
 
-Palantir owns indentation (four spaces), its 120-column wrapping policy,
-statement layout, whitespace, existing brace layout and lambda formatting.
-Long indivisible strings/comments can exceed the preferred width. The formatter
-does not add missing braces; do not add them manually in formatting-only work.
-Sources use UTF-8 and LF, consistent with `.gitattributes`. Javadoc reformatting
-is disabled; comments and their meaning must survive patch review.
+Preserve literal values, annotations, method signatures, NBT/schema identifiers,
+resource locations, exception handling, evaluation order, gameplay and renderer
+behavior. For Java edits, apply deliberately, inspect the patch, check, then
+compile/test. Never use formatter output as an opportunity for unrelated cleanup.
 
-The Spotless Palantir integration inherently sorts ordinary/static imports and
-removes unused imports. Those small import changes are part of the trial and
-must compile. Wildcard imports remain wildcard imports. No extra import-order,
-wildcard expansion, fully qualified type shortening, cleanup/refactoring or
-static-analysis steps are enabled. A later import-policy change needs its own
-review and compilation evidence.
+## Migration evidence and validation
 
-Preserve public APIs, serialized/NBT identifiers, resource locations, literal
-values, exception handling, evaluation order, comments, gameplay geometry and
-method behavior. Do not rename, extract methods, reorganize packages, change
-fixtures or update golden hashes while formatting.
+Baseline: `d91425eb02b5be5cf9d7fe1acb4177b9e96d8c88`, clean `main`.
+The remaining 315 files were formatted in five package batches: 62 shared/conduit,
+52 process, 90 controllers/parts, 28 client/presentation, 83 development/tool files.
+See [CODE_STYLE_BATCHES.txt](CODE_STYLE_BATCHES.txt) for exact membership and
+[CODE_STYLE_MIGRATION.md](CODE_STYLE_MIGRATION.md) for validation and limitations.
+The original installation evidence remains in
+[CODE_STYLE_VALIDATION.md](CODE_STYLE_VALIDATION.md).
 
-For future Codex Java edits: check the manifest first. For an enrolled file,
-edit, run `spotlessApply`, inspect the patch, run `spotlessCheck`, compile/test,
-then commit only when authorized. For an unenrolled file, enroll the specifically
-authorized file/batch in the manifest and document that expansion; do not
-silently leave touched Java unformatted or authorize unrelated migrations.
+All non-import code tokens, literals and normalized comment text match the
+baseline in 321 files. The remaining CPU test has only the separately authorized
+removal of Java-source-text assertions. A forced second apply left all 322 hashes unchanged.
+All 766 required GameTests passed. Production resources, art inputs and exported
+geometry are unchanged. The generated provenance manifest necessarily updates
+only `geometryExporterSha256` to record the formatted exporter source; all
+other provenance bytes are identical. Golden hashes were not changed.
 
-## Migration plan (not executed)
+The initial build/preview failure came from `ConduitArtGeometryTest` matching
+exact renderer-source snippets. The user authorized removing those assertions
+entirely: tests should verify behavior rather than Java source text. Runtime
+geometry, tool mounting, mesh, persistence and model-rendering assertions remain.
+Full `spotlessCheck build proceduralArtPreview compareProceduralArtBaseline`
+subsequently passed, including procedural resource/provenance packaging checks.
+There are no formatting or build exceptions.
 
-The pre-format source revision is `6bc79442f489637689e7eee57d57c52bd1f1f472`.
-Keep that revision available for comparison and blame; record each later batch's
-parent SHA. No tag or commit was created in this installation slice.
+Historical acceptance-world failures remain unresolved. Acceptance generation,
+client launches, publication, dependency upgrades and semantic refactoring were
+not performed. Formatting does not resolve the audit's architectural findings.
 
-1. Small value objects and shared utilities.
-2. Conduit and resource infrastructure.
-3. Vat and Mixer processing.
-4. Controllers and block entities.
-5. Client rendering.
-6. Tests, acceptance builders, benchmark sources and the build-only exporter.
+## Reviewing and merging the baseline
 
-For each authorized batch, append its exact paths to the enrollment manifest,
-apply only that expanded scope, inspect the mechanical/import diff, apply a
-second time and compare hashes, check, compile and run relevant tests. Run art
-checks when geometry/export inputs change. Keep formatting-only commits separate
-from semantic refactoring. Record a batch's validation independently of existing
-acceptance-world issues.
-
-After all authored Java is migrated and a full diagnostic check passes, replace
-the manifest target with `authoredJava`, make full checks mandatory, and retire
-the temporary scope/property/apply guard together. Until then there is no
-permanent legacy-source exclusion. The exact remaining inventory is recorded in
-[CODE_STYLE_REMAINING.txt](CODE_STYLE_REMAINING.txt); it is an inventory, not a
-formatter exclusion list.
-
-## Installation evidence and limitations
-
-See [CODE_STYLE_VALIDATION.md](CODE_STYLE_VALIDATION.md) for the current baseline,
-trial, idempotence, art hashes, toolchain and final validation results.
-The historical audit's parser warning was resolved by the JSON extraction and
-compiled exporter before this installation. Formatting `ConduitGeometry` must
-still pass the runtime/exported-dimension tests and immutable art baseline.
-
-The two acceptance-world failures in [PROCEDURAL_ART_VALIDATION.md](PROCEDURAL_ART_VALIDATION.md)
-remain outstanding. Their existing logs and report are preserved. No client or
-acceptance-world generation is required or performed by this tooling slice.
-Gradle 10 and other JDK versions are not certified by these results.
-
-References: [Spotless 8.10.4 plugin](https://plugins.gradle.org/plugin/com.diffplug.spotless/8.10.4),
-[Spotless Gradle guide](https://github.com/diffplug/spotless/blob/main/plugin-gradle/README.md),
-[Palantir 2.102.0 release](https://github.com/palantir/palantir-java-format/releases/tag/2.102.0),
-[Palantir Java 21 runtime guidance](https://github.com/palantir/palantir-java-format#java-21-support),
-[Spotless Palantir import integration](https://github.com/diffplug/spotless/blob/main/lib/src/palantirJavaFormat/java/com/diffplug/spotless/glue/pjf/PalantirJavaFormatFormatterFunc.java).
+Keep formatting changes separate from behavior changes. Compare against the
+recorded baseline and review by the documented package batches; whitespace-hidden
+diffs help inspect imports but do not replace literal/token verification.
+Do not commit or push without authorization. If authorized later, prefer
+separate mechanical batch commits and a tooling/documentation commit; the authorized test
+compatibility fix should have its own explicit diff/commit. Coordinate rebases
+with other branches before merging the large layout change. Add a committed
+formatting revision to blame-ignore configuration only after that revision exists.

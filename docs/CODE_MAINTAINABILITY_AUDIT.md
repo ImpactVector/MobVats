@@ -2,15 +2,21 @@
 
 Audit date: 2026-10-13. Baseline: `1959f89f80ce82612f61101c372b28b7614ed2ef`.
 
-**Formatter milestone, 2026-10-13:** The later JSON artwork extraction replaced
-the whitespace-sensitive Java parser with a compiled geometry exporter. At
-pre-format revision `6bc79442f489637689e7eee57d57c52bd1f1f472`, Spotless 8.10.4
-and Palantir Java Format 2.102.0 were installed with a seven-file mechanical
-trial, Java 21 / Gradle 9.2.1 validation, and staged enforcement. See
-[CODE_STYLE.md](CODE_STYLE.md), the exact enrollment manifest linked there, and
-[CODE_STYLE_VALIDATION.md](CODE_STYLE_VALIDATION.md). P1-A's lexical coupling is
-resolved; P2-A's repository-wide formatting/import debt remains. Statements
-below describe the original read-only audit, not the later installation.
+**Formatter milestone, 2026-10-13:** The JSON artwork extraction resolved
+P1-A's lexical coupling. Repository-wide normalization from clean revision
+`d91425eb02b5be5cf9d7fe1acb4177b9e96d8c88` formatted the remaining 315 Java
+files; all 322 authored Java files now pass pinned Spotless 8.10.4 / Palantir
+2.102.0 and are enforced through `check`. P2-A's layout debt is addressed;
+broader import policy and all structural/ownership findings remain separate.
+Code tokens/literals are unchanged apart from formatter import cleanup and
+the separately user-authorized removal of Java-source-text assertions from
+one CPU test. All 766 required GameTests passed; full build, procedural preview
+and immutable art hash comparison passed after that test-only adjustment. See
+[CODE_STYLE.md](CODE_STYLE.md) and
+[CODE_STYLE_MIGRATION.md](CODE_STYLE_MIGRATION.md). The source measurements,
+line references and ranked findings below describe the original read-only audit;
+formatting has moved those line locations and does not resolve architecture.
+
 
 MobVats has useful domain boundaries and unusually substantial regression evidence, but compressed source obscures those boundaries. The highest-value cleanup is mechanical formatting followed by narrowly scoped ownership and planning improvements. A wholesale controller, routing, process-engine, or rendering rewrite would discard working contracts without addressing the main readability problem.
 
@@ -311,7 +317,7 @@ Severity and confidence are separate. **P0 entries below are source-supported sa
 
 **Scope/risk/tests:** 1–2 days; medium-to-high routing risk. ConduitItem/ResourceRole/DynamicResource stale-plan tests and ConduitPerformance generation tests; add a prepare/change-filter-or-remove/commit acquisition case if retained reservations remain public. No live delayed-call failure was established in this audit.
 
-### P2-A — Broad formatting/import debt
+### P2-A — Broad formatting/import debt (layout debt addressed)
 
 **Location/example:** measured throughout production; `M/MultiblockMixer.java:306`, `C/PhysicalFluidStorage.java:124`, `V/process/ProcessTransaction.java:17`, `T/Slice11GameTests.java:55`.
 
