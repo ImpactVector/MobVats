@@ -2,6 +2,7 @@ plugins {
     id 'java-library'
     id 'net.neoforged.moddev' version '2.0.148'
     id 'idea'
+    id 'com.diffplug.spotless' version '8.10.4'
 }
 version = mod_version
 group = mod_group_id
@@ -127,6 +128,7 @@ neoForge.ideSyncTask generateModMetadata
 // Development resources and mandatory public-distribution validation.
 apply from: 'gradle/ai-placeholder-art.gradle'
 apply from: 'gradle/procedural-art.gradle'
+apply from: 'gradle/spotless.gradle'
 
 // Local development housekeeping only; never attached to a Minecraft run task.
 def invalidateDevMixerDefaults = tasks.register('invalidateDevMixerDefaults') {

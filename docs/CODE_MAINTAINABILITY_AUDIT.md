@@ -2,6 +2,16 @@
 
 Audit date: 2026-10-13. Baseline: `1959f89f80ce82612f61101c372b28b7614ed2ef`.
 
+**Formatter milestone, 2026-10-13:** The later JSON artwork extraction replaced
+the whitespace-sensitive Java parser with a compiled geometry exporter. At
+pre-format revision `6bc79442f489637689e7eee57d57c52bd1f1f472`, Spotless 8.10.4
+and Palantir Java Format 2.102.0 were installed with a seven-file mechanical
+trial, Java 21 / Gradle 9.2.1 validation, and staged enforcement. See
+[CODE_STYLE.md](CODE_STYLE.md), the exact enrollment manifest linked there, and
+[CODE_STYLE_VALIDATION.md](CODE_STYLE_VALIDATION.md). P1-A's lexical coupling is
+resolved; P2-A's repository-wide formatting/import debt remains. Statements
+below describe the original read-only audit, not the later installation.
+
 MobVats has useful domain boundaries and unusually substantial regression evidence, but compressed source obscures those boundaries. The highest-value cleanup is mechanical formatting followed by narrowly scoped ownership and planning improvements. A wholesale controller, routing, process-engine, or rendering rewrite would discard working contracts without addressing the main readability problem.
 
 This was a read-only source audit apart from this document. No code, tests, dependencies, Gradle configuration, generated assets, or existing files were changed. No build, test, server, client, clone, installation, commit, push, or publication was performed. Test references below identify evidence to reuse; they do **not** claim a current passing run.

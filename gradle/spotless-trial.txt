@@ -1,0 +1,7 @@
+src/main/java/net/impactvector/mobvats/gamecontent/mob/CapturedSpecimen.java
+src/main/java/net/impactvector/mobvats/gamecontent/fluid/compound/CultureFouling.java
+src/main/java/net/impactvector/mobvats/gamecontent/multiblock/conduit/ConduitGeometry.java
+src/main/java/net/impactvector/mobvats/gamecontent/multiblock/conduit/FluidBufferEntity.java
+src/main/java/net/impactvector/mobvats/gamecontent/multiblock/vat/VatPortCapabilities.java
+src/main/java/net/impactvector/mobvats/gametest/ConduitGeometryGameTests.java
+src/test/java/net/impactvector/mobvats/render/ConduitArtGeometryTest.java

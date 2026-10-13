@@ -1,0 +1,35 @@
+// Temporary adoption scope; see docs/CODE_STYLE.md. No build-time rewriting.
+def formattingScope = providers.gradleProperty('spotlessScope').getOrElse('trial')
+if (!(formattingScope in ['trial', 'all'])) {
+    throw new GradleException('spotlessScope must be trial or all')
+}
+def authoredJava = files(
+    fileTree('src') { include '**/*.java'; exclude '**/generated/**' },
+    fileTree('benchmarks/src') { include '**/*.java'; exclude '**/generated/**' },
+    'tools/procedural-art/GeometryExport.java'
+)
+def trialJava = file('gradle/spotless-trial.txt').readLines('UTF-8')
+    .findAll { !it.isBlank() && !it.startsWith('#') }
+def authoredPaths = authoredJava.files.collect { project.relativePath(it).replace('\\', '/') }.toSet()
+if (trialJava.any { !authoredPaths.contains(it) }) {
+    throw new GradleException('Spotless trial paths must name existing authored Java files')
+}
+
+spotless {
+    // check/build enforce only the enrolled trial until migration is complete.
+    enforceCheck = formattingScope == 'trial'
+    encoding 'UTF-8'
+    lineEndings = 'UNIX'
+    java {
+        target formattingScope == 'all' ? authoredJava : files(trialJava)
+        // Palantir's integration also sorts/removes unused imports; never expands wildcards.
+        palantirJavaFormat('2.102.0').style('PALANTIR').formatJavadoc(false)
+    }
+}
+
+// Full-scope diagnostics are read-only during adoption, including direct Java apply tasks.
+tasks.matching { it.name.startsWith('spotless') && it.name.endsWith('Apply') }.configureEach {
+    if (formattingScope == 'all') {
+        doFirst { throw new GradleException('Full formatting is not enabled; enroll an authorized batch in spotless-trial.txt') }
+    }
+}

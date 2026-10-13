@@ -11,6 +11,7 @@ These references describe the current source implementation. Read in order:
 | [05 — Procedural Art](05-PROCEDURAL-ART.md) | Semantic palettes, resource generation, models, provenance and release policy |
 | [06 — Development](06-DEVELOPMENT.md) | Dependencies, build tasks, configuration and tooling |
 | [07 — Testing](07-TESTING.md) | Automated tests, operator fixtures, visual acceptance and benchmarks |
+| [Java code style](CODE_STYLE.md) | Pinned formatter, seven-file enforcement scope and staged migration |
 
 [Configuration examples](examples/README.md), [future designs](design/FUTURE-FEATURES.md), [historical records](history/README.md), and [generated Mixer clearance tables](generated/MIXER_CLEARANCE_GENERATED.md) complement the current references. The [consolidation record](history/2026-10-12-documentation-consolidation.md) records the original inventory, moves, dates and validation.
 
