@@ -14,5 +14,6 @@ public final class CowBalance {
     public static final int MEAT_PER_HARVEST = 1000, BLENDER_XP = 0;
     public static final int WASTE_INTERVAL = 1200, WASTE_PER_INTERVAL = 250;
     public static final String DRAIN_USE = PassiveUses.DRAIN;
+
     private CowBalance() {}
 }

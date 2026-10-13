@@ -1,2 +1,6 @@
 package net.impactvector.mobvats.gamecontent.multiblock.vat.process;
-public enum LifeStage { ADULT, JUVENILE }
+
+public enum LifeStage {
+    ADULT,
+    JUVENILE
+}
