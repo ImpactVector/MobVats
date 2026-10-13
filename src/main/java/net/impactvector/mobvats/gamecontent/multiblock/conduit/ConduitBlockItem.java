@@ -16,21 +16,27 @@ public final class ConduitBlockItem extends BlockItem {
         this.mode = mode;
     }
 
-    public ConduitMode mode() { return mode; }
+    public ConduitMode mode() {
+        return mode;
+    }
 
-    @Override protected BlockState getPlacementState(BlockPlaceContext context) {
+    @Override
+    protected BlockState getPlacementState(BlockPlaceContext context) {
         var state = getBlock().getStateForPlacement(context);
         if (state == null) return null;
         state = state.setValue(ConduitBlock.MODE, mode);
         return canPlace(context, state) ? state : null;
     }
 
-    @Override public void registerBlocks(Map<Block, Item> map, Item item) {
+    @Override
+    public void registerBlocks(Map<Block, Item> map, Item item) {
         // Keep Block.asItem() stable regardless of item registration order.
         if (mode == ConduitMode.TRUNK) super.registerBlocks(map, item);
     }
 
-    @Override public String getDescriptionId() {
-        return "item.mobvats." + ConduitContent.name(((ConduitBlock)getBlock()).resource()) + (mode == ConduitMode.TAP ? "_tap" : "");
+    @Override
+    public String getDescriptionId() {
+        return "item.mobvats." + ConduitContent.name(((ConduitBlock) getBlock()).resource())
+                + (mode == ConduitMode.TAP ? "_tap" : "");
     }
 }

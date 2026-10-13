@@ -19,8 +19,9 @@ public final class SpecimenPresentation {
     private SpecimenPresentation() {}
 
     public static CompoundTag data(ItemStack stack, boolean head) {
-        var tag = stack.getOrDefault(head ? DataComponents.BLOCK_ENTITY_DATA : DataComponents.CUSTOM_DATA,
-            CustomData.EMPTY).copyTag();
+        var tag = stack.getOrDefault(
+                        head ? DataComponents.BLOCK_ENTITY_DATA : DataComponents.CUSTOM_DATA, CustomData.EMPTY)
+                .copyTag();
         return head && tag.contains("zcvase_payload", 10) ? tag.getCompound("zcvase_payload") : tag;
     }
 
@@ -30,8 +31,10 @@ public final class SpecimenPresentation {
         var id = ResourceLocation.tryParse(tag.getString("entity"));
         if (id == null) return fallback;
         var entityName = BuiltInRegistries.ENTITY_TYPE.containsKey(id)
-            ? BuiltInRegistries.ENTITY_TYPE.get(id).getDescription() : Component.literal(id.toString());
-        return Component.translatable(head ? "item.mobvats.specimen_head" : "item.mobvats.specimen_essence", entityName);
+                ? BuiltInRegistries.ENTITY_TYPE.get(id).getDescription()
+                : Component.literal(id.toString());
+        return Component.translatable(
+                head ? "item.mobvats.specimen_head" : "item.mobvats.specimen_essence", entityName);
     }
 
     public static int harnessCount(SimulacrumGeometry geometry) {
@@ -47,14 +50,24 @@ public final class SpecimenPresentation {
             var g = specimen.geometry();
             int harnesses = harnessCount(g);
             tooltip.add(Component.translatable("tooltip.mobvats.geometry", g.width(), g.height(), g.depth()));
-            tooltip.add(Component.translatable(harnesses == 1 ? "tooltip.mobvats.support_single" : "tooltip.mobvats.support_plural", harnesses));
+            tooltip.add(Component.translatable(
+                    harnesses == 1 ? "tooltip.mobvats.support_single" : "tooltip.mobvats.support_plural", harnesses));
             if (flag.isAdvanced()) {
-                tooltip.add(Component.translatable("tooltip.mobvats.entity", specimen.identity().toString()));
-                tooltip.add(Component.translatable("tooltip.mobvats.head_offset", g.headOffset().getX(), g.headOffset().getY(), g.headOffset().getZ()));
-                tooltip.add(Component.translatable("tooltip.mobvats.facing", Component.translatable("tooltip.mobvats.facing." + g.facing().getSerializedName())));
+                tooltip.add(Component.translatable(
+                        "tooltip.mobvats.entity", specimen.identity().toString()));
+                tooltip.add(Component.translatable(
+                        "tooltip.mobvats.head_offset",
+                        g.headOffset().getX(),
+                        g.headOffset().getY(),
+                        g.headOffset().getZ()));
+                tooltip.add(Component.translatable(
+                        "tooltip.mobvats.facing",
+                        Component.translatable(
+                                "tooltip.mobvats.facing." + g.facing().getSerializedName())));
                 tooltip.add(Component.translatable("tooltip.mobvats.harnesses", harnesses));
                 tooltip.add(Component.translatable("tooltip.mobvats.drain", 1));
-                tooltip.add(Component.translatable("tooltip.mobvats.geometry_version", g.save().getInt("version")));
+                tooltip.add(Component.translatable(
+                        "tooltip.mobvats.geometry_version", g.save().getInt("version")));
             }
         } catch (IllegalArgumentException error) {
             tooltip.add(Component.translatable("tooltip.mobvats.invalid_geometry", error.getMessage()));

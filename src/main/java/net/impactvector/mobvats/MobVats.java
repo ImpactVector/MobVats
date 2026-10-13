@@ -1,11 +1,10 @@
 package net.impactvector.mobvats;
 
+import net.impactvector.mobvats.config.Config;
 import net.impactvector.mobvats.gamecontent.Content;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.loading.FMLEnvironment;
-import net.impactvector.mobvats.config.Config;
+import net.neoforged.fml.common.Mod;
 
 @Mod(MobVats.MOD_ID)
 public final class MobVats {
@@ -16,8 +15,10 @@ public final class MobVats {
         Content.register(bus);
         net.impactvector.mobvats.gamecontent.fluid.compound.CompoundFluids.register(bus);
         net.impactvector.mobvats.gamecontent.multiblock.mixer.process.MixerDefinitionEvents.register(bus);
-        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(net.impactvector.mobvats.gamecontent.multiblock.vat.process.PassiveDefinitionEvents::startup);
-        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(net.impactvector.mobvats.gamecontent.multiblock.vat.process.PassiveDefinitionEvents::commands);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                net.impactvector.mobvats.gamecontent.multiblock.vat.process.PassiveDefinitionEvents::startup);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                net.impactvector.mobvats.gamecontent.multiblock.vat.process.PassiveDefinitionEvents::commands);
         Config.initialize(container);
     }
 }

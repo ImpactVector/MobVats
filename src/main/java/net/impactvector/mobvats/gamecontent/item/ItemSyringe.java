@@ -7,11 +7,19 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 
 public class ItemSyringe extends Item {
-    public ItemSyringe(Properties p) { super(p); }
-    @Override public InteractionResult interactLivingEntity(ItemStack syringe, Player player, LivingEntity target, InteractionHand hand) {
-        if(player.level().isClientSide)return InteractionResult.SUCCESS;
-        var result=CaptureTransaction.capture(syringe,player,target);
-        if(!result.success()){player.displayClientMessage(Component.literal(result.diagnostic()),true);return InteractionResult.FAIL;}
+    public ItemSyringe(Properties p) {
+        super(p);
+    }
+
+    @Override
+    public InteractionResult interactLivingEntity(
+            ItemStack syringe, Player player, LivingEntity target, InteractionHand hand) {
+        if (player.level().isClientSide) return InteractionResult.SUCCESS;
+        var result = CaptureTransaction.capture(syringe, player, target);
+        if (!result.success()) {
+            player.displayClientMessage(Component.literal(result.diagnostic()), true);
+            return InteractionResult.FAIL;
+        }
         return InteractionResult.CONSUME;
     }
 }
