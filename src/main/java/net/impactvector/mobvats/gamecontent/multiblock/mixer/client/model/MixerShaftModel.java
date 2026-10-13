@@ -13,8 +13,15 @@ import net.neoforged.neoforge.client.model.data.ModelData;
 
 /** Controller owns the formed shaft mesh; retain construction and inventory appearances. */
 public final class MixerShaftModel extends BakedModelWrapper<BakedModel> {
-    public MixerShaftModel(BakedModel original){super(original);}
-    @Override public List<BakedQuad> getQuads(BlockState block,Direction side,RandomSource random,ModelData data,RenderType layer){
-        return Boolean.TRUE.equals(data.get(MixerShaftEntity.FORMED))?List.of():originalModel.getQuads(block,side,random,data,layer);
+    public MixerShaftModel(BakedModel original) {
+        super(original);
+    }
+
+    @Override
+    public List<BakedQuad> getQuads(
+            BlockState block, Direction side, RandomSource random, ModelData data, RenderType layer) {
+        return Boolean.TRUE.equals(data.get(MixerShaftEntity.FORMED))
+                ? List.of()
+                : originalModel.getQuads(block, side, random, data, layer);
     }
 }

@@ -16,7 +16,8 @@ import net.neoforged.neoforge.client.model.DynamicFluidContainerModel;
 public final class ProductFluidClient {
     @SubscribeEvent
     public static void bucketColors(RegisterColorHandlersEvent.Item event) {
-        event.register(new DynamicFluidContainerModel.Colors(), ProductFluids.buckets().toArray(Item[]::new));
+        event.register(
+                new DynamicFluidContainerModel.Colors(), ProductFluids.buckets().toArray(Item[]::new));
     }
 
     @SubscribeEvent

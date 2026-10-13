@@ -12,16 +12,24 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
 
-@EventBusSubscriber(modid=MobVats.MOD_ID,value=Dist.CLIENT)
+@EventBusSubscriber(modid = MobVats.MOD_ID, value = Dist.CLIENT)
 public final class MixerClient {
-    @SubscribeEvent public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event){
-        event.registerBlockEntityRenderer(MixerContent.entityType(MixerPartType.Controller),MixerControllerRenderer::new);
+    @SubscribeEvent
+    public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(
+                MixerContent.entityType(MixerPartType.Controller), MixerControllerRenderer::new);
     }
-    @SubscribeEvent public static void bakeModels(ModelEvent.ModifyBakingResult event){
-        var id=ResourceLocation.fromNamespaceAndPath(MobVats.MOD_ID,MixerPartType.Shaft.getSerializedName());
-        var models=new IdentityHashMap<BakedModel,MixerShaftModel>();
-        event.getModels().replaceAll((location,original)->location.id().equals(id) && !location.variant().equals("inventory")
-            ?models.computeIfAbsent(original,MixerShaftModel::new):original);
+
+    @SubscribeEvent
+    public static void bakeModels(ModelEvent.ModifyBakingResult event) {
+        var id = ResourceLocation.fromNamespaceAndPath(MobVats.MOD_ID, MixerPartType.Shaft.getSerializedName());
+        var models = new IdentityHashMap<BakedModel, MixerShaftModel>();
+        event.getModels()
+                .replaceAll((location, original) ->
+                        location.id().equals(id) && !location.variant().equals("inventory")
+                                ? models.computeIfAbsent(original, MixerShaftModel::new)
+                                : original);
     }
-    private MixerClient(){}
+
+    private MixerClient() {}
 }
