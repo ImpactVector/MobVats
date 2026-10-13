@@ -6,7 +6,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class VatGlassBlock extends GlassBlock<MultiblockVat, VatPartType> {
     public VatGlassBlock() {
-        super(MultiblockPartProperties.create(VatPartType.Glass,
-            GlassBlock.addGlassProperties(BlockBehaviour.Properties.of().strength(2.5f))));
+        super(MultiblockPartProperties.create(
+                VatPartType.Glass,
+                GlassBlock.addGlassProperties(BlockBehaviour.Properties.of().strength(2.5f))));
     }
 }

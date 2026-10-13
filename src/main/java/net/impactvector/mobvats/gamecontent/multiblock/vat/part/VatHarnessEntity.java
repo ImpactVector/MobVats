@@ -5,5 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class VatHarnessEntity extends AbstractVatEntity {
-    public VatHarnessEntity(BlockPos pos, BlockState state) { super(VatPartType.Harness, pos, state); }
+    public VatHarnessEntity(BlockPos pos, BlockState state) {
+        super(VatPartType.Harness, pos, state);
+    }
 }

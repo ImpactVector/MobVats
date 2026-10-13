@@ -6,5 +6,7 @@ package net.impactvector.mobvats.gamecontent.multiblock.mixer;
 public interface MixerDrive {
     double availableDrive(MultiblockMixer mixer);
     /** Pays for one full drive tick. Queries never consume resources. */
-    default boolean driveTick(MultiblockMixer mixer){return availableDrive(mixer)>=1.0;}
+    default boolean driveTick(MultiblockMixer mixer) {
+        return availableDrive(mixer) >= 1.0;
+    }
 }

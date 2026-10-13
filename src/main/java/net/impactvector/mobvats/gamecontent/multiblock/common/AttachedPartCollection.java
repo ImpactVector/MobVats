@@ -16,16 +16,34 @@ public final class AttachedPartCollection<T> {
         this.type = type;
         this.order = order;
     }
+
     public void add(Object part) {
         if (type.isInstance(part) && members.add(type.cast(part))) dirty = true;
     }
+
     public void remove(Object part) {
-        if (members.remove(part)) { ordered = List.of(); dirty = true; }
+        if (members.remove(part)) {
+            ordered = List.of();
+            dirty = true;
+        }
     }
-    public void clear() { members.clear(); ordered = List.of(); dirty = false; }
-    public void rebuild(Collection<?> parts) { clear(); parts.forEach(this::add); }
+
+    public void clear() {
+        members.clear();
+        ordered = List.of();
+        dirty = false;
+    }
+
+    public void rebuild(Collection<?> parts) {
+        clear();
+        parts.forEach(this::add);
+    }
+
     public List<T> parts() {
-        if (dirty) { ordered = members.stream().sorted(order).toList(); dirty = false; }
+        if (dirty) {
+            ordered = members.stream().sorted(order).toList();
+            dirty = false;
+        }
         return ordered;
     }
 }

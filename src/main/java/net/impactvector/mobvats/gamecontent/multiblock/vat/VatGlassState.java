@@ -11,23 +11,33 @@ public record VatGlassState(int faces) {
     public static final int TOP = 1, BOTTOM = 2, LEFT = 4, RIGHT = 8;
     private static final int PRESENT = 16;
 
-    public boolean formed() { return faces != 0; }
-    public boolean hasFace(Direction face) { return (faces >>> (face.ordinal() * 5) & PRESENT) != 0; }
-    public int edges(Direction face) { return faces >>> (face.ordinal() * 5) & 15; }
+    public boolean formed() {
+        return faces != 0;
+    }
+
+    public boolean hasFace(Direction face) {
+        return (faces >>> (face.ordinal() * 5) & PRESENT) != 0;
+    }
+
+    public int edges(Direction face) {
+        return faces >>> (face.ordinal() * 5) & 15;
+    }
 
     public static VatGlassState from(BlockPos pos, BlockPos min, BlockPos max) {
-        return from(pos,min,max,true);
+        return from(pos, min, max, true);
     }
     /** Mixers have no mandatory casing rings: perimeter rims follow the entire enclosure. */
-    public static VatGlassState mixer(BlockPos pos,BlockPos min,BlockPos max){
-        return from(pos,min,max,false);
+    public static VatGlassState mixer(BlockPos pos, BlockPos min, BlockPos max) {
+        return from(pos, min, max, false);
     }
-    private static VatGlassState from(BlockPos pos,BlockPos min,BlockPos max,boolean casingRings){
+
+    private static VatGlassState from(BlockPos pos, BlockPos min, BlockPos max, boolean casingRings) {
         int result = 0;
         for (var face : Direction.values()) {
             int coordinate = pos.get(face.getAxis());
             int boundary = face.getAxisDirection() == Direction.AxisDirection.NEGATIVE
-                ? min.get(face.getAxis()) : max.get(face.getAxis());
+                    ? min.get(face.getAxis())
+                    : max.get(face.getAxis());
             if (coordinate != boundary) continue;
             // Side planes: U=X (N/S), U=Z (E/W), V=Y. Roof: U=X, V=Z.
             // Left/right mean low/high U; bottom/top mean low/high V in this projection.
