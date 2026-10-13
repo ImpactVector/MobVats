@@ -1,5 +1,7 @@
 package net.impactvector.benchmark;
+
 import jdk.jfr.*;
+
 @Name("mobvats.benchmark.Window")
 @Label("Lifecycle benchmark window")
 @Category("Lifecycle benchmark")

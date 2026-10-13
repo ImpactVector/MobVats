@@ -1,7 +1,9 @@
 package net.impactvector.mobvats.gametest;
 
-import java.util.*;
+import static net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.*;
+
 import com.google.gson.JsonParser;
+import java.util.*;
 import net.impactvector.mobvats.gamecontent.Content;
 import net.impactvector.mobvats.gamecontent.fluid.ProductFluids;
 import net.impactvector.mobvats.gamecontent.fluid.compound.*;
@@ -20,52 +22,392 @@ import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.gametest.*;
-import static net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.*;
 
-@GameTestHolder("mobvats") @PrefixGameTestTemplate(false)
+@GameTestHolder("mobvats")
+@PrefixGameTestTemplate(false)
 public final class Slice121GameTests {
-    private static final BlockPos MIN=new BlockPos(1,1,1),MAX=new BlockPos(6,4,6),HEAD=new BlockPos(3,3,3);
-    @GameTest(template="empty") public static void sharedReachHasProportionalCreditAndLargeShellHasSameCeiling(GameTestHelper h){
-        var a=new BlockPos(3,3,3);var shared=a.east();var exclusive=a.west();
-        var first=new SpecimenClearance(Set.of(shared,exclusive),Set.of(),List.of());var second=new SpecimenClearance(Set.of(shared),Set.of(),List.of());
-        close(h,first.creditedFraction(List.of(first,second)),.75);close(h,second.creditedFraction(List.of(first,second)),.5);
-        var blocked=new SpecimenClearance(Set.of(shared,exclusive),Set.of(shared),List.of());close(h,blocked.creditedFraction(List.of(blocked,second)),.5);
-        for(int width:new int[]{1,3}){var geometry=net.impactvector.mobvats.gamecontent.mob.SimulacrumGeometry.resolve(width,2,width,Direction.NORTH,null);var clearance=new SpecimenClearance(geometry.comfortShell(a),Set.of(),List.of(new net.minecraft.world.phys.AABB(a)));close(h,.5+1.5*clearance.creditedFraction(List.of(clearance)),2);}
+    private static final BlockPos MIN = new BlockPos(1, 1, 1),
+            MAX = new BlockPos(6, 4, 6),
+            HEAD = new BlockPos(3, 3, 3);
+
+    @GameTest(template = "empty")
+    public static void sharedReachHasProportionalCreditAndLargeShellHasSameCeiling(GameTestHelper h) {
+        var a = new BlockPos(3, 3, 3);
+        var shared = a.east();
+        var exclusive = a.west();
+        var first = new SpecimenClearance(Set.of(shared, exclusive), Set.of(), List.of());
+        var second = new SpecimenClearance(Set.of(shared), Set.of(), List.of());
+        close(h, first.creditedFraction(List.of(first, second)), .75);
+        close(h, second.creditedFraction(List.of(first, second)), .5);
+        var blocked = new SpecimenClearance(Set.of(shared, exclusive), Set.of(shared), List.of());
+        close(h, blocked.creditedFraction(List.of(blocked, second)), .5);
+        for (int width : new int[] {1, 3}) {
+            var geometry = net.impactvector.mobvats.gamecontent.mob.SimulacrumGeometry.resolve(
+                    width, 2, width, Direction.NORTH, null);
+            var clearance = new SpecimenClearance(
+                    geometry.comfortShell(a), Set.of(), List.of(new net.minecraft.world.phys.AABB(a)));
+            close(h, .5 + 1.5 * clearance.creditedFraction(List.of(clearance)), 2);
+        }
         h.succeed();
     }
-    @GameTest(template="empty") public static void oneAndTwoCellSpacingCreditMatchesShellClaims(GameTestHelper h){
-        var geometry=net.impactvector.mobvats.gamecontent.mob.SimulacrumGeometry.resolve(1,2,1,Direction.NORTH,null);var a=new BlockPos(3,3,3);
-        for(int distance:new int[]{2,3}){var first=new SpecimenClearance(geometry.comfortShell(a),Set.of(),List.of());var second=new SpecimenClearance(geometry.comfortShell(a.east(distance)),Set.of(),List.of());int shared=first.sharedShell(second).size();close(h,first.creditedFraction(List.of(first,second)),1-shared*.5/first.shell().size());h.assertTrue((distance==2)==(shared>0),"Spacing claims incorrect");}
+
+    @GameTest(template = "empty")
+    public static void oneAndTwoCellSpacingCreditMatchesShellClaims(GameTestHelper h) {
+        var geometry =
+                net.impactvector.mobvats.gamecontent.mob.SimulacrumGeometry.resolve(1, 2, 1, Direction.NORTH, null);
+        var a = new BlockPos(3, 3, 3);
+        for (int distance : new int[] {2, 3}) {
+            var first = new SpecimenClearance(geometry.comfortShell(a), Set.of(), List.of());
+            var second = new SpecimenClearance(geometry.comfortShell(a.east(distance)), Set.of(), List.of());
+            int shared = first.sharedShell(second).size();
+            close(
+                    h,
+                    first.creditedFraction(List.of(first, second)),
+                    1 - shared * .5 / first.shell().size());
+            h.assertTrue((distance == 2) == (shared > 0), "Spacing claims incorrect");
+        }
         h.succeed();
     }
-    @GameTest(template="empty") public static void reconnectionConflictPreservesIdentitiesAndSequentialDrain(GameTestHelper h){var first=medium(h);first.fill(culture(1000,false),EXECUTE);var second=medium(h);second.fill(culture(1000,true),EXECUTE);first.assimilate(second);var restored=medium(h);restored.load(first.save(h.getLevel().registryAccess()),h.getLevel().registryAccess());h.assertTrue(!restored.diagnostics().isEmpty()&&restored.fill(culture(10,false),EXECUTE)==0,"Reconnection conflict allowed fill");h.assertTrue(FluidStack.isSameFluidSameComponents(restored.drain(1000,EXECUTE),culture(1,false))&&FluidStack.isSameFluidSameComponents(restored.drain(1000,EXECUTE),culture(1,true))&&restored.isEmpty(),"Reconnection mixed or lost identity");h.succeed();}
-    @GameTest(template="empty",timeoutTicks=70) public static void genericTimersOptInAndYieldOutputsCommitActualMetrics(GameTestHelper h){
-        VatGameTests.build(h,5);var head=(VatHeadEntity)h.getBlockEntity(HEAD);head.encode(ResourceLocation.withDefaultNamespace("cow"));Slice11Fixtures.vatStorage(h,MIN,5,5);Slice11Fixtures.resourceIo(h,MIN);
-        h.runAtTickTime(35,()->{
-            var vat=head.getMultiblockController().orElseThrow();var bio=new PassiveMobDefinition.ResourceProcess("test:bio",4,StageRequirement.ANY,"",List.of(),List.of(new PassiveMobDefinition.ResourceOutput("item",null,null,"minecraft:egg",1,0,true)),true);
-            var machine=new PassiveMobDefinition.ResourceProcess("test:machine",4,StageRequirement.ANY,"",List.of(),List.of(),false);
-            var d=new PassiveMobDefinition("minecraft:cow",null,0,List.of(),null,null,null,null,Map.of(),List.of(bio,machine));var profile=PassiveProcessCompiler.compile(d);var registry=new MobProcessRegistry();registry.register(d.identity(),profile);var engine=new VatProcessEngine(vat,registry.freeze());engine.assembled();
-            var state=engine.state(head.getBlockPos());state.process(bio.id()).start();state.process(machine.id()).start();for(int i=0;i<7;i++)engine.tick();h.assertTrue(state.process(bio.id()).elapsed==3&&state.process(machine.id()).elapsed==4,"Generic timer opt-in was ignored");engine.tick();h.assertTrue(state.process(bio.id()).elapsed==4,"Fractional bio timer missed completion");
-            var context=new ProcessContext(engine,vat.getAssemblies().getFirst(),state,profile);var runtime=new ResourceProcessRuntime(bio);for(int i=0;i<4;i++){state.process(bio.id()).phase=ProcessState.Phase.READY;h.assertTrue(runtime.finish(context,state.process(bio.id())).reason()==ProcessResult.Reason.COMMITTED,"Yield output blocked");}
-            long expected=(long)Math.floor(4*vat.yieldMultiplier(head.getBlockPos()));long actual=List.of(MIN.offset(3,0,2),MIN.offset(2,0,3)).stream().map(p->(VatItemPortEntity)h.getBlockEntity(p)).mapToLong(p->p.staging().getStackInSlot(0).getCount()).sum();h.assertTrue(actual==expected&&vat.metrics().total("test:bio/item")==expected,"Generic output carry or actual metrics wrong");h.succeed();
+
+    @GameTest(template = "empty")
+    public static void reconnectionConflictPreservesIdentitiesAndSequentialDrain(GameTestHelper h) {
+        var first = medium(h);
+        first.fill(culture(1000, false), EXECUTE);
+        var second = medium(h);
+        second.fill(culture(1000, true), EXECUTE);
+        first.assimilate(second);
+        var restored = medium(h);
+        restored.load(first.save(h.getLevel().registryAccess()), h.getLevel().registryAccess());
+        h.assertTrue(
+                !restored.diagnostics().isEmpty() && restored.fill(culture(10, false), EXECUTE) == 0,
+                "Reconnection conflict allowed fill");
+        h.assertTrue(
+                FluidStack.isSameFluidSameComponents(restored.drain(1000, EXECUTE), culture(1, false))
+                        && FluidStack.isSameFluidSameComponents(restored.drain(1000, EXECUTE), culture(1, true))
+                        && restored.isEmpty(),
+                "Reconnection mixed or lost identity");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 70)
+    public static void genericTimersOptInAndYieldOutputsCommitActualMetrics(GameTestHelper h) {
+        VatGameTests.build(h, 5);
+        var head = (VatHeadEntity) h.getBlockEntity(HEAD);
+        head.encode(ResourceLocation.withDefaultNamespace("cow"));
+        Slice11Fixtures.vatStorage(h, MIN, 5, 5);
+        Slice11Fixtures.resourceIo(h, MIN);
+        h.runAtTickTime(35, () -> {
+            var vat = head.getMultiblockController().orElseThrow();
+            var bio = new PassiveMobDefinition.ResourceProcess(
+                    "test:bio",
+                    4,
+                    StageRequirement.ANY,
+                    "",
+                    List.of(),
+                    List.of(new PassiveMobDefinition.ResourceOutput("item", null, null, "minecraft:egg", 1, 0, true)),
+                    true);
+            var machine = new PassiveMobDefinition.ResourceProcess(
+                    "test:machine", 4, StageRequirement.ANY, "", List.of(), List.of(), false);
+            var d = new PassiveMobDefinition(
+                    "minecraft:cow", null, 0, List.of(), null, null, null, null, Map.of(), List.of(bio, machine));
+            var profile = PassiveProcessCompiler.compile(d);
+            var registry = new MobProcessRegistry();
+            registry.register(d.identity(), profile);
+            var engine = new VatProcessEngine(vat, registry.freeze());
+            engine.assembled();
+            var state = engine.state(head.getBlockPos());
+            state.process(bio.id()).start();
+            state.process(machine.id()).start();
+            for (int i = 0; i < 7; i++) engine.tick();
+            h.assertTrue(
+                    state.process(bio.id()).elapsed == 3 && state.process(machine.id()).elapsed == 4,
+                    "Generic timer opt-in was ignored");
+            engine.tick();
+            h.assertTrue(state.process(bio.id()).elapsed == 4, "Fractional bio timer missed completion");
+            var context = new ProcessContext(engine, vat.getAssemblies().getFirst(), state, profile);
+            var runtime = new ResourceProcessRuntime(bio);
+            for (int i = 0; i < 4; i++) {
+                state.process(bio.id()).phase = ProcessState.Phase.READY;
+                h.assertTrue(
+                        runtime.finish(context, state.process(bio.id())).reason() == ProcessResult.Reason.COMMITTED,
+                        "Yield output blocked");
+            }
+            long expected = (long) Math.floor(4 * vat.yieldMultiplier(head.getBlockPos()));
+            long actual = List.of(MIN.offset(3, 0, 2), MIN.offset(2, 0, 3)).stream()
+                    .map(p -> (VatItemPortEntity) h.getBlockEntity(p))
+                    .mapToLong(p -> p.staging().getStackInSlot(0).getCount())
+                    .sum();
+            h.assertTrue(
+                    actual == expected && vat.metrics().total("test:bio/item") == expected,
+                    "Generic output carry or actual metrics wrong");
+            h.succeed();
         });
     }
-    private static void close(GameTestHelper h,double actual,double expected){h.assertTrue(Math.abs(actual-expected)<1e-8,"Expected "+expected+", got "+actual);}
-    private static VatMediumStorage medium(GameTestHelper h){var m=new VatMediumStorage(()->{});m.compile(h.getLevel(),h.absolutePos(MIN),h.absolutePos(MAX));return m;}
-    private static FluidStack water(int n){return new FluidStack(Fluids.WATER,n);}
-    private static FluidStack culture(int n,boolean extra){var s=new FluidStack(ProductFluids.CULTURE_SLURRY.get(),n);var entries=new ArrayList<CompoundComposition.Entry>();entries.add(new CompoundComposition.Entry(CompoundComposition.Kind.FLUID,"#c:water",1000));entries.add(new CompoundComposition.Entry(CompoundComposition.Kind.FLUID,"mobvats:experience",250));if(extra)entries.add(new CompoundComposition.Entry(CompoundComposition.Kind.ITEM,"minecraft:wheat",8));s.set(CompoundFluids.COMPOSITION.get(),new CompoundComposition(entries));return s;}
-    @GameTest(template="empty") public static void horizontalSurfaceAndBottomFirst(GameTestHelper h){var m=medium(h);h.assertTrue(m.getCapacity()==32000,"Shell contributed capacity");m.fill(water(4000),EXECUTE);for(int x=2;x<=5;x++)for(int z=2;z<=5;z++)close(h,m.exposure(h.absolutePos(new BlockPos(x,2,z))),.25);close(h,m.levelFill(h.absolutePos(new BlockPos(2,3,2)).getY()),0);m.fill(water(20000),EXECUTE);close(h,m.exposure(h.absolutePos(new BlockPos(2,2,2))),1);close(h,m.exposure(h.absolutePos(new BlockPos(2,3,2))),.5);close(h,m.exposure(h.absolutePos(MIN)),0);h.succeed();}
-    @GameTest(template="empty") public static void buffersDisplaceAndPartialContractIsReusable(GameTestHelper h){for(var p:List.of(new BlockPos(2,2,2),new BlockPos(3,2,2)))h.setBlock(p,FluidBufferContent.state(ConduitCladding.BARE));var m=medium(h);h.assertTrue(m.getCapacity()==30000,"Buffers did not displace 1000 each");m.fill(water(7000),EXECUTE);close(h,m.exposure(h.absolutePos(new BlockPos(4,2,2))),.5);close(h,m.exposure(h.absolutePos(new BlockPos(2,2,2))),0);VatDisplacement.register(Blocks.SPONGE,(w,p)->250);h.setBlock(new BlockPos(4,2,2),Blocks.SPONGE);m.compile(h.getLevel(),h.absolutePos(MIN),h.absolutePos(MAX));m.setFluid(water(m.getCapacity()));close(h,m.exposure(h.absolutePos(new BlockPos(4,2,2))),.75);h.succeed();}
-    @GameTest(template="empty") public static void valvePartialTailAndExactComponentsRoundTrip(GameTestHelper h){var m=medium(h);m.setCapacity(1250);var original=culture(2000,true);original.set(DataComponents.CUSTOM_NAME,Component.literal("Medium metadata"));var bus=new FluidTank(3000);bus.setFluid(original.copy());var p=new BlockPos(7,2,2);h.setBlock(p,Content.state(VatPartType.FillValve));var valve=(VatBoundaryEntity)h.getBlockEntity(p);var source=PhysicalFluidStorage.handler(List.of(bus),false,s->true);h.assertTrue(BoundaryDevices.fill(m,source,valve)&&BoundaryDevices.fill(m,source,valve)&&m.getFluidAmount()==1250&&bus.getFluidAmount()==750,"Partial final fill failed");var restored=new VatMediumStorage(()->{});restored.load(m.save(h.getLevel().registryAccess()),h.getLevel().registryAccess());restored.setCapacity(1250);var out=new FluidTank(1250);h.assertTrue(BoundaryDevices.drain(restored,out,valve)&&BoundaryDevices.drain(restored,out,valve)&&restored.isEmpty(),"Partial drain failed");h.assertTrue(FluidStack.isSameFluidSameComponents(original,out.getFluid()),"Valve/save stripped full components");h.succeed();}
-    @GameTest(template="empty") public static void unlikeCompositionRejectedUntilEmpty(GameTestHelper h){var m=medium(h);m.fill(culture(1000,false),EXECUTE);h.assertTrue(m.fill(culture(1000,true),SIMULATE)==0&&m.fill(culture(1000,true),EXECUTE)==0&&m.fill(water(1000),EXECUTE)==0,"Unlike media blended");m.drain(1000,EXECUTE);h.assertTrue(m.fill(culture(321,true),EXECUTE)==321,"Empty vat rejected new identity");h.succeed();}
-    @GameTest(template="empty") public static void overCapacityPreservesAndDrainsWithoutExposureFromExcess(GameTestHelper h){var m=medium(h);m.fill(culture(32000,true),EXECUTE);var before=m.getFluid().copy();m.compile(h.getLevel(),h.absolutePos(MIN),h.absolutePos(new BlockPos(3,3,3)));h.assertTrue(m.overCapacity()&&!m.diagnostics().isEmpty()&&FluidStack.matches(before,m.getFluid()),"Capacity reduction voided medium");h.assertTrue(m.fill(culture(10,true),SIMULATE)==0&&m.fill(culture(10,true),EXECUTE)==0&&m.getFluidAmount()==32000,"Overfull fill clamped or accepted");close(h,m.exposure(h.absolutePos(new BlockPos(2,2,2))),1);close(h,m.exposure(h.absolutePos(new BlockPos(4,2,2))),0);m.drain(31000,EXECUTE);h.assertTrue(!m.overCapacity()&&m.getFluidAmount()==1000,"Drain did not recover capacity");h.succeed();}
-    @GameTest(template="empty") public static void mixedLegacySourcesRemainUntilResolved(GameTestHelper h){h.setBlock(new BlockPos(2,2,2),Blocks.WATER);h.setBlock(new BlockPos(5,3,5),Blocks.LAVA);var m=medium(h);m.migrate(h.getLevel());h.assertTrue(m.isEmpty()&&!m.diagnostics().isEmpty()&&h.getBlockState(new BlockPos(2,2,2)).is(Blocks.WATER)&&h.getBlockState(new BlockPos(5,3,5)).is(Blocks.LAVA),"Mixed migration modified sources");h.setBlock(new BlockPos(5,3,5),Blocks.AIR);m.migrate(h.getLevel());h.assertTrue(m.getFluidAmount()==1000&&h.getBlockState(new BlockPos(2,2,2)).isAir(),"Resolved migration failed");h.succeed();}
-    @GameTest(template="empty") public static void legacyCultureDoesNotInventFormula(GameTestHelper h){h.setBlock(new BlockPos(2,2,2),ProductFluids.CULTURE_SLURRY.get().defaultFluidState().createLegacyBlock());var m=medium(h);m.migrate(h.getLevel());h.assertTrue(m.getFluidAmount()==1000&&m.getFluid().get(CompoundFluids.COMPOSITION.get())==null,"Migration invented lost composition");h.succeed();}
-    @GameTest(template="empty") public static void cultureSubsetOrderingAndMobResolution(GameTestHelper h){var before=CultureProfiles.snapshot();try{var parsed=CultureProfiles.parse(JsonParser.parseString("""
+
+    private static void close(GameTestHelper h, double actual, double expected) {
+        h.assertTrue(Math.abs(actual - expected) < 1e-8, "Expected " + expected + ", got " + actual);
+    }
+
+    private static VatMediumStorage medium(GameTestHelper h) {
+        var m = new VatMediumStorage(() -> {});
+        m.compile(h.getLevel(), h.absolutePos(MIN), h.absolutePos(MAX));
+        return m;
+    }
+
+    private static FluidStack water(int n) {
+        return new FluidStack(Fluids.WATER, n);
+    }
+
+    private static FluidStack culture(int n, boolean extra) {
+        var s = new FluidStack(ProductFluids.CULTURE_SLURRY.get(), n);
+        var entries = new ArrayList<CompoundComposition.Entry>();
+        entries.add(new CompoundComposition.Entry(CompoundComposition.Kind.FLUID, "#c:water", 1000));
+        entries.add(new CompoundComposition.Entry(CompoundComposition.Kind.FLUID, "mobvats:experience", 250));
+        if (extra) entries.add(new CompoundComposition.Entry(CompoundComposition.Kind.ITEM, "minecraft:wheat", 8));
+        s.set(CompoundFluids.COMPOSITION.get(), new CompoundComposition(entries));
+        return s;
+    }
+
+    @GameTest(template = "empty")
+    public static void horizontalSurfaceAndBottomFirst(GameTestHelper h) {
+        var m = medium(h);
+        h.assertTrue(m.getCapacity() == 32000, "Shell contributed capacity");
+        m.fill(water(4000), EXECUTE);
+        for (int x = 2; x <= 5; x++)
+            for (int z = 2; z <= 5; z++) close(h, m.exposure(h.absolutePos(new BlockPos(x, 2, z))), .25);
+        close(h, m.levelFill(h.absolutePos(new BlockPos(2, 3, 2)).getY()), 0);
+        m.fill(water(20000), EXECUTE);
+        close(h, m.exposure(h.absolutePos(new BlockPos(2, 2, 2))), 1);
+        close(h, m.exposure(h.absolutePos(new BlockPos(2, 3, 2))), .5);
+        close(h, m.exposure(h.absolutePos(MIN)), 0);
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void buffersDisplaceAndPartialContractIsReusable(GameTestHelper h) {
+        for (var p : List.of(new BlockPos(2, 2, 2), new BlockPos(3, 2, 2)))
+            h.setBlock(p, FluidBufferContent.state(ConduitCladding.BARE));
+        var m = medium(h);
+        h.assertTrue(m.getCapacity() == 30000, "Buffers did not displace 1000 each");
+        m.fill(water(7000), EXECUTE);
+        close(h, m.exposure(h.absolutePos(new BlockPos(4, 2, 2))), .5);
+        close(h, m.exposure(h.absolutePos(new BlockPos(2, 2, 2))), 0);
+        VatDisplacement.register(Blocks.SPONGE, (w, p) -> 250);
+        h.setBlock(new BlockPos(4, 2, 2), Blocks.SPONGE);
+        m.compile(h.getLevel(), h.absolutePos(MIN), h.absolutePos(MAX));
+        m.setFluid(water(m.getCapacity()));
+        close(h, m.exposure(h.absolutePos(new BlockPos(4, 2, 2))), .75);
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void valvePartialTailAndExactComponentsRoundTrip(GameTestHelper h) {
+        var m = medium(h);
+        m.setCapacity(1250);
+        var original = culture(2000, true);
+        original.set(DataComponents.CUSTOM_NAME, Component.literal("Medium metadata"));
+        var bus = new FluidTank(3000);
+        bus.setFluid(original.copy());
+        var p = new BlockPos(7, 2, 2);
+        h.setBlock(p, Content.state(VatPartType.FillValve));
+        var valve = (VatBoundaryEntity) h.getBlockEntity(p);
+        var source = PhysicalFluidStorage.handler(List.of(bus), false, s -> true);
+        h.assertTrue(
+                BoundaryDevices.fill(m, source, valve)
+                        && BoundaryDevices.fill(m, source, valve)
+                        && m.getFluidAmount() == 1250
+                        && bus.getFluidAmount() == 750,
+                "Partial final fill failed");
+        var restored = new VatMediumStorage(() -> {});
+        restored.load(m.save(h.getLevel().registryAccess()), h.getLevel().registryAccess());
+        restored.setCapacity(1250);
+        var out = new FluidTank(1250);
+        h.assertTrue(
+                BoundaryDevices.drain(restored, out, valve)
+                        && BoundaryDevices.drain(restored, out, valve)
+                        && restored.isEmpty(),
+                "Partial drain failed");
+        h.assertTrue(
+                FluidStack.isSameFluidSameComponents(original, out.getFluid()), "Valve/save stripped full components");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void unlikeCompositionRejectedUntilEmpty(GameTestHelper h) {
+        var m = medium(h);
+        m.fill(culture(1000, false), EXECUTE);
+        h.assertTrue(
+                m.fill(culture(1000, true), SIMULATE) == 0
+                        && m.fill(culture(1000, true), EXECUTE) == 0
+                        && m.fill(water(1000), EXECUTE) == 0,
+                "Unlike media blended");
+        m.drain(1000, EXECUTE);
+        h.assertTrue(m.fill(culture(321, true), EXECUTE) == 321, "Empty vat rejected new identity");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void overCapacityPreservesAndDrainsWithoutExposureFromExcess(GameTestHelper h) {
+        var m = medium(h);
+        m.fill(culture(32000, true), EXECUTE);
+        var before = m.getFluid().copy();
+        m.compile(h.getLevel(), h.absolutePos(MIN), h.absolutePos(new BlockPos(3, 3, 3)));
+        h.assertTrue(
+                m.overCapacity() && !m.diagnostics().isEmpty() && FluidStack.matches(before, m.getFluid()),
+                "Capacity reduction voided medium");
+        h.assertTrue(
+                m.fill(culture(10, true), SIMULATE) == 0
+                        && m.fill(culture(10, true), EXECUTE) == 0
+                        && m.getFluidAmount() == 32000,
+                "Overfull fill clamped or accepted");
+        close(h, m.exposure(h.absolutePos(new BlockPos(2, 2, 2))), 1);
+        close(h, m.exposure(h.absolutePos(new BlockPos(4, 2, 2))), 0);
+        m.drain(31000, EXECUTE);
+        h.assertTrue(!m.overCapacity() && m.getFluidAmount() == 1000, "Drain did not recover capacity");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void mixedLegacySourcesRemainUntilResolved(GameTestHelper h) {
+        h.setBlock(new BlockPos(2, 2, 2), Blocks.WATER);
+        h.setBlock(new BlockPos(5, 3, 5), Blocks.LAVA);
+        var m = medium(h);
+        m.migrate(h.getLevel());
+        h.assertTrue(
+                m.isEmpty()
+                        && !m.diagnostics().isEmpty()
+                        && h.getBlockState(new BlockPos(2, 2, 2)).is(Blocks.WATER)
+                        && h.getBlockState(new BlockPos(5, 3, 5)).is(Blocks.LAVA),
+                "Mixed migration modified sources");
+        h.setBlock(new BlockPos(5, 3, 5), Blocks.AIR);
+        m.migrate(h.getLevel());
+        h.assertTrue(
+                m.getFluidAmount() == 1000
+                        && h.getBlockState(new BlockPos(2, 2, 2)).isAir(),
+                "Resolved migration failed");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void legacyCultureDoesNotInventFormula(GameTestHelper h) {
+        h.setBlock(
+                new BlockPos(2, 2, 2),
+                ProductFluids.CULTURE_SLURRY.get().defaultFluidState().createLegacyBlock());
+        var m = medium(h);
+        m.migrate(h.getLevel());
+        h.assertTrue(
+                m.getFluidAmount() == 1000 && m.getFluid().get(CompoundFluids.COMPOSITION.get()) == null,
+                "Migration invented lost composition");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void cultureSubsetOrderingAndMobResolution(GameTestHelper h) {
+        var before = CultureProfiles.snapshot();
+        try {
+            var parsed = CultureProfiles.parse(JsonParser.parseString("""
         {"default":"ordinary","mobs":{"minecraft:cow":"enriched"},"groups":[{"mobs":["minecraft:sheep"],"profile":"enriched"}],"profiles":{"ordinary":[{"medium":"minecraft:water","frequency":1}],"enriched":[{"medium":"mobvats:culture_slurry","required":[{"kind":"FLUID","selector":"#c:water","amount":1000},{"kind":"FLUID","selector":"mobvats:experience","amount":250}],"frequency":5},{"medium":"mobvats:culture_slurry","frequency":1}]}}
-        """).getAsJsonObject());CultureProfiles.publish(parsed);for(boolean extra:new boolean[]{false,true})close(h,CultureProfiles.multiplier(ResourceLocation.withDefaultNamespace("cow"),culture(1,extra)),5);close(h,CultureProfiles.multiplier(ResourceLocation.withDefaultNamespace("sheep"),culture(1,true)),5);close(h,CultureProfiles.multiplier(ResourceLocation.parse("example:modded"),water(1)),1);close(h,CultureProfiles.multiplier(ResourceLocation.withDefaultNamespace("cow"),new FluidStack(ProductFluids.CULTURE_SLURRY.get(),1)),1);}finally{CultureProfiles.publish(before);}h.succeed();}
-    @GameTest(template="empty") public static void yieldCarryPersistsByResourceAndRollback(GameTestHelper h){var state=new SpecimenProcessState();for(int i=0;i<4;i++){var plan=state.yield().plan(.5,h.getLevel().registryAccess());var drops=plan.items("egg",List.of(new ItemStack(Items.EGG)));h.assertTrue(drops.stream().mapToInt(ItemStack::getCount).sum()==i%2,"Half egg lost carry");h.assertTrue(new ProcessTransaction().add(plan.step()).commit(),"Carry commit failed");state=SpecimenProcessState.load(state.save(h.getLevel().registryAccess()),h.getLevel().registryAccess());}var failed=state.yield().plan(1.5,h.getLevel().registryAccess());failed.items("wool",List.of(new ItemStack(Items.WHITE_WOOL)));var saved=state.yield().save();h.assertTrue(!new ProcessTransaction().add(failed.step()).add(new ProcessTransaction.Step(new Object(),()->true,()->false,()->{})).commit()&&saved.equals(state.yield().save()),"Rollback spent carry");for(int i=0;i<4;i++){var plan=state.yield().plan(1.5,h.getLevel().registryAccess());h.assertTrue(plan.items("wool",List.of(new ItemStack(Items.WHITE_WOOL))).stream().mapToInt(ItemStack::getCount).sum()==1+i%2,"Wool carry donated or lost");new ProcessTransaction().add(plan.step()).commit();}h.succeed();}
-    @GameTest(template="empty") public static void fractionalFrequencyPersistsAndIsIndependentPerTimer(GameTestHelper h){var state=new ProcessState();h.assertTrue(state.advance(.5)==0,"Half rate rounded up");state=ProcessState.load(state.save(h.getLevel().registryAccess()),h.getLevel().registryAccess());h.assertTrue(state.advance(.5)==1&&new ProcessState().advance(.5)==0,"Frequency carry lost or shared");int total=0;for(int i=0;i<4;i++)total+=state.advance(2.75);h.assertTrue(total==11,"Fractional ideal immersion rate wrong");h.succeed();}
-    @GameTest(template="empty",timeoutTicks=70) public static void assembledFrequencyUsesFullReachAndHappinessIgnoresMedium(GameTestHelper h){VatGameTests.build(h,5);var head=(VatHeadEntity)h.getBlockEntity(HEAD);head.encode(ResourceLocation.withDefaultNamespace("cow"));h.runAtTickTime(35,()->{var vat=head.getMultiblockController().orElseThrow();h.assertTrue(vat.isAssembled(),"Fixture unformed");double happiness=vat.yieldMultiplier(head.getBlockPos());close(h,vat.frequencyMultiplier(head.getBlockPos()),.5);vat.medium().setFluid(culture(vat.medium().getCapacity(),true));double exposure=vat.specimenClearance(head.getBlockPos()).shell().stream().mapToDouble(vat.medium()::exposure).average().orElseThrow();close(h,vat.frequencyMultiplier(head.getBlockPos()),.5+4.5*exposure);close(h,vat.yieldMultiplier(head.getBlockPos()),happiness);h.assertTrue(happiness>.5&&happiness<2,"Shell walls were ignored");h.succeed();});}
-    @GameTest(template="empty",timeoutTicks=70) public static void minimumLegalVatHasMinimumYield(GameTestHelper h){VatGameTests.build(h,3);var head=(VatHeadEntity)h.getBlockEntity(new BlockPos(2,3,2));head.encode(ResourceLocation.withDefaultNamespace("cow"));h.runAtTickTime(35,()->{var vat=head.getMultiblockController().orElseThrow();h.assertTrue(vat.isAssembled(),"Minimum vat rejected");close(h,vat.yieldMultiplier(head.getBlockPos()),.5);close(h,vat.frequencyMultiplier(head.getBlockPos()),.5);h.succeed();});}
+        """).getAsJsonObject());
+            CultureProfiles.publish(parsed);
+            for (boolean extra : new boolean[] {false, true})
+                close(
+                        h,
+                        CultureProfiles.multiplier(ResourceLocation.withDefaultNamespace("cow"), culture(1, extra)),
+                        5);
+            close(h, CultureProfiles.multiplier(ResourceLocation.withDefaultNamespace("sheep"), culture(1, true)), 5);
+            close(h, CultureProfiles.multiplier(ResourceLocation.parse("example:modded"), water(1)), 1);
+            close(
+                    h,
+                    CultureProfiles.multiplier(
+                            ResourceLocation.withDefaultNamespace("cow"),
+                            new FluidStack(ProductFluids.CULTURE_SLURRY.get(), 1)),
+                    1);
+        } finally {
+            CultureProfiles.publish(before);
+        }
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void yieldCarryPersistsByResourceAndRollback(GameTestHelper h) {
+        var state = new SpecimenProcessState();
+        for (int i = 0; i < 4; i++) {
+            var plan = state.yield().plan(.5, h.getLevel().registryAccess());
+            var drops = plan.items("egg", List.of(new ItemStack(Items.EGG)));
+            h.assertTrue(drops.stream().mapToInt(ItemStack::getCount).sum() == i % 2, "Half egg lost carry");
+            h.assertTrue(new ProcessTransaction().add(plan.step()).commit(), "Carry commit failed");
+            state = SpecimenProcessState.load(
+                    state.save(h.getLevel().registryAccess()), h.getLevel().registryAccess());
+        }
+        var failed = state.yield().plan(1.5, h.getLevel().registryAccess());
+        failed.items("wool", List.of(new ItemStack(Items.WHITE_WOOL)));
+        var saved = state.yield().save();
+        h.assertTrue(
+                !new ProcessTransaction()
+                                .add(failed.step())
+                                .add(new ProcessTransaction.Step(new Object(), () -> true, () -> false, () -> {}))
+                                .commit()
+                        && saved.equals(state.yield().save()),
+                "Rollback spent carry");
+        for (int i = 0; i < 4; i++) {
+            var plan = state.yield().plan(1.5, h.getLevel().registryAccess());
+            h.assertTrue(
+                    plan.items("wool", List.of(new ItemStack(Items.WHITE_WOOL))).stream()
+                                    .mapToInt(ItemStack::getCount)
+                                    .sum()
+                            == 1 + i % 2,
+                    "Wool carry donated or lost");
+            new ProcessTransaction().add(plan.step()).commit();
+        }
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void fractionalFrequencyPersistsAndIsIndependentPerTimer(GameTestHelper h) {
+        var state = new ProcessState();
+        h.assertTrue(state.advance(.5) == 0, "Half rate rounded up");
+        state = ProcessState.load(
+                state.save(h.getLevel().registryAccess()), h.getLevel().registryAccess());
+        h.assertTrue(state.advance(.5) == 1 && new ProcessState().advance(.5) == 0, "Frequency carry lost or shared");
+        int total = 0;
+        for (int i = 0; i < 4; i++) total += state.advance(2.75);
+        h.assertTrue(total == 11, "Fractional ideal immersion rate wrong");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 70)
+    public static void assembledFrequencyUsesFullReachAndHappinessIgnoresMedium(GameTestHelper h) {
+        VatGameTests.build(h, 5);
+        var head = (VatHeadEntity) h.getBlockEntity(HEAD);
+        head.encode(ResourceLocation.withDefaultNamespace("cow"));
+        h.runAtTickTime(35, () -> {
+            var vat = head.getMultiblockController().orElseThrow();
+            h.assertTrue(vat.isAssembled(), "Fixture unformed");
+            double happiness = vat.yieldMultiplier(head.getBlockPos());
+            close(h, vat.frequencyMultiplier(head.getBlockPos()), .5);
+            vat.medium().setFluid(culture(vat.medium().getCapacity(), true));
+            double exposure = vat.specimenClearance(head.getBlockPos()).shell().stream()
+                    .mapToDouble(vat.medium()::exposure)
+                    .average()
+                    .orElseThrow();
+            close(h, vat.frequencyMultiplier(head.getBlockPos()), .5 + 4.5 * exposure);
+            close(h, vat.yieldMultiplier(head.getBlockPos()), happiness);
+            h.assertTrue(happiness > .5 && happiness < 2, "Shell walls were ignored");
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 70)
+    public static void minimumLegalVatHasMinimumYield(GameTestHelper h) {
+        VatGameTests.build(h, 3);
+        var head = (VatHeadEntity) h.getBlockEntity(new BlockPos(2, 3, 2));
+        head.encode(ResourceLocation.withDefaultNamespace("cow"));
+        h.runAtTickTime(35, () -> {
+            var vat = head.getMultiblockController().orElseThrow();
+            h.assertTrue(vat.isAssembled(), "Minimum vat rejected");
+            close(h, vat.yieldMultiplier(head.getBlockPos()), .5);
+            close(h, vat.frequencyMultiplier(head.getBlockPos()), .5);
+            h.succeed();
+        });
+    }
 }
