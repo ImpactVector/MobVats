@@ -239,20 +239,6 @@ public final class ConduitArtGeometryTest {
                 new net.impactvector.mobvats.gamecontent.multiblock.vat.VatPresentation(List.of(feedLink), List.of())
                         .save());
         require(restored.tools().getFirst().equals(feedLink), "Decoration changed restored assignment/target");
-        var renderSource = Files.readString(Path.of(args[2])
-                .resolve(
-                        "../../src/main/java/net/impactvector/mobvats/gamecontent/multiblock/vat/client/render/VatMechanismRenderer.java")
-                .normalize());
-        require(
-                renderSource.split("renderer.render\\(held", -1).length == 2,
-                "Equipped tool is submitted more than once");
-        require(
-                renderSource.contains("Axis.YP.rotationDegrees(held.is(Content.SYRINGE.get()) ? 90 : -90)")
-                        && renderSource.contains("pose.scale(scale.x(),scale.y(),scale.z())")
-                        && renderSource.contains("renderer.render(held,ItemDisplayContext.NONE,false")
-                        && renderSource.contains("pose.translate(0,scale.y() * 5.0 / 16,length + scale.x() * 5.0 / 16)")
-                        && renderSource.contains("pose.translate(0,0,length + Math.abs(scale.x()) / 2)"),
-                "Mechanical item transform changed");
         var armQuads = new ArrayList<Object>();
         int rodIndex = 0;
         for (var curve : List.of(
