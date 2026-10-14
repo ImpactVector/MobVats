@@ -272,6 +272,12 @@ public final class VatClient {
     }
 
     @SubscribeEvent
+    public static void registerReloadListeners(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener((net.minecraft.server.packs.resources.ResourceManagerReloadListener)
+                manager -> VatHeadEntityRenderer.clearVisualCaches());
+    }
+
+    @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(
                 Content.CONTROLLER_MENU.get(),

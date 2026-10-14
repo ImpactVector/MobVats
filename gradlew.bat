@@ -35,6 +35,10 @@ set APP_HOME=%DIRNAME%
 @rem Resolve any "." and ".." in APP_HOME to make it shorter.
 for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
 
+@rem Keep the default local cache outside protected agent configuration folders.
+@rem Explicit GRADLE_USER_HOME values remain supported.
+if not defined GRADLE_USER_HOME for %%i in ("%APP_HOME%\..\workspace\.cache\gradle") do set "GRADLE_USER_HOME=%%~fi"
+
 @rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
 

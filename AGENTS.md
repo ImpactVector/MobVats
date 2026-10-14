@@ -9,6 +9,7 @@ are unavailable; retain the testing restrictions in `README.md`.
 - Follow ExtremeReactors2's controller, part-type, individual entity, and client package structure.
 - Compilation, unit tests, and autonomous headless GameTests are allowed. GameTests must handle setup, simulated interactions, and verification themselves. Do not take over the mouse/keyboard, use browser-style screenshot loops, or perform manual Minecraft client testing. The user handles client play and visual acceptance. Do not launch client smoke/reload tasks unless specifically requested. This preference was clarified on October 3, 2026.
 - Keep IntelliJ and Minecraft generated files ignored.
+- The standard Gradle wrappers default `GRADLE_USER_HOME` to the writable `../workspace/.cache/gradle` directory. Do not override it with the protected `../.codex/gradle` cache.
 
 ## Java formatting
 

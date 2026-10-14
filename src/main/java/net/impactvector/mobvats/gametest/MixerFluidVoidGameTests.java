@@ -257,10 +257,23 @@ public final class MixerFluidVoidGameTests {
     public static void removedVoidDoesNotLoseFluids(GameTestHelper h) {
         rig(h, c -> {
             full(c);
+            var physical = c.storage().clusters().stream()
+                    .flatMap(cluster -> cluster.members().stream())
+                    .toList();
+            var before = physical.stream()
+                    .map(member -> member.tank.getFluid().copy())
+                    .toList();
             var r = c.state().prepare(recipe()).orElseThrow();
             var removed = sink(h);
             h.setBlock(V, Blocks.AIR);
-            h.assertTrue(!r.commit() && c.state().amount(0) == 100 && !removed.flaring(), "Removed sink lost fluid");
+            h.assertTrue(
+                    !r.commit() && !removed.flaring() && c.storage().clusters().isEmpty(),
+                    "Removed sink retained storage authority or committed disposal");
+            // The controller view is retired immediately; conservation belongs to the persisted member tanks.
+            for (int i = 0; i < physical.size(); i++)
+                h.assertTrue(
+                        FluidStack.matches(before.get(i), physical.get(i).tank.getFluid()),
+                        "Removed sink changed physical amount/components");
             h.succeed();
         });
     }

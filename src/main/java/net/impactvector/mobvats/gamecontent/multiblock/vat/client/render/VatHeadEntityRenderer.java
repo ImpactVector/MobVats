@@ -21,8 +21,10 @@ import net.minecraft.world.phys.Vec3;
 public class VatHeadEntityRenderer implements BlockEntityRenderer<AbstractVatEntity> {
     private static final ResourceLocation STRAP_MATERIAL =
             ResourceLocation.fromNamespaceAndPath(MobVats.MOD_ID, "textures/blocks/vat_casing_inner.png");
-    // Values contain geometry and a client specimen, never a part/controller reference back to the weak key.
-    private final WeakHashMap<AbstractVatEntity, VisualState> visuals = new WeakHashMap<>();
+    // A detached Mob still owns its Level. Explicit retirement breaks indirect references to weak keys.
+    private final VatVisualCache<AbstractVatEntity, VisualState> visuals = new VatVisualCache<>();
+    private static final java.util.Set<VatHeadEntityRenderer> INSTANCES =
+            java.util.Collections.newSetFromMap(new WeakHashMap<>());
 
     private record DetailState(Vec3 camera, AABB bounds, int full, int reduced, int cull, VatRenderDetail detail) {}
 
@@ -68,7 +70,60 @@ public class VatHeadEntityRenderer implements BlockEntityRenderer<AbstractVatEnt
         }
     }
 
-    public VatHeadEntityRenderer(BlockEntityRendererProvider.Context context) {}
+    public VatHeadEntityRenderer(BlockEntityRendererProvider.Context context) {
+        INSTANCES.add(this);
+    }
+
+    public static void clearVisualCaches() {
+        for (var renderer : INSTANCES) {
+            renderer.visuals.clear();
+            renderer.details.clear();
+        }
+    }
+
+    /** Primitive ownership summary for the opt-in development command; never exports entity references. */
+    public static String cacheOwnershipDiagnostics() {
+        var current = Minecraft.getInstance().level;
+        int heads = 0;
+        long specimens = 0, foreignLevels = 0;
+        for (var renderer : INSTANCES) {
+            heads += renderer.visuals.size();
+            specimens += renderer.visuals.count(state -> state.specimen != null);
+            foreignLevels +=
+                    renderer.visuals.count(state -> state.specimen != null && state.specimen.level() != current);
+        }
+        return "cachedHeads=" + heads + " specimenMobs=" + specimens + " foreignLevels=" + foreignLevels;
+    }
+
+    public static void retireChunk(net.minecraft.world.level.Level level, net.minecraft.world.level.ChunkPos chunk) {
+        for (var renderer : INSTANCES)
+            renderer.visuals.retire(head -> head.getLevel() == level
+                    && new net.minecraft.world.level.ChunkPos(head.getBlockPos()).equals(chunk));
+    }
+
+    public static void retireLevel(net.minecraft.world.level.Level level) {
+        for (var renderer : INSTANCES) {
+            renderer.visuals.retire(head -> head.getLevel() == level);
+            renderer.details.keySet().removeIf(vat -> vat.getWorld() == level);
+        }
+    }
+
+    /** Also retires replaced/removed Heads that are never rendered again, including distance-culled Heads. */
+    public static void maintainVisualCaches(net.minecraft.world.level.Level current) {
+        for (var renderer : INSTANCES) {
+            renderer.visuals.world(current);
+            renderer.visuals.retire((head, state) -> current == null
+                    || head.isRemoved()
+                    || head.getLevel() != current
+                    || !head.isMachineAssembled()
+                    || !current.hasChunkAt(head.getBlockPos())
+                    || current.getBlockEntity(head.getBlockPos()) != head
+                    || head instanceof VatHeadEntity specimenHead
+                            && (state.revision != specimenHead.getRenderRevision()
+                                    || state.descriptor.specimenYaw() != specimenHead.getSpecimenYaw()));
+            renderer.details.keySet().removeIf(vat -> vat.getWorld() != current || !vat.isAssembled());
+        }
+    }
 
     public boolean hasVisual(AbstractVatEntity entity) {
         var state = visualState(entity);
@@ -81,8 +136,14 @@ public class VatHeadEntityRenderer implements BlockEntityRenderer<AbstractVatEnt
     }
 
     private VisualState visualState(AbstractVatEntity entity) {
+        var current = Minecraft.getInstance().level;
+        visuals.world(current);
         var vat = entity.getMultiblockController().filter(MultiblockVat::isAssembled);
-        if (!(entity instanceof VatHeadEntity head) || vat.isEmpty() || entity.getLevel() == null) {
+        if (!(entity instanceof VatHeadEntity head)
+                || vat.isEmpty()
+                || current == null
+                || entity.getLevel() != current
+                || entity.isRemoved()) {
             visuals.remove(entity);
             return null;
         }

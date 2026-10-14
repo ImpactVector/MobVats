@@ -19,7 +19,14 @@ public final class FluidBufferEntity extends BlockEntity implements ResourceEndp
     }
 
     public boolean routingAvailable() {
-        return !isRemoved();
+        return chunkAvailable && !isRemoved();
+    }
+
+    private boolean chunkAvailable = true;
+    private long storageEpoch;
+
+    long storageEpoch() {
+        return storageEpoch;
     }
 
     public static final int CAPACITY = 4000;
@@ -62,18 +69,22 @@ public final class FluidBufferEntity extends BlockEntity implements ResourceEndp
 
     @Override
     public void onLoad() {
+        chunkAvailable = true;
         super.onLoad();
         FluidBufferPresentation.changed(level, worldPosition);
     }
 
     @Override
     public void onChunkUnloaded() {
+        ++storageEpoch;
+        chunkAvailable = false;
         FluidBufferPresentation.changed(level, worldPosition);
         super.onChunkUnloaded();
     }
 
     @Override
     public void setRemoved() {
+        ++storageEpoch;
         FluidBufferPresentation.changed(level, worldPosition);
         super.setRemoved();
     }
@@ -81,6 +92,7 @@ public final class FluidBufferEntity extends BlockEntity implements ResourceEndp
     @Override
     public void clearRemoved() {
         super.clearRemoved();
+        chunkAvailable = true;
         FluidBufferPresentation.changed(level, worldPosition);
     }
 
@@ -144,14 +156,17 @@ public final class FluidBufferEntity extends BlockEntity implements ResourceEndp
     }
     /** Build the addressed logical cluster even outside a formed machine. */
     public PhysicalFluidStorage.Cluster interactionCluster() {
+        var owner = ConduitStructure.containing(level, worldPosition);
         var members = new java.util.ArrayList<FluidBufferEntity>();
         var seen = new java.util.HashSet<BlockPos>();
         var queue = new java.util.ArrayDeque<BlockPos>();
         queue.add(worldPosition);
         while (!queue.isEmpty()) {
             var pos = queue.removeFirst();
-            if (!seen.add(pos)) continue;
-            if (level.getBlockEntity(pos) instanceof FluidBufferEntity member) {
+            if (!seen.add(pos) || !level.hasChunkAt(pos)) continue;
+            if (level.getBlockEntity(pos) instanceof FluidBufferEntity member
+                    && member.routingAvailable()
+                    && ConduitStructure.containing(level, pos) == owner) {
                 members.add(member);
                 for (var face : Direction.values()) queue.add(pos.relative(face));
             }

@@ -10,6 +10,18 @@ Conduit mode is a blockstate; TRUNK and TAP inventory items share one block per 
 
 Fluid Buffers hold resources in physical tanks. Compatible adjacent members form logical clusters; stored identity and components constrain clustering, so an empty intermediary cannot bridge incompatible fluid identities. Exact filters and fluid components remain distinct constraints. A cluster preserves its filter when drained; an empty container interaction can clear an empty filtered cluster's filter. Native buckets transfer 1,000 mB atomically and other fluid-capability containers follow their transfer policy.
 
+Container discovery and storage views use loaded Buffers within the same
+`ConduitStructure.containing` owner. Adjacent independent assembled machines do
+not share a logical tank. A null owner allows standalone/unformed clusters;
+disassembly retires controller access while preserving direct physical container
+use. Disabled assembled machines retain their established boundary transport.
+Unload, replacement, ownership changes, compatibility changes and storage
+clear/recompile invalidate affected cluster views without moving physical fluid.
+Retained wrappers expose no usable capacity after retirement; prepared resource
+transactions recheck current capacity, contents and output filters before writes.
+Queries and unload callbacks never acquire missing chunks. See the evidence and
+integration limits in [the maintainability audit](CODE_MAINTAINABILITY_AUDIT.md).
+
 Input/Output describe the outside boundary, while Producer/Consumer/Store describe operation roles. Configured ports preserve direction, selectors and active/passive state. Pumps explicitly move world fluid; Fill/Drain Valves move Vat medium. Voids dispose only through explicit disposal policy after compatible storage/staging capacity is exhausted. Sump is the specimen service collector; it is not an environment extraction valve. No standalone item-buffer block is registered.
 
 Active boundary transfer is controller-scheduled in deterministic rotating part order with a per-port fluid budget. Adapters use ZeroCore neighbor sources and NeoForge simulation. Direct machine adjacency assigns transfer to active output-side push; input-side pull can serve passive outputs, avoiding duplicate active-to-active ownership. Passive capability requests remain distinct from scheduled transfer.

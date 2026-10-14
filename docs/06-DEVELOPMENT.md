@@ -19,11 +19,13 @@ git diff --check
 
 `build` compiles, generates/processes resources, packages the mod and runs `check`, including CPU render/geometry and art/provenance/JAR hook exclusion checks. `publicReleaseValidation` simulates a guarded public entry point without publishing. No successful validation command authorizes a release.
 
-An optional portable cache can be selected from this checkout:
+The standard wrappers default to the ignored, writable sibling cache `../workspace/.cache/gradle`. Normal build commands remain unchanged:
 
 ```powershell
-$env:GRADLE_USER_HOME = [IO.Path]::GetFullPath((Join-Path (Get-Location) '../workspace/.cache/gradle'))
+.\gradlew.bat build
 ```
+
+An explicit `GRADLE_USER_HOME` overrides this default. Do not select `../.codex/gradle`, because agent configuration directories are protected. Configure a Java 21 Gradle runtime through `JAVA_HOME` or machine-local `org.gradle.java.home` in the cache's `gradle.properties`. The cache location must be selected before Gradle starts; project `gradle.properties` does not relocate Gradle User Home.
 
 Offline mode requires cached dependencies. Use `tasks --all` to inspect the actual wrapper task inventory. Keep generated caches, logs, IDE files and worlds ignored.
 

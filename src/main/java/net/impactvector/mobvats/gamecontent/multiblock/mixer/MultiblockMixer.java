@@ -555,8 +555,7 @@ public final class MultiblockMixer
         activePorts.remove(part);
         if (part == activeDrive) stopDrive(false);
         invalidateConduitBounds();
-        routing = null;
-        intakes = List.of();
+        invalidateConduitTopology();
     }
 
     protected boolean updateServer() {

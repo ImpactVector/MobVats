@@ -255,9 +255,9 @@ After formatting, evaluate a small Checkstyle policy for wildcard imports and bo
 
 ## 6. Ranked cleanup backlog
 
-Severity and confidence are separate. **P0 entries below are source-supported safety review gates, not reproduced runtime failures.** Their missing guards/retention paths are concrete; the affected gameplay/client scenarios were not executed. Characterize them before further feature development, fix confirmed failures, and downgrade a concern only with recorded evidence. P1/P2 findings are confirmed source-level maintainability problems.
+Severity and confidence are separate. **At the original audit baseline, P0 entries were source-supported safety review gates, not reproduced runtime failures.** The October 13 follow-up below records reproduced failures, narrow corrections and remaining integration gates. P1/P2 findings are source-level maintainability problems.
 
-### P0-A — Buffer interaction discovery can escape the controller's member set
+### P0-A — Buffer interaction discovery can escape the controller's member set (confirmed defects corrected; real-eviction verification remains)
 
 **Location/example:** `C/FluidBufferEntity.java:61` through `:72` discovers every adjacent Buffer using `level.getBlockEntity` with no loaded-chunk or controller-owner fence. Compare `C/FluidBufferPresentation.java:34`, `:39` (loaded and owner checks) and bounds-limited controller storage compilation.
 
@@ -267,7 +267,7 @@ Severity and confidence are separate. **P0 entries below are source-supported sa
 
 **Scope/risk/evidence:** small targeted discovery change plus autonomous tests, approximately 1–2 days; medium risk to legitimate standalone clusters. Existing Slice11 split/write-through, FluidBufferArt incompatibility, ConduitPerformance retained-handler, and PartOwnership tests are relevant but do not prove this exact container boundary case.
 
-### P0-B — Detached client specimen can indirectly retain the weak cache's world
+### P0-B — Detached client specimen can indirectly retain the weak cache's world (confirmed cache-ownership defect; client integration check remains)
 
 **Location/example:** `V/client/render/VatHeadEntityRenderer.java:24`, `:41`, `:110`. A weak-key cache value holds a Mob created with the real client Level. Removal at line 63 requires another call for the invalid part. The comment rules out a direct back-reference but not `value -> specimen -> Level -> loaded chunks/parts -> key`. No explicit disconnect/level-change cleanup was found in `V/client/VatClient.java`.
 
@@ -276,6 +276,271 @@ Severity and confidence are separate. **P0 entries below are source-supported sa
 **Correction:** verify renderer lifetime and implement explicit cache retirement on client level change/disconnect if needed, preserving detached, never-ticked specimens. A small testable cache owner can prove retirement without launching Minecraft; the human operator handles any later client acceptance. Do not attempt to solve this by spawning live entities or retaining only weak visual Mobs that may disappear unpredictably.
 
 **Scope/risk/evidence:** roughly 1 day for lifetime characterization and targeted retirement; medium presentation risk. VatRenderLifecycle tests protect descriptors/Head restoration, not GC of actual client Mobs. Existing client smoke code is not authorization to launch it. This requires new focused lifetime evidence if confirmed.
+
+### Lifecycle/ownership verification — October 13, 2026
+
+Baseline: clean `main`, `bff8e446683d21e1e485993d71a63f41e755d4c2`.
+The committed Spotless 8.10.4 / Palantir 2.102.0 configuration and full authored
+Java coverage were inspected; baseline `spotlessCheck --offline` passed. The
+requested lifecycle document is now archived at
+[2026-10-11-zerocore-lifecycle-parity.md](history/2026-10-11-zerocore-lifecycle-parity.md).
+The sibling `../workspace/AGENTS.md` remains unavailable. No pre-existing edits
+were present, no client was launched, and no commit/publication is authorized.
+The original audit's read-only statements above apply to that earlier audit,
+not to this follow-up investigation.
+
+#### A: observed failures and authoritative contract
+
+**Classification: confirmed defects, high confidence for the reproduced paths.**
+Original interaction BFS could cross independent assembled owner envelopes.
+`FluidBufferOwnershipGameTests.touchingIndependentOwnersDoNotShareContainerStorage`
+builds a touching Vat and Mixer with separate owners and 4,000/2,000 mB water.
+On unchanged production code it failed `Container discovery escaped its owner`.
+The correction also tests actual bucket drain/fill against the second machine,
+with exact 4,000/1,000 then 4,000/2,000 physical distributions and container items.
+An initial fixture accidentally replaced the Mixer Controller; its failure was
+corrected before recording the independent-owner reproduction.
+
+The existing contract is `ConduitStructure.containing`: assembled controller
+identity plus its validated bounds. Physical Buffers are passive blocks, not
+ZeroCore parts. A null owner deliberately permits standalone/unformed adjacent
+clusters; pause/disassembly retires controller routing but does not destroy
+physical tanks or forbid direct standalone container use. Operator disable is
+distinct from pause: assembled disabled boundary transport remains supported.
+Presentation already used this owner fence. Compatibility stays in the existing
+compiler: exact filter equality and same fluid/components, with deterministic
+member ordering. No alternative clustering model or presentation-based storage
+was introduced.
+
+Additional before-fix evidence:
+
+| Regression | Observed invalid state |
+| --- | --- |
+| `retiredClusterRejectsPreparedTransactionAndDirectHandler` | `ResourceReservation.commit()` wrote through a retained cluster after `PhysicalFluidStorage.clear()` |
+| `unloadCallbackRetiresReachabilityBeforeRemoval` | Cached membership exposed a Buffer after `onChunkUnloaded()` but before removal |
+| `compatibilityChangeRejectsRetainedClusterWithoutRedistribution` | A retained cluster aggregated water and lava before deferred recompilation |
+| `machineRepairAndControllerReplacementRetirePreparedStorage` | Mixer part removal retained storage authority; a prepared plan committed after Controller replacement |
+| `preparedFillRechecksChangedFilter` | A prepared water output committed after the empty Buffer changed to a lava filter |
+| `chunkBoundaryUnloadAndUnloadedQueriesConservePhysicalStorage` | Unload followed by reload revived a prepared standalone transaction when only current availability was checked |
+
+Corrections are restricted to `C/FluidBufferEntity.java`,
+`C/PhysicalFluidStorage.java`, `C/ResourceReservation.java`, and
+`M/MultiblockMixer.java`. Interaction discovery checks loaded chunks, Buffer
+availability and the addressed owner. Bounds enumeration checks loaded chunks.
+The unload callback immediately retires Buffer availability without world reads.
+Cluster wrappers bind to their storage generation, member lifecycle epochs and discovered owner, reject
+removed/replaced/unloaded members and live compatibility changes, and expose zero
+capacity/empty contents after invalidation. Zero capacity makes existing snapshot
+transactions reject stale wrappers before writes; old wrappers never become valid
+again after clear/recompile or a member unload/removal, even after reload. Current connectivity snapshots still reuse endpoint
+identities until an actual rebuild. Mixer removal now invokes its existing
+`invalidateConduitTopology`, matching Vat retirement. Reservation commit checks
+the current fluid validator before any item/fluid writes. Tanks, NBT, composition,
+Store/Producer/Consumer roles, direction filters, and routing algorithms stay intact.
+
+Characterization also covers a loaded physical chunk boundary, one Buffer's
+unload/load callbacks and NBT round trip, machine break/repair, Controller
+replacement, an unformed plan followed by owner assignment, and empty queries
+over genuinely unloaded coordinates with unchanged loaded-chunk counts. The
+boundary fixture uses absolute placement because `GameTestHelper.relativePos`
+rotates coordinates; its earlier placement assertion was a fixture failure.
+Existing `Slice11`, `Slice111`, `FluidBufferArt`, `ConduitPerformance`,
+`MachineLifecycle`, `PartOwnership`, `ResourceRole`, Mixer operation/drive and
+compound-fluid suites supply complementary identity, conservation, assimilation,
+endpoint caching and transaction evidence.
+
+`MixerFluidVoidGameTests.removedVoidDoesNotLoseFluids` now compares every
+persisted member's complete FluidStack before/after removal and requires the
+controller view to be empty and disposal to fail. Its former controller-view
+`amount(0)==100` assertion depended on the stale view being retained; an empty
+retired view does not mean the persisted resource was lost. Exact amount and
+component checks are preserved at the authoritative owner instead.
+
+**Limit:** GameTest-owned chunks are not evicted from the server map. Unload
+callbacks are invoked autonomously while the chunk remains loaded; actual missing
+chunks are exercised separately by read-only storage enumeration. Minecraft
+1.21.1 `LevelReader.hasChunkAt` delegates to `ServerChunkCache.hasChunk`, which
+checks visible holders without creating a chunk. Every newly added block-entity
+lookup follows this guard. Buffer unload and controller retirement callbacks
+perform no immediate world lookup. Real server eviction/reload under operator
+play remains a bounded integration check, not an asserted automated result.
+Keep the **P0-A real-eviction verification gate** open: particularly exercise a
+boundary chunk containing only passive Buffers/conduits, with Controller/Head
+parts still loaded in the other chunk. Verify actual chunk-map eviction,
+framework pause/restoration behavior, fresh endpoint identities after reload,
+and conserved physical NBT totals. Callback tests and guarded missing-chunk
+queries establish the corrected access fence, but do not prove that full event
+sequence or passive-only chunk reattachment.
+
+#### B: cache graph, correction and evidence boundary
+
+**Classification: confirmed cache-ownership defect; high confidence in the
+source graph and direct retirement contract. Live client integration remains
+an unresolved P0-B verification gate until the manual checks below pass.**
+`V/client/render/VatHeadEntityRenderer.java` holds actual detached Minecraft
+`Mob` objects in `VisualState`, created with the real client Level. Minecraft
+`Entity.level` is a strong reference; ClientLevel owns its chunk cache and loaded
+chunks own block entities. Thus the map value can reach its weak Head key through
+the Level. `WeakHashMap` cannot supply the claimed lifetime bound. A later render
+of an invalid Head was the only explicit removal; distance culling or logout can
+prevent that render. Geometry/descriptors, the separate detail cache, and
+`VatRenderDiagnostics`' value records do not themselves hold specimen entities.
+Head identity/state/life-stage/geometry/yaw revisions already rebuild visual state
+when queried; resource reload recreates renderers through vanilla
+`BlockEntityRenderDispatcher.onResourceManagerReload`. Those facts did not provide
+explicit per-chunk or per-world retirement for retained visual Mobs.
+
+`V/client/render/VatVisualCache.java` is a small renderer-owned map with explicit
+world/Head retirement. It supplements weak keys and does not introduce a gameplay
+lifecycle abstraction. `V/client/VatRenderLifecycle.java` retires chunk/world
+states on client unload events and prunes removed/replaced/unassembled or revised
+Heads each client tick, including culled Heads. A current-Level identity check
+rejects old-world render calls. `V/client/VatClient.java` registers resource-reload
+retirement. The renderer registry itself has weak renderer keys; retired renderers
+are not held by the registry. Stable worlds/revisions reuse cached models/Mobs;
+specimens remain detached, never world-spawned or ticked. No new packets are used.
+
+`src/test/java/net/impactvector/mobvats/render/VatVisualCacheTest.java` runs through
+`vatVisualCacheTest` and `check`. Its original-map mode
+(`vatVisualCacheTest -PvatCacheBaseline`) fails the direct retirement assertion
+with a deterministic value -> specimen -> world -> Head graph. The corrected
+owner passes creation/reuse, revision invalidation, Head replacement, selective
+chunk retirement, reload with a fresh Head instance, world replacement, resource
+clear and disconnect. This is an ownership harness with stand-in objects, not an
+actual ClientLevel/Mob renderer run. It makes no GC request or memory-size claim.
+Existing `VatRenderLifecycleGameTests` verify actual Head synchronization and
+independent revisions. The new development-only `/mobvats_render cache` command
+reports actual `cachedHeads`, `specimenMobs` and `foreignLevels` without exporting
+references or changing synchronization.
+As with the existing CPU harnesses, this Java entry point is excluded from
+framework `test` discovery and executed explicitly by `check`; no assertion is
+removed or skipped by that wiring.
+
+**Remaining evidence:** headless execution cannot prove client event delivery,
+visual acceptance, live-world GC or the cause of intermittent missing simulacra.
+No connection between missing simulacra and this ownership defect was reproduced.
+P0-B's client integration gate stays explicit; the implemented ownership defect
+is not described as an ongoing unchanged bug.
+
+#### ZeroCore2 / XR2 comparison
+
+The established local references remain ZeroCore2 `1.21` metadata 2.4.17,
+revision `64d892b1ba099192a35bfa4ee08465540a2f12e7`, and XR2 2.4.27,
+revision `f6cc65140a8abbfc87137f5c54fc641085f66048`; the runtime dependency is
+ZeroCore2 **2.4.18**. These are partial cached source references, not exact-runtime
+source authentication. `lib/multiblock/AbstractMultiblockController.detachPart`
+pauses before removal callbacks; `AbstractMultiblockPart.setRemoved` and
+`onChunkUnloaded` detach through that authority. Assimilation transfers parts and
+invokes recipient/donor callbacks; MobVats donor retirement and reassembly rebuilds
+remain unchanged. ZeroCore does not own MobVats passive physical Buffers or client
+specimen caches. Those added services must fence their own references and queries.
+XR2 `turbine/MultiblockTurbine` retires turbine data on disassembly and attached
+role references on donor assimilation;
+`turbine/client/render/rotor/RotorBearingEntityRenderer` consumes a bearing-owned
+rotor descriptor/baked models rather than a renderer map of world-bound Mobs.
+That difference justifies explicit MobVats specimen retirement, not copying XR2
+storage or replacing ZeroCore's lifecycle.
+
+#### Bounded manual checks (human operator; no automatic client launch)
+
+1. In the development client, load a valid single-Head cow Vat, look at it, and
+   run `/mobvats_render cache`. Expect a specimen Mob and `foreignLevels=0`.
+2. Replace/re-encode the Head, including a geometry or life-stage change. After
+   one client tick, check the old visual retires; looking back creates the correct
+   specimen without accumulating replaced Heads. Verify straps/mechanisms too.
+3. Move beyond chunk loading distance (including a previously distance-culled
+   Head), run the cache command, then return. Expect unloaded entries to disappear
+   and valid simulacra to reappear. For a boundary reservoir, unload one side and
+   return; verify physical amount/components and capacity before/after.
+4. Switch dimensions, then disconnect/reconnect or load another world. Check
+   `foreignLevels=0` and no old Head count before looking at new Vats. World exit
+   event delivery can be inspected at `VatRenderLifecycle.levelUnloaded` in the
+   debugger; directly verify the renderer map drops the old values.
+5. Reload resources with F3+T. Inspect `clearVisualCaches` at reload (zero owned
+   entries), then verify a visible Vat recreates its visual and repeated stable
+   frames reuse it. Do not use eventual GC timing as a pass/fail condition.
+
+#### Validation results and remaining gates
+
+Report finalized October 14, 2026. Java 21 / Gradle 9.2.1 used the existing
+workspace cache with `--offline`. All 326 authored Java files remain in the
+pinned formatter's positive roots.
+
+| Check | Result |
+| --- | --- |
+| Baseline `spotlessCheck` | Passed on the clean baseline before editing |
+| Final `spotlessCheck` / `build` | Passed, including CPU cache, existing render/geometry checks, development-hook exclusion and resource/provenance guards |
+| `runGameTestServer` | All **773 required tests passed**: 766 existing plus seven focused ownership regressions; server saved all dimensions and stopped normally |
+| `vatVisualCacheTest` | Passed direct cache ownership/lifecycle assertions; original weak-map characterization mode failed as expected |
+| Standard `buildTestWorld -PworldName=MobVatsAcceptance` | Initially failed with legacy ignored runtime definitions; isolated bundled-default rerun passed at **48,381 observation ticks** |
+| Minimum-XP `buildTestWorld -PworldName=MobVatsMinimumXp -PacceptanceMinimumCowXp=true` | Initially failed with the same legacy definitions; isolated bundled-default rerun passed at **49,791 observation ticks**; minimum native XP events recorded |
+| Untouched baseline acceptance control | Exact SHA source archive, fresh runtime defaults: passed standard acceptance at **5,000 ticks** |
+| `git diff --check` | Passed; Git's LF/CRLF informational warning is not a whitespace error |
+
+The GameTests passed in the combined build/GameTest invocation; that invocation's
+overall failure was solely Gradle's attempt to discover the new CPU entry point
+as a framework test. The harness was given the existing CPU-test discovery
+exclusion, retained under `check`, and the full build passed afterward. Production
+code and server regressions did not change after the 773-test passing run.
+
+Acceptance failures were investigated rather than attributed to historical
+intermittency. Existing `run-world-generator/config/mobvats/mixer/_defaults.json`
+specified **100 mB XP** per culture batch; bundled defaults and the acceptance
+assertion specify **250 mB XP**. The persisted passive definitions also differed
+from fresh defaults. Both original runs failed `Culture batches did not consume
+1000 mB water + 250 mB XP`; P-06 actually produced 7,000/3,000 mB culture under
+those legacy recipes. An untouched SHA archive passed with fresh defaults.
+Both current-code reruns then passed using an ignored init script that selected
+`.cache/lifecycle-clean-runtime`, allowing the unchanged bundled definitions to
+generate there. Original ignored configurations were preserved: Mixer SHA-256
+`4174EF9E887AB5417AD9CA9612676F3980C9D52811873073D84F0886BAE8A76C`, passive
+definitions SHA-256
+`52A1010AB3E6B41833B23057938EFD2CF0A9D2810884501E437A1DC77B780571`.
+No authored recipe/resource was changed. This explains these configuration-bound
+failures; it does not close every historical acceptance intermittency report.
+
+Evidence is retained in ignored `.cache/`: `lifecycle-baseline-spotless.log`,
+`lifecycle-before-corrected.log`, `lifecycle-filter-before.log`,
+`lifecycle-reload-before.log`, `lifecycle-client-baseline.log`,
+`lifecycle-final-validation.log`, `lifecycle-final-build.log`,
+`lifecycle-acceptance.log`, `lifecycle-minimum-xp.log`,
+`lifecycle-baseline-acceptance.log`, `lifecycle-acceptance-clean.log` and
+`lifecycle-minimum-xp-clean.log`. Failed acceptance reports and the exact baseline
+source archive are retained there too. Both successful generated worlds contain
+`generation-complete.txt`, `level.dat` and acceptance reports.
+
+Confirmed defects have narrow, regression-protected corrections. **P0-A actual
+server eviction/reattachment and P0-B live client event-delivery gates remain
+open**, with precise checks above. Missing simulacra are not attributed to the
+cache defect without live evidence. Mixer recipe-planning maintainability remains
+a separate slice after these gates; no planner refactor is included here.
+No client, commit, push, public release, upload or deployment occurred. AI
+placeholder release safeguards remain unchanged.
+
+#### Exact final working-tree inventory
+
+`main`, HEAD unchanged at `bff8e446683d21e1e485993d71a63f41e755d4c2`.
+Eleven modified tracked files and four untracked authored Java files; nothing
+staged. Ignored logs, source-control archive, runtime configs and generated worlds
+are not part of the patch.
+
+```text
+ M build.gradle
+ M docs/03-RESOURCE-ROUTING.md
+ M docs/CODE_MAINTAINABILITY_AUDIT.md
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/conduit/FluidBufferEntity.java
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/conduit/PhysicalFluidStorage.java
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/conduit/ResourceReservation.java
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/mixer/MultiblockMixer.java
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/vat/client/VatClient.java
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/vat/client/render/VatHeadEntityRenderer.java
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/vat/client/render/VatRenderDiagnostics.java
+ M src/main/java/net/impactvector/mobvats/gametest/MixerFluidVoidGameTests.java
+?? src/main/java/net/impactvector/mobvats/gamecontent/multiblock/vat/client/VatRenderLifecycle.java
+?? src/main/java/net/impactvector/mobvats/gamecontent/multiblock/vat/client/render/VatVisualCache.java
+?? src/main/java/net/impactvector/mobvats/gametest/FluidBufferOwnershipGameTests.java
+?? src/test/java/net/impactvector/mobvats/render/VatVisualCacheTest.java
+```
 
 ### P1-A — Formatting depends on an art-generator lexical assumption
 

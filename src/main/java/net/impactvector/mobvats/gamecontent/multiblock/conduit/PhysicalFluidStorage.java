@@ -15,6 +15,7 @@ public final class PhysicalFluidStorage {
     private ConduitTopology topology = ConduitTopology.EMPTY;
     private final Map<BlockPos, List<Cluster>> bulkMembership = new HashMap<>();
     private boolean available = true;
+    private long generation;
     private long bulkSnapshotBuilds;
 
     public long bulkSnapshotBuilds() {
@@ -22,6 +23,7 @@ public final class PhysicalFluidStorage {
     }
     /** Retire endpoint identities on pause, structural invalidation, and chunk unload. */
     public void clear() {
+        ++generation;
         available = false;
         clusters = List.of();
         topology = ConduitTopology.EMPTY;
@@ -229,12 +231,15 @@ public final class PhysicalFluidStorage {
     public static List<FluidBufferEntity> members(Level level, BlockPos min, BlockPos max) {
         var out = new ArrayList<FluidBufferEntity>();
         for (var pos : BlockPos.betweenClosed(min, max))
-            if (level.getBlockEntity(pos) instanceof FluidBufferEntity e) out.add(e);
+            if (level.hasChunkAt(pos)
+                    && level.getBlockEntity(pos) instanceof FluidBufferEntity e
+                    && e.routingAvailable()) out.add(e);
         out.sort(Comparator.comparing(FluidBufferEntity::getBlockPos, ConduitTopology.POSITION));
         return out;
     }
 
     public void compile(List<FluidBufferEntity> members, ConduitTopology topology) {
+        ++generation;
         members = members.stream()
                 .sorted(Comparator.comparing(FluidBufferEntity::getBlockPos, ConduitTopology.POSITION))
                 .toList();
@@ -246,6 +251,9 @@ public final class PhysicalFluidStorage {
         var result = new ArrayList<Cluster>();
         while (!remaining.isEmpty()) {
             var first = remaining.values().iterator().next();
+            var owner = first.getLevel() == null
+                    ? null
+                    : ConduitStructure.containing(first.getLevel(), first.getBlockPos());
             remaining.remove(first.getBlockPos());
             var group = new ArrayList<FluidBufferEntity>();
             group.add(first);
@@ -257,6 +265,10 @@ public final class PhysicalFluidStorage {
                 for (var face : Direction.values()) {
                     var next = remaining.get(e.getBlockPos().relative(face));
                     if (next == null
+                            || (next.getLevel() == null
+                                            ? null
+                                            : ConduitStructure.containing(next.getLevel(), next.getBlockPos()))
+                                    != owner
                             || !first.filter().equals(next.filter())
                             || !content.isEmpty()
                                     && !next.tank.isEmpty()
@@ -270,22 +282,66 @@ public final class PhysicalFluidStorage {
             }
             group.sort(Comparator.comparing(FluidBufferEntity::getBlockPos, ConduitTopology.POSITION));
             var immutable = List.copyOf(group);
-            result.add(new Cluster(immutable, new ClusterTank(immutable)));
+            result.add(new Cluster(immutable, new ClusterTank(immutable, owner)));
         }
         clusters = List.copyOf(result);
     }
 
-    private static final class ClusterTank extends FluidTank {
+    private final class ClusterTank extends FluidTank {
         private final List<FluidBufferEntity> members;
+        private final long compiledGeneration;
+        private final long[] memberEpochs;
+        private final ConduitCuboidController<?> owner;
 
-        ClusterTank(List<FluidBufferEntity> members) {
+        ClusterTank(List<FluidBufferEntity> members, ConduitCuboidController<?> owner) {
             super(Math.multiplyExact(FluidBufferEntity.CAPACITY, members.size()));
             this.members = members;
+            memberEpochs =
+                    members.stream().mapToLong(FluidBufferEntity::storageEpoch).toArray();
+            this.owner = owner;
+            compiledGeneration = generation;
             setValidator(s -> members.stream().allMatch(e -> e.accepts(s)));
             refresh();
         }
 
+        private boolean valid() {
+            if (!available || compiledGeneration != generation) return false;
+            var filter = members.getFirst().filter();
+            FluidStack identity = FluidStack.EMPTY;
+            int index = 0;
+            for (var member : members) {
+                if (member.storageEpoch() != memberEpochs[index++]
+                        || !member.routingAvailable()
+                        || !filter.equals(member.filter())) return false;
+                var level = member.getLevel();
+                var pos = member.getBlockPos();
+                // The loaded guard precedes every world lookup, including the unload-callback interval.
+                if (level != null
+                        && (!level.hasChunkAt(pos)
+                                || level.getBlockEntity(pos) != member
+                                || ConduitStructure.containing(level, pos) != owner)) return false;
+                var stored = member.tank.getFluid();
+                if (!stored.isEmpty()) {
+                    if (!identity.isEmpty() && !FluidStack.isSameFluidSameComponents(identity, stored)) return false;
+                    identity = stored;
+                }
+            }
+            return true;
+        }
+
+        public int getCapacity() {
+            return valid() ? super.getCapacity() : 0;
+        }
+
+        public boolean isFluidValid(FluidStack stack) {
+            return valid() && super.isFluidValid(stack);
+        }
+
         private void refresh() {
+            if (!valid()) {
+                fluid = FluidStack.EMPTY;
+                return;
+            }
             FluidStack value = FluidStack.EMPTY;
             for (var e : members)
                 if (!e.tank.isEmpty()) {
@@ -311,6 +367,7 @@ public final class PhysicalFluidStorage {
         }
 
         public void setFluid(FluidStack value) {
+            if (!valid()) throw new IllegalStateException("Retired fluid cluster");
             super.setFluid(value.copy());
             onContentsChanged();
         }
@@ -327,16 +384,19 @@ public final class PhysicalFluidStorage {
         }
 
         public int fill(FluidStack stack, IFluidHandler.FluidAction action) {
+            if (!valid()) return 0;
             refresh();
             return super.fill(stack, action);
         }
 
         public FluidStack drain(FluidStack stack, IFluidHandler.FluidAction action) {
+            if (!valid()) return FluidStack.EMPTY;
             refresh();
             return super.drain(stack, action);
         }
 
         public FluidStack drain(int amount, IFluidHandler.FluidAction action) {
+            if (!valid()) return FluidStack.EMPTY;
             refresh();
             return super.drain(amount, action);
         }
@@ -365,7 +425,7 @@ public final class PhysicalFluidStorage {
         } else if (ConduitPerformance.ENABLED) ++ConduitPerformance.storageHits;
         // Availability is live, including the interval before deferred structural recompilation.
         return members.stream()
-                .filter(c -> c.members().stream().noneMatch(FluidBufferEntity::isRemoved))
+                .filter(c -> c.tank().getCapacity() > 0)
                 .map(Cluster::tank)
                 .toList();
     }

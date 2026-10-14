@@ -61,6 +61,8 @@ public final class ResourceReservation {
         for (var e : beforeFluids.entrySet())
             if (capacities.get(e.getKey()) != e.getKey().getCapacity()
                     || !FluidStack.matches(e.getValue(), e.getKey().getFluid())) return false;
+        for (var e : afterFluids.entrySet())
+            if (!e.getValue().isEmpty() && !e.getKey().isFluidValid(e.getValue())) return false;
         try {
             afterItems.forEach((s, v) -> {
                 if (!ItemStack.matches(beforeItems.get(s), v)) s.handler().setStackInSlot(s.slot(), v.copy());

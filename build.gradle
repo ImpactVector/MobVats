@@ -16,7 +16,7 @@ tasks.register('renderBufferTest', JavaExec) {
     mainClass = 'net.impactvector.mobvats.render.VatBufferOrderingTest'
     description = 'CPU-only Minecraft buffer ordering regression; no game or window is launched.'
 }
-tasks.named('test') { exclude '**/VatBufferOrderingTest*', '**/MixerShaftGeometryTest*' }
+tasks.named('test') { exclude '**/VatBufferOrderingTest*', '**/MixerShaftGeometryTest*', '**/VatVisualCacheTest*' }
 tasks.named('check') { dependsOn tasks.named('renderBufferTest') }
 tasks.register('mixerShaftGeometryTest', JavaExec) {
     dependsOn tasks.named('testClasses')
@@ -27,6 +27,14 @@ tasks.register('mixerShaftGeometryTest', JavaExec) {
     description = 'CPU-only formed Mixer Shaft geometry regression; no client or world is launched.'
 }
 tasks.named('check') { dependsOn tasks.named('mixerShaftGeometryTest') }
+tasks.register('vatVisualCacheTest', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'net.impactvector.mobvats.render.VatVisualCacheTest'
+    if (providers.gradleProperty('vatCacheBaseline').isPresent()) args '--baseline'
+    description = 'CPU-only specimen cache retirement checks; no client is launched.'
+}
+tasks.named('check') { dependsOn tasks.named('vatVisualCacheTest') }
 def manualWorldName = providers.gradleProperty('worldName').getOrElse('MobVatsTest')
 if (!(manualWorldName ==~ /[A-Za-z0-9][A-Za-z0-9_-]{0,63}/) ||
     manualWorldName.toUpperCase(java.util.Locale.ROOT) ==~ /CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]/) {

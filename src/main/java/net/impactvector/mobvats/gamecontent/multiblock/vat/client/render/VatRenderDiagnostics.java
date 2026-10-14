@@ -101,6 +101,12 @@ public final class VatRenderDiagnostics {
         if (FMLLoader.isProduction()) return;
         event.getDispatcher()
                 .register(Commands.literal("mobvats_render")
+                        .then(Commands.literal("cache").executes(c -> {
+                            var ownership = VatHeadEntityRenderer.cacheOwnershipDiagnostics();
+                            com.mojang.logging.LogUtils.getLogger().info("Vat specimen cache: {}", ownership);
+                            c.getSource().sendSuccess(() -> Component.literal(ownership), false);
+                            return 1;
+                        }))
                         .then(Commands.literal("trace")
                                 .then(Commands.argument("seconds", IntegerArgumentType.integer(1, 120))
                                         .executes(c -> {
