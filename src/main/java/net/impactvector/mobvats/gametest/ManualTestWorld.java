@@ -41,6 +41,8 @@ public final class ManualTestWorld {
     private static boolean verified;
     private static boolean operatorsSuspended;
     private static int operatorsResumeTick;
+    private static final int OPERATOR_REPLENISH_TICKS =
+            2 * net.impactvector.mobvats.gamecontent.multiblock.vat.process.VatProcessEngine.CADENCE;
     private static final int Y = -60;
 
     @SubscribeEvent
@@ -306,6 +308,19 @@ public final class ManualTestWorld {
                 return;
             }
             if (ticks < operatorsResumeTick) return;
+            // A final brushing can break its tool on this exact observation tick. Let the
+            // native output-drain/acquisition cadence mount the staged replacement, then
+            // apply every original acceptance check. A blocked/exhausted rig still fails.
+            if (operatorsResumeTick != 0
+                    && ticks < operatorsResumeTick + OPERATOR_REPLENISH_TICKS
+                    && OperatorVatFixtures.brushReplacementPending(level)) {
+                LogUtils.getLogger()
+                        .info(
+                                "MOBVATS OPERATOR REPLENISHMENT WAIT tick={} deadline={}",
+                                ticks,
+                                operatorsResumeTick + OPERATOR_REPLENISH_TICKS);
+                return;
+            }
             active = false;
             var manifest = new StringBuilder(
                     "# MobVats manual fixtures\n\nID | Machine | Constructed | GameTest method | Origin | Description\n---|---|---|---|---|---\n");

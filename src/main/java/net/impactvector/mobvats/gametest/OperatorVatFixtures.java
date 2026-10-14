@@ -68,6 +68,28 @@ final class OperatorVatFixtures {
         PAUSED.clear();
     }
 
+    /** Only a broken brush with a real staged replacement can defer the final snapshot. */
+    static boolean brushReplacementPending(ServerLevel level) {
+        for (var fixture : ROW) {
+            if (fixture.input() != Items.BRUSH) continue;
+            var origin = fixture.origin();
+            if (brushReplacementPending(
+                    (VatToolPortEntity) level.getBlockEntity(origin.offset(2, 1, 4)),
+                    (VatItemPortEntity) level.getBlockEntity(origin.offset(1, 1, 4)))) return true;
+        }
+        return false;
+    }
+
+    static boolean brushReplacementPending(VatToolPortEntity tool, VatItemPortEntity input) {
+        return tool.heldItem().isEmpty() && input.staging().getStackInSlot(0).is(Items.BRUSH);
+    }
+
+    static boolean suppliedInput(VatToolPortEntity tool, VatItemPortEntity input, Item expected) {
+        return tool.heldItem().is(expected)
+                || (expected == Items.BUCKET
+                        && input.staging().getStackInSlot(0).is(expected));
+    }
+
     static void build(ServerLevel level) throws java.io.IOException {
         ROW.clear();
         PAUSED.clear();
@@ -415,13 +437,15 @@ final class OperatorVatFixtures {
                 require(LOADED.contains(f.id()), f, "required input never entered Input Port through hopper");
                 var tool = (VatToolPortEntity) level.getBlockEntity(o.offset(2, 1, 4));
                 require(ACQUIRED.contains(f.id()), f, "Tool Port never acquired supplied input");
-                var staged = ((VatItemPortEntity) level.getBlockEntity(o.offset(1, 1, 4)))
-                        .staging()
-                        .getStackInSlot(0);
+                var input = (VatItemPortEntity) level.getBlockEntity(o.offset(1, 1, 4));
+                var staged = input.staging().getStackInSlot(0);
                 require(
-                        tool.heldItem().is(f.input()) || (f.input() == Items.BUCKET && staged.is(f.input())),
+                        suppliedInput(tool, input, f.input()),
                         f,
-                        "Tool Port has no supplied tool/catalyst or next container");
+                        "Tool Port has no supplied tool/catalyst or next container: held=" + tool.heldItem()
+                                + "; staged=" + staged + "; results="
+                                + tool.results().snapshot()
+                                + "; time=" + level.getGameTime());
                 require(
                         ToolInteractions.uses(level, head.getIdentity(), new ItemStack(f.input()))
                                 .contains(f.use()),

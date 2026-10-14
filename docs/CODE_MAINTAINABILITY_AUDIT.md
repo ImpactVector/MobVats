@@ -894,6 +894,71 @@ status message, isolated-build/receipt safeguards and this evidence update.
 ?? src/main/java/net/impactvector/mobvats/gametest/client/ClientLifecycleAcceptance.java
 ```
 
+### Minimum-XP brush observation closure — October 14, 2026
+
+This follow-up supersedes the unresolved brush intermittency recorded above.
+The failure is a final-observation race in the development world generator,
+not a passive chunk-retirement defect or loss of supplied brushes.
+
+After the long P-06 observation, the operator row resumed for exactly 100 ticks
+before the complete verification. A fresh brush paused halfway through its
+first operation can break on that last observation cadence. Its scute must
+drain before the next acquisition mounts the staged replacement. The strict
+held-tool assertion correctly rejects that transient empty port, even though
+the normal resource pipeline replenishes it ten ticks later.
+
+Two isolated diagnostic minimum-XP worlds passed at 49,791 ticks with the
+original fixed observation timing (`.cache/brush-baseline.log` and
+`.cache/brush-baseline2.log`). They did not reproduce the random full-world
+failure. Transition tracing showed actual brush breakage with staged stock
+and a ten-tick output-drain/reacquisition interval. The new deterministic
+`EnvironmentalToolGameTests.armadilloResumeSnapshotCatchesBreakageAndReplenishes`
+then reproduces the precise failing snapshot: it pauses a fresh brush with ten
+ticks of committed progress, resumes ordinary controller processing for 100
+ticks, requires the original supplied-tool predicate to reject the empty port,
+and verifies a genuinely mounted replacement and retained scute ten ticks
+later. No acquisition, output drain or processing tick is substituted during
+that observation interval.
+
+`ManualTestWorld` retains the existing 100-tick resumed-processing minimum.
+Only an empty brush port with an actual brush in the input staging slot can
+defer its final snapshot, for at most two ordinary ten-tick cadences. Every
+original acceptance assertion still runs; a staged brush never satisfies the
+final held-brush assertion. Missing stock fails immediately, and a blocked or
+nonreplenishing rig reaches the hard deadline and fails the original checks.
+The existing bucket exception is unchanged. Failure messages now include held
+input, staged input, pending output and game time.
+
+A second new regression,
+`armadilloAcceptanceRequiresMountedReplacementAfterBreakage`, commits a real
+brush break, rejects staged stock as final acceptance evidence, verifies that
+pending scutes block acquisition, and lets ordinary controller ticks drain the
+output and mount the conserved replacement. The build and **all 775 required
+GameTests** passed in `.cache/brush-final-validation.log`.
+
+The same final validation invocation passed complete minimum-XP world
+acceptance at **49,791 observation ticks**, with all ten mirrored fixtures and
+nine operator Vats verified. The generated manifest confirms one vanilla XP
+point before yield, O-09 delivering 239 scutes through its output chest, and
+P-06 producing 1,000 mB of culture through the real fluid route. The disposable
+world is `.cache/p0-world-runtime/saves/MobVatsBrushFixed`; its fresh
+`generation-complete.txt` receipt confirms full verification. Formatting,
+CPU/resource/provenance checks and development-hook exclusion also passed.
+
+Standard acceptance passed separately at **48,381 observation ticks** in
+`.cache/brush-standard-validation.log` (`BUILD SUCCESSFUL`). Its first cohort
+naturally rolled 240 mB XP, so the unchanged 250 mB culture requirement kept
+the existing replacement-cohort path active. All ten mirrored fixtures and
+nine operator Vats passed final verification, with a fresh receipt in
+`.cache/p0-world-runtime/saves/MobVatsBrushStandard`.
+
+Only development GameTest/acceptance sources and this audit change. Production
+tool code, durability, stock quantity (54 brushes), processing balance,
+recipes and acceptance predicates remain unchanged. Temporary transition
+logging is removed. The build skipped normal development-default invalidation
+with `-PisolatedAcceptance`, and the normal Mixer/passive defaults retain the
+same SHA-256 hashes recorded in the passive eviction closure.
+
 ### P1-A — Formatting depends on an art-generator lexical assumption
 
 **Location/example:** `gradle/procedural-art.gradle:247`–`:249`; `C/ConduitGeometry.java:11`. Whitespace-only Java formatting breaks the exact diameter regex.

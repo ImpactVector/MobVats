@@ -231,6 +231,103 @@ public final class EnvironmentalToolGameTests {
                 }));
     }
 
+    @GameTest(template = "empty", timeoutTicks = 70)
+    public static void armadilloAcceptanceRequiresMountedReplacementAfterBreakage(GameTestHelper h) {
+        rig(h, "armadillo");
+        var output = TOOL.east();
+        h.setBlock(output, Content.state(VatPartType.ItemPort));
+        ((VatItemPortEntity) h.getBlockEntity(output))
+                .setIoDirection(it.zerono.mods.zerocore.lib.data.IoDirection.Output);
+        h.runAtTickTime(
+                35,
+                () -> withDefaults("armadillo", () -> {
+                    var input = (VatItemPortEntity) h.getBlockEntity(SOURCE);
+                    input.staging().setStackInSlot(0, new ItemStack(Items.BRUSH));
+                    var brush = new ItemStack(Items.BRUSH);
+                    brush.setDamageValue(brush.getMaxDamage() - 1);
+                    tool(h).setHeldItem(brush);
+                    var state = new ProcessState();
+                    var definition = operation("armadillo");
+                    execute(h, state, definition);
+                    h.assertTrue(execute(h, state, definition).changed(), "Brush did not commit its final scute");
+                    h.assertTrue(
+                            tool(h).heldItem().isEmpty() && OperatorVatFixtures.brushReplacementPending(tool(h), input),
+                            "Expected a broken brush with staged replenishment");
+                    h.assertTrue(
+                            !OperatorVatFixtures.suppliedInput(tool(h), input, Items.BRUSH),
+                            "Acceptance incorrectly allowed a staged brush to substitute for a mounted tool");
+                    var context = context(h);
+                    var profile = PassiveMobDefinitionRegistry.resolve(head(h).getIdentity());
+                    h.assertTrue(
+                            !ToolInteractions.acquire(context, profile).changed(),
+                            "Pending scute did not block acquisition");
+                }));
+        // Let ordinary controller ticks drain the scute and acquire the routed replacement.
+        h.runAtTickTime(55, () -> {
+            var input = (VatItemPortEntity) h.getBlockEntity(SOURCE);
+            h.assertTrue(
+                    ((VatItemPortEntity) h.getBlockEntity(output))
+                            .staging()
+                            .getStackInSlot(0)
+                            .is(Items.ARMADILLO_SCUTE),
+                    "Output drain lost the final scute");
+            h.assertTrue(
+                    OperatorVatFixtures.suppliedInput(tool(h), input, Items.BRUSH)
+                            && !OperatorVatFixtures.brushReplacementPending(tool(h), input)
+                            && tool(h).heldItem().getDamageValue() <= 16
+                            && input.staging().getStackInSlot(0).isEmpty(),
+                    "Acceptance did not require an actually mounted, conserved replacement brush");
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 210)
+    public static void armadilloResumeSnapshotCatchesBreakageAndReplenishes(GameTestHelper h) {
+        rig(h, "armadillo");
+        var output = TOOL.east();
+        h.setBlock(output, Content.state(VatPartType.ItemPort));
+        ((VatItemPortEntity) h.getBlockEntity(output))
+                .setIoDirection(it.zerono.mods.zerocore.lib.data.IoDirection.Output);
+        h.runAtTickTime(
+                35,
+                () -> withDefaults("armadillo", () -> {
+                    ((VatItemPortEntity) h.getBlockEntity(SOURCE))
+                            .staging()
+                            .setStackInSlot(0, new ItemStack(Items.BRUSH));
+                    tool(h).setHeldItem(new ItemStack(Items.BRUSH));
+                    var context = context(h);
+                    var state = context.state().process("mobvats:armadillo_brush");
+                    h.assertTrue(
+                            execute(h, state, operation("armadillo")).reason() == ProcessResult.Reason.RUNNING
+                                    && state.elapsed == 10
+                                    && tool(h).heldItem().getDamageValue() == 0,
+                            "Pause must preserve a fresh brush halfway through its first operation");
+                    context.controller().setMachineActive(false);
+                }));
+        h.runAtTickTime(
+                75, () -> head(h).getMultiblockController().orElseThrow().setMachineActive(true));
+        h.runAtTickTime(175, () -> {
+            var input = (VatItemPortEntity) h.getBlockEntity(SOURCE);
+            h.assertTrue(
+                    OperatorVatFixtures.brushReplacementPending(tool(h), input)
+                            && !OperatorVatFixtures.suppliedInput(tool(h), input, Items.BRUSH),
+                    "The fixed 100-tick resume snapshot must expose genuine brush breakage, not pass staged stock");
+        });
+        h.runAtTickTime(185, () -> {
+            var input = (VatItemPortEntity) h.getBlockEntity(SOURCE);
+            h.assertTrue(
+                    OperatorVatFixtures.suppliedInput(tool(h), input, Items.BRUSH)
+                            && tool(h).heldItem().getDamageValue() == 0
+                            && input.staging().getStackInSlot(0).isEmpty()
+                            && ((VatItemPortEntity) h.getBlockEntity(output))
+                                    .staging()
+                                    .getStackInSlot(0)
+                                    .is(Items.ARMADILLO_SCUTE),
+                    "Native acquisition did not restore the strict acceptance state within one more cadence");
+            h.succeed();
+        });
+    }
+
     @GameTest(template = "empty", timeoutTicks = 10)
     public static void environmentalDefinitionValidationAndExistingEggProcess(GameTestHelper h) {
         for (var entity : List.of("goat", "sniffer", "armadillo")) {
