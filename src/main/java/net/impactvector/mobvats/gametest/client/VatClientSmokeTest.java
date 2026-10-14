@@ -48,6 +48,10 @@ public final class VatClientSmokeTest {
             if (mc.screen instanceof AccessibilityOnboardingScreen) {
                 mc.setScreen(new TitleScreen());
             }
+            if (Boolean.getBoolean("mobvats.clientLifecycleAcceptance") && ticks >= 250) {
+                ClientLifecycleAcceptance.tick(mc);
+                return;
+            }
             if (!opened && mc.screen instanceof TitleScreen) {
                 opened = true;
                 String name = "MobVats-Smoke";
@@ -128,6 +132,8 @@ public final class VatClientSmokeTest {
                             .getPlayerList()
                             .getPlayers()
                             .getFirst();
+                    if (Boolean.getBoolean("mobvats.clientLifecycleAcceptance"))
+                        net.impactvector.mobvats.gametest.ClientLifecycleFixtures.setup(level);
                     player.connection.teleport(5.5, -59.5, -4.5, 36, 5);
                 });
             }
@@ -163,6 +169,7 @@ public final class VatClientSmokeTest {
             if (ticks == 250) {
                 check(mc, true);
                 if (!RELOAD) capture(mc, "03-reformed.png");
+                if (Boolean.getBoolean("mobvats.clientLifecycleAcceptance")) return;
                 LogUtils.getLogger().info("MOBVATS CLIENT SMOKE PASSED (reload={})", RELOAD);
                 mc.stop();
             }
@@ -246,6 +253,10 @@ public final class VatClientSmokeTest {
         for (var pos : new BlockPos[] {BASE.offset(0, 1, 0), BASE.offset(2, 2, 2), BASE.offset(0, 1, 1)}) {
             var glass = (VatGlassEntity) mc.level.getBlockEntity(pos);
             var state = mc.level.getBlockState(pos);
+            if (state.isAir()) {
+                require(!assembled && glass == null, "Assembled glass position was missing");
+                continue;
+            }
             var model = mc.getBlockRenderer().getBlockModel(state);
             require(model instanceof VatGlassModel, "Glass model wrapper was not installed");
             var data = glass.getModelData();
@@ -253,9 +264,7 @@ public final class VatClientSmokeTest {
             require(skin != null && skin.formed() == assembled, "Glass model data did not follow assembly");
             var layers = model.getRenderTypes(state, RandomSource.create(), data);
             require(
-                    assembled
-                            ? layers.contains(RenderType.translucent()) && !layers.contains(RenderType.cutout())
-                            : layers.contains(RenderType.cutout()) && !layers.contains(RenderType.translucent()),
+                    layers.contains(RenderType.translucent()) && !layers.contains(RenderType.cutout()),
                     "Glass selected duplicate or incorrect render layers");
             if (assembled) {
                 var quads = model.getQuads(state, null, RandomSource.create(), data, RenderType.translucent());
@@ -304,6 +313,7 @@ public final class VatClientSmokeTest {
     }
 
     private static void capture(Minecraft mc, String name) {
+        if (Boolean.getBoolean("mobvats.clientLifecycleAcceptance")) return;
         Screenshot.grab(
                 mc.gameDirectory,
                 name,

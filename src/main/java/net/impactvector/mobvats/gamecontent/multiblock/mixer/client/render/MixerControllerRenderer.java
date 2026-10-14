@@ -47,8 +47,51 @@ public final class MixerControllerRenderer implements BlockEntityRenderer<Abstra
     }
 
     private final WeakHashMap<AbstractMixerEntity, Geometry> cache = new WeakHashMap<>();
+    private static final java.util.Set<MixerControllerRenderer> INSTANCES =
+            java.util.Collections.newSetFromMap(new WeakHashMap<>());
 
-    public MixerControllerRenderer(BlockEntityRendererProvider.Context context) {}
+    public MixerControllerRenderer(BlockEntityRendererProvider.Context context) {
+        INSTANCES.add(this);
+    }
+
+    public static void clearVisualCaches() {
+        for (var renderer : INSTANCES) renderer.cache.clear();
+    }
+
+    public static void retireChunk(net.minecraft.world.level.Level level, net.minecraft.world.level.ChunkPos chunk) {
+        for (var renderer : INSTANCES)
+            renderer.cache
+                    .keySet()
+                    .removeIf(part -> part.getLevel() == level
+                            && new net.minecraft.world.level.ChunkPos(part.getBlockPos()).equals(chunk));
+    }
+
+    public static void retireLevel(net.minecraft.world.level.Level level) {
+        for (var renderer : INSTANCES) renderer.cache.keySet().removeIf(part -> part.getLevel() == level);
+    }
+
+    public static void maintainVisualCaches(net.minecraft.client.multiplayer.ClientLevel current) {
+        for (var renderer : INSTANCES)
+            renderer.cache.entrySet().removeIf(entry -> {
+                var part = entry.getKey();
+                return current == null
+                        || part.getLevel() != current
+                        || part.isRemoved()
+                        || !part.isMachineAssembled()
+                        || current.getChunkSource()
+                                        .getChunk(
+                                                part.getBlockPos().getX() >> 4,
+                                                part.getBlockPos().getZ() >> 4,
+                                                net.minecraft.world.level.chunk.status.ChunkStatus.FULL,
+                                                false)
+                                == null
+                        || current.getBlockEntity(part.getBlockPos()) != part
+                        || part.getMultiblockController()
+                                        .flatMap(MultiblockMixer::renderDescriptor)
+                                        .orElse(null)
+                                != entry.getValue().descriptor();
+            });
+    }
     /** Opt-in client smoke coverage; bakes rendering meshes without constructing or changing a world. */
     public static void assertSmokeGeometry() {
         var assembly = new net.impactvector.mobvats.gamecontent.multiblock.mixer.MixerAssembly(

@@ -26,6 +26,7 @@
   "multiblock.mobvats.one_specimen": "One controller and at least one encoded Head required: controllers %s, harnesses %s, sumps %s, heads %s.",
   "multiblock.mobvats.encoded_head": "Encode the specimen Head with resolved geometry.",
   "multiblock.mobvats.flesh_column": "Required specimen Flesh is missing.",
+  "multiblock.mobvats.unloaded_structure": "A chunk containing the machine structure is unloaded.",
   "multiblock.mobvats.substrate": "Insufficient specimen substrate: %s head/flesh blocks; need %s.",
   "multiblock.mobvats.extra_flesh": "Unowned Flesh: %s total, %s claimed by saved specimen geometry. Remove this extra Flesh.",
   "multiblock.mobvats.room": "Insufficient specimen room: interior %s x %s x %s; need %s x %s x %s (X,Y,Z).",

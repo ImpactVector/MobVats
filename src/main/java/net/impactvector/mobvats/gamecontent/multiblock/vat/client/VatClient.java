@@ -273,8 +273,12 @@ public final class VatClient {
 
     @SubscribeEvent
     public static void registerReloadListeners(RegisterClientReloadListenersEvent event) {
-        event.registerReloadListener((net.minecraft.server.packs.resources.ResourceManagerReloadListener)
-                manager -> VatHeadEntityRenderer.clearVisualCaches());
+        event.registerReloadListener((net.minecraft.server.packs.resources.ResourceManagerReloadListener) manager -> {
+            VatHeadEntityRenderer.clearVisualCaches();
+            net.impactvector.mobvats.gamecontent.multiblock.mixer.client.render.MixerControllerRenderer
+                    .clearVisualCaches();
+            net.impactvector.mobvats.gamecontent.multiblock.conduit.client.FluidBufferRenderer.clearVisualCaches();
+        });
     }
 
     @SubscribeEvent

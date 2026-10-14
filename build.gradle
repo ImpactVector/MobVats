@@ -40,9 +40,10 @@ if (!(manualWorldName ==~ /[A-Za-z0-9][A-Za-z0-9_-]{0,63}/) ||
     manualWorldName.toUpperCase(java.util.Locale.ROOT) ==~ /CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]/) {
     throw new GradleException('worldName must be a simple folder name (letters, digits, hyphens, underscores; max 64 characters).')
 }
-def manualSaves = file('run/saves').toPath().toAbsolutePath().normalize()
+def isolatedAcceptance = providers.gradleProperty('isolatedAcceptance').isPresent()
+def manualSaves = file(isolatedAcceptance ? '.cache/p0-world-runtime/saves' : 'run/saves').toPath().toAbsolutePath().normalize()
 def manualWorld = manualSaves.resolve(manualWorldName).normalize()
-def manualServerDir = file('run-world-generator')
+def manualServerDir = file(isolatedAcceptance ? '.cache/p0-world-runtime/server' : 'run-world-generator')
 // Operator tools belong only to the normal manual client run, never shared classpaths.
 configurations {
     manualClientRuntime {
@@ -86,7 +87,20 @@ neoForge {
             systemProperty 'mobvats.clientSmokeTest', 'true'
             systemProperty 'mobvats.smokeReload', 'true'
         }
+        clientLifecycleAcceptance {
+            client()
+            gameDirectory = file('.cache/p0-client-runtime')
+            systemProperty 'mobvats.clientSmokeTest', 'true'
+            systemProperty 'mobvats.clientLifecycleAcceptance', 'true'
+        }
         server { server(); programArgument '--nogui' }
+        lifecycleAcceptanceServer {
+            server()
+            gameDirectory = file('.cache/p0-server-runtime')
+            programArgument '--nogui'
+            systemProperty 'mobvats.lifecycleAcceptance', 'true'
+            systemProperty 'mobvats.passiveOnlyChunkProbe', providers.gradleProperty('passiveOnlyChunkProbe').isPresent().toString()
+        }
         buildTestWorldServer {
             server()
             gameDirectory = manualServerDir
@@ -140,6 +154,7 @@ apply from: 'gradle/spotless.gradle'
 
 // Local development housekeeping only; never attached to a Minecraft run task.
 def invalidateDevMixerDefaults = tasks.register('invalidateDevMixerDefaults') {
+    onlyIf('Isolated acceptance preserves operator runtime configuration') { !isolatedAcceptance }
     group = 'MobVats development'
     description = 'Invalidate only run/config/mobvats/mixer/_defaults.json; preserve authored siblings.'
     def defaultsFile = layout.projectDirectory.file('run/config/mobvats/mixer/_defaults.json').asFile
@@ -301,6 +316,29 @@ tasks.register('verifyRenderResources') {
     }
 }
 tasks.named('check').configure { dependsOn tasks.named('verifyRenderResources') }
+
+def lifecycleServerResult = layout.projectDirectory.file('.cache/p0-server-runtime/world/p0-lifecycle-result.txt')
+def lifecycleClientLog = layout.projectDirectory.file('.cache/p0-client-runtime/logs/latest.log')
+tasks.named('runLifecycleAcceptanceServer').configure {
+    doFirst {
+        // A startup crash must not reuse a passing receipt from an earlier disposable run.
+        java.nio.file.Files.deleteIfExists(lifecycleServerResult.asFile.toPath())
+    }
+    doLast {
+        def result = lifecycleServerResult.asFile
+        if (!result.exists() || !result.text.startsWith('P0 SERVER PROBE PASSED')) {
+            throw new GradleException('Server lifecycle probe did not pass: ' + (result.exists() ? result.text : 'result missing'))
+        }
+    }
+}
+tasks.named('runClientLifecycleAcceptance').configure {
+    doLast {
+        def log = lifecycleClientLog.asFile
+        if (!log.exists() || !log.text.contains('P0 CLIENT PROBE PASSED') || log.text.contains('P0 CLIENT PROBE FAILED')) {
+            throw new GradleException('Client lifecycle probe failed; see .cache/p0-client-runtime/logs/latest.log')
+        }
+    }
+}
 
 def smokeLog = layout.projectDirectory.file('run-client-smoke/logs/latest.log')
 ['runClientSmokeTest', 'runClientReloadTest'].each { runName ->

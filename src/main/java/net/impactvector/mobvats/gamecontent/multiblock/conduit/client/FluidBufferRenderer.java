@@ -60,8 +60,44 @@ public final class FluidBufferRenderer implements BlockEntityRenderer<FluidBuffe
     }
 
     private final Map<FluidBufferEntity, State> states = new WeakHashMap<>();
+    private static final java.util.Set<FluidBufferRenderer> INSTANCES = Collections.newSetFromMap(new WeakHashMap<>());
 
-    public FluidBufferRenderer(BlockEntityRendererProvider.Context context) {}
+    public FluidBufferRenderer(BlockEntityRendererProvider.Context context) {
+        INSTANCES.add(this);
+    }
+
+    public static void clearVisualCaches() {
+        for (var renderer : INSTANCES) renderer.states.clear();
+    }
+
+    public static void retireChunk(net.minecraft.world.level.Level level, net.minecraft.world.level.ChunkPos chunk) {
+        for (var renderer : INSTANCES)
+            renderer.states
+                    .keySet()
+                    .removeIf(part -> part.getLevel() == level
+                            && new net.minecraft.world.level.ChunkPos(part.getBlockPos()).equals(chunk));
+    }
+
+    public static void retireLevel(net.minecraft.world.level.Level level) {
+        for (var renderer : INSTANCES) renderer.states.keySet().removeIf(part -> part.getLevel() == level);
+    }
+
+    public static void maintainVisualCaches(net.minecraft.client.multiplayer.ClientLevel current) {
+        for (var renderer : INSTANCES)
+            renderer.states
+                    .keySet()
+                    .removeIf(part -> current == null
+                            || part.getLevel() != current
+                            || part.isRemoved()
+                            || current.getChunkSource()
+                                            .getChunk(
+                                                    part.getBlockPos().getX() >> 4,
+                                                    part.getBlockPos().getZ() >> 4,
+                                                    net.minecraft.world.level.chunk.status.ChunkStatus.FULL,
+                                                    false)
+                                    == null
+                            || current.getBlockEntity(part.getBlockPos()) != part);
+    }
 
     public static CableRenderer.Mesh mesh(List<FluidBufferArt.Panel> panels, FluidBufferArt.Material material) {
         var quads = new ArrayList<CableRenderer.Quad>();

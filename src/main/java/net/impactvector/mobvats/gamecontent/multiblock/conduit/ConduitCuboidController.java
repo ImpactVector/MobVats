@@ -105,6 +105,18 @@ public abstract class ConduitCuboidController<C extends ConduitCuboidController<
         ConduitStructure.register(this);
     }
 
+    @Override
+    protected boolean isMachineWhole(it.zerono.mods.zerocore.lib.multiblock.validation.IMultiblockValidator validator) {
+        // Passive shell cells have no ZC part to pause the machine during chunk eviction.
+        // Validate availability before ZC enumerates world cells, using the last complete envelope.
+        var bounds = structuralEnvelope;
+        if (!getWorld().isClientSide && bounds != null && !getWorld().hasChunksAt(bounds.getMin(), bounds.getMax())) {
+            validator.setLastError("multiblock.mobvats.unloaded_structure");
+            return false;
+        }
+        return super.isMachineWhole(validator);
+    }
+
     public void invalidateConduitBounds() {
         conduitBounds = null;
     }

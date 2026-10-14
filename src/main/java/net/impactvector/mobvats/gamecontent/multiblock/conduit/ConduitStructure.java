@@ -227,5 +227,32 @@ public final class ConduitStructure {
         for (var mixer : takeMixerGeometryDirty(event.getLevel())) mixer.recheckPhysicalAssembly();
     }
 
+    @SubscribeEvent
+    public static void chunkUnloaded(net.neoforged.neoforge.event.level.ChunkEvent.Unload event) {
+        chunkAvailabilityChanged(event, true);
+    }
+
+    @SubscribeEvent
+    public static void chunkLoaded(net.neoforged.neoforge.event.level.ChunkEvent.Load event) {
+        chunkAvailabilityChanged(event, false);
+    }
+
+    private static void chunkAvailabilityChanged(
+            net.neoforged.neoforge.event.level.ChunkEvent event, boolean unloading) {
+        if (!(event.getLevel() instanceof net.minecraft.server.level.ServerLevel level)) return;
+        var chunk = event.getChunk().getPos();
+        // Only inspect cached bounds here. Unload events must never fetch blocks or chunks.
+        for (var controller : controllers()) {
+            var bounds = controller.structuralEnvelope();
+            if (controller.getWorld() == level
+                    && (unloading || !controller.isAssembled())
+                    && bounds != null
+                    && chunk.x >= (bounds.getMinX() >> 4)
+                    && chunk.x <= (bounds.getMaxX() >> 4)
+                    && chunk.z >= (bounds.getMinZ() >> 4)
+                    && chunk.z <= (bounds.getMaxZ() >> 4)) enqueue(controller, true);
+        }
+    }
+
     private ConduitStructure() {}
 }

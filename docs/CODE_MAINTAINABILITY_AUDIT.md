@@ -542,6 +542,358 @@ are not part of the patch.
 ?? src/test/java/net/impactvector/mobvats/render/VatVisualCacheTest.java
 ```
 
+### P0 runtime acceptance follow-up — October 14, 2026
+
+The P0-A blocker recorded in this historical follow-up is superseded by the
+passive-only eviction closure below.
+
+**P0-A: BLOCKED — runtime verification unavailable for the passive-only partial
+eviction criterion. Full-machine eviction/reattachment passed in the actual
+dedicated server. This is partial coverage, so P0-A remains open.**
+
+**P0-B: PASS — runtime verified.** Actual graphical client events, rendered
+cache contents, resource reload, disassembly/reformation, model updates and
+disconnect/rejoin were exercised for Vat, Mixer, Buffer and conduit paths.
+Human visual acceptance and eventual garbage collection are separate claims.
+
+#### Baseline and isolation
+
+The current starting tree was clean `main`, HEAD
+`f1505fc` (`fix: enforce storage and render cache lifecycles and relocate Gradle
+cache`), rather than the historical uncommitted `bff8e44` handoff. The previous
+corrections and all seven ownership regressions were already committed.
+The sibling workspace instructions were available and read. No existing changes
+were reset. Java 21 (Eclipse Adoptium), Gradle 9.2.1, Minecraft 1.21.1,
+NeoForge 21.1.252 and ZeroCore2 2.4.18 were used with `--offline` and the standard
+`../workspace/.cache/gradle` cache. The pasted request explicitly authorized
+this task's autonomous client execution. No input takeover, screenshots,
+manual play, commit, push, publication or procedural-art change occurred.
+
+All new runs use ignored disposable directories:
+
+- `.cache/p0-server-runtime`: flat dedicated server, no players, view/simulation
+  distance 2, port 25575, harness tick rate 100, fixtures far outside spawn.
+- `.cache/p0-client-runtime`: fresh client options and generated creative flat
+  world `MobVats-Smoke`; integrated server and actual renderer frames.
+- `.cache/p0-world-runtime/server` and `saves`: both acceptance worlds with
+  bundled defaults, selected by the new `-PisolatedAcceptance` switch.
+
+The original `run/` and `run-world-generator/` worlds/configuration were not
+modified. The original Mixer/passive default SHA-256 values still match the
+earlier evidence: `4174EF9E887AB5417AD9CA9612676F3980C9D52811873073D84F0886BAE8A76C`
+and `52A1010AB3E6B41833B23057938EFD2CF0A9D2810884501E437A1DC77B780571`.
+
+#### Real server results and remaining blocker
+
+`ServerChunkLifecycleAcceptance` is an opt-in dedicated-server subscriber,
+outside GameTest chunk ownership and excluded from the mod JAR. Four fixtures
+formed: a single-chunk cow Vat, a single-chunk Mixer receiving finite water
+from an adjacent passive-output Vat, a two-chunk Mixer, and a four-chunk Mixer
+whose corner chunk contains only four passive Buffers and no ZeroCore parts.
+The finite source uses a different machine family to preserve independent
+ZeroCore ownership. Buffers intentionally have no external fluid capability;
+the active transport goes through the actual machine ports.
+
+The trigger removes the harness's forced tickets after saving. It requires
+both `ServerChunkCache.hasChunk=false` and `getChunkNow=null`, actual
+`ChunkEvent.Unload` delivery, and 40 consecutive absent observations before
+reloading. Load events during the absence interval are rejected. The full
+eviction run observed exactly **eight unloads and sixteen loads**. Fresh Buffer
+instances, fresh controller ownership and fresh storage wrappers were observed
+after restoration, including the passive-corner fixture when all its chunks
+were released. Evidence: `.cache/p0-final-build-server.log`.
+
+| Required invariant | Actual full-eviction evidence |
+| --- | --- |
+| No chunk reacquisition during unload | Eight initial loads, eight unloads, no further target loads until the explicit reload trigger; bounded absent interval |
+| Ownership retirement | Old controllers unassembled, old Buffers unavailable, owner lookup empty while evicted |
+| Endpoint/transaction retirement | Old wrappers have zero capacity; prepared reservation rejects; direct retained drain returns empty; old wrappers remain retired after reload |
+| Persistence and conservation | Physical water is 3,000 mB before a 250 mB drain, 2,750 through eviction/reload, and 2,500 after the resumed reservation |
+| Exactly-once resumed mutation | Fresh reservation commits once and rejects its second commit |
+| Active transport | Adjacent finite Vat source delivers 3,000 mB to Mixer before eviction; after reload a new 250 mB source charge becomes exactly 250 mB in the Mixer, with source empty after 40 ticks |
+| Part restoration | Valid owner envelopes return; cow Head is assembled and retains its encoded identity |
+
+The optional `-PpassiveOnlyChunkProbe` tests the audit's stronger partial case:
+release only passive-corner availability while the three framework-part chunks
+remain at FULL through radius-zero region tickets. The corner becomes
+inaccessible (`hasChunk=false`, `getChunkNow=null`) but its holder remains at
+**ticket level 34 / INACCESSIBLE**. No ninth unload event arrives within the
+6,000-tick bound. This is not proven chunk-map eviction. The harness explicitly
+reports `P0 SERVER PROBE BLOCKED`, and Gradle rejects that result; the requirement
+was not weakened into a simulated callback test. Evidence:
+`.cache/p0-passive-blocker.log` and the runtime world's `p0-lifecycle-result.txt`.
+
+Earlier short bounds and observations before delayed unload callbacks were
+fixture failures, not established production defects. The full suite's bound
+was increased, and the partial probe now requires the actual unload event
+before testing callback retirement. No production server lifecycle change was
+made. Partial passive-only pause/restoration, endpoint reattachment, resource
+components beyond the water fixtures, and renderer-facing state under that
+specific partial transition remain unverified. A way to produce genuine
+eviction while preserving adjacent framework-part chunk availability is needed
+to close the stronger P0-A gate. Removing neighboring tickets would repeat the
+already passing full-machine scenario.
+
+#### Live client defect, correction and results
+
+The first extended live probe reproduced **Mixer/Buffer per-entity caches
+surviving distant chunk loss** (`.cache/p0-client-shared-before.log`). Holding
+the departed Level for identity comparison makes explicit retirement observable
+without depending on GC. This is a cache-lifecycle contract failure; no memory
+size or eventual world-GC claim is made.
+
+`MixerControllerRenderer` and `FluidBufferRenderer` now have weak renderer
+registries and explicit per-chunk/per-Level retirement. Family-specific client
+subscribers retire cache entries on real unload events and prune removed,
+replaced or out-of-range entities each client tick; Mixer pruning also rejects
+unassembled or changed descriptor entries. The existing resource-reload hook
+clears all three per-entity render owners. Reusable world-free Buffer shapes
+and conduit mesh batches retain their existing ownership: they hold geometry,
+not Levels, block entities or detached Mobs. No gameplay routing, balance or
+ZeroCore persistence was changed.
+
+The existing smoke fixture also had two stale assertions: unformed glass now
+uses the current translucent layer, and a removed glass position contains air.
+Both were corrected while retaining model-data, geometry, winding, material,
+descriptor and assembly checks. P0 mode adds the Mixer/Buffer/conduit fixture,
+suppresses screenshot capture and extends the existing autonomous sequence.
+All instrumentation and private-cache reflection are in the development-only
+GameTest package, excluded from the JAR. Production has no per-frame logging.
+
+Final live evidence: `.cache/p0-client-verified.log`, ending:
+
+```text
+P0 CLIENT PROBE PASSED chunkLoads=8 chunkUnloads=2 levelUnloads=1
+cachedHeads=1 specimenMobs=1 foreignLevels=0
+```
+
+| Boundary/assertion | Live result |
+| --- | --- |
+| Initial formation and correct frame state | Real detached cow rendered; actual Mixer vessel and Buffer state maps populated; current nonempty conduit pipe geometry present in the shared render cache |
+| Disassembly/reformation | Vat descriptor and shell model data follow assembly; Mixer geometry retires and reformation produces a different geometry object |
+| Distance removal | Teleport 1,024 blocks away; nonloading client chunk-cache lookup proves absence; all three per-entity cache owners are empty after 40 ticks |
+| Unload event delivery | Real server-to-client chunk-forget packets for both fixture chunks deliver two NeoForge unload events; LOWEST observers verify the corresponding owners were retired by the production subscribers |
+| Reload and rebuilding | Real chunk/light packets restore new client block entities; actual renderer frames repopulate all owners; current conduit geometry is selected |
+| Resource/model reload | Actual `reloadResourcePacks()` completes; retained old Mixer/Buffer maps empty; new renderer maps and detached cow rebuild on demand |
+| Changed Buffer model data | Server changes water from 2,000 to 500 mB; client receives amount 500 and rendered liquid height equals the synchronized visual height (0.265625) |
+| Disconnect/world departure | One unload event for the intentional departure; all per-entity maps empty before opening the world again |
+| Rejoin/no stale world | New ClientLevel identity; all renderer paths rebuild; actual current conduit geometry has rendered; no foreign-Level specimen |
+| Duplicate processing/listeners | Exactly eight fixture-chunk loads and two packet unloads over initial load, travel return, packet reload and rejoin; one intentional world-unload boundary. Final application shutdown produces its separate normal world unload |
+
+`ClientLevel.hasChunk()` always returns true in this runtime; the probe uses
+`ClientChunkCache.getChunk(FULL, false)` instead. Long-distance view-center changes
+did **not** emit chunk-unload events here. Tick maintenance supplies retirement
+for that real path. Explicit network chunk-forget packets separately prove
+event delivery without directly invoking event handlers or cache methods.
+Render readiness is bounded: a new synchronized descriptor can precede the
+frame that caches its conduit geometry. The probe waits for the current
+geometry to be present rather than accepting an old cached object.
+
+#### Validation and review state
+
+| Check | Result |
+| --- | --- |
+| `spotlessApply`, mechanical diff inspection, `spotlessCheck` | Passed; only authorized Java changes were formatted |
+| Final `build` | Passed, including CPU cache/geometry checks, resources/provenance and development-hook exclusion |
+| `runGameTestServer` after the production client corrections | **All 773 required tests passed**, unchanged count; new runtime probes are opt-in subscribers, not additional GameTests |
+| Full dedicated eviction probe | Passed for all four machines and active port route |
+| Passive-only partial eviction probe | **BLOCKED**, intentionally not accepted by its Gradle task |
+| Final graphical client probe | Passed all expanded lifecycle/render-path assertions |
+| Standard isolated acceptance | Passed at 48,381 observation ticks; completion marker and saved world verified |
+| Minimum-XP isolated acceptance | Passed at 49,791 observation ticks; completion marker and saved world verified |
+| `git diff --check` | Passed |
+
+Regression logs: `.cache/p0-regressions.log`, `.cache/p0-final-regressions.log`,
+`.cache/p0-final-build-server.log`, `.cache/p0-acceptance.log` and
+`.cache/p0-minimum-xp.log`. Acceptance generation ran during this investigation;
+the later production corrections are client-only. Server probe/fixture changes
+were compiled and exercised afterward. Original configurations retain their
+hashes. The Mixer planner refactor, processing balance, cladding, artwork and
+release safeguards remain outside this patch.
+
+HEAD remains `f1505fc`, nothing staged. Six modified tracked files and five new
+authored Java files; generated runtime output remains ignored:
+
+```text
+ M build.gradle
+ M docs/CODE_MAINTAINABILITY_AUDIT.md
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/conduit/client/FluidBufferRenderer.java
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/mixer/client/render/MixerControllerRenderer.java
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/vat/client/VatClient.java
+ M src/main/java/net/impactvector/mobvats/gametest/client/VatClientSmokeTest.java
+?? src/main/java/net/impactvector/mobvats/gamecontent/multiblock/conduit/client/FluidBufferRenderLifecycle.java
+?? src/main/java/net/impactvector/mobvats/gamecontent/multiblock/mixer/client/MixerRenderLifecycle.java
+?? src/main/java/net/impactvector/mobvats/gametest/ClientLifecycleFixtures.java
+?? src/main/java/net/impactvector/mobvats/gametest/ServerChunkLifecycleAcceptance.java
+?? src/main/java/net/impactvector/mobvats/gametest/client/ClientLifecycleAcceptance.java
+```
+
+### Passive-only chunk eviction closure — October 14, 2026
+
+**P0-A: PASS — runtime verified.** The previously blocked passive-only criterion
+now has actual server eviction and disk-restoration evidence with neighboring
+framework parts remaining loaded. **P0-B retains its preceding live-client PASS**;
+no client was launched for this server follow-up. Normal worlds/configuration
+and all pre-existing working-tree changes were preserved. Nothing was committed
+or pushed; HEAD remains `f1505fcfa3fcce9d7c16ad3d0fd522b02f23fedf`.
+
+#### Ticket retention and the bounded native trigger
+
+The exact Minecraft/NeoForge runtime sources supplied by ModDev were inspected:
+`DistanceManager`, `ChunkLevel`, `ChunkMap`, `ChunkHolder`, `ServerChunkCache` and
+`LevelChunk`. A neighboring FULL holder at level 33 propagates a dependency level
+34 to the corner. That is INACCESSIBLE to `hasChunk`/`getChunkNow` but still within
+`ChunkLevel.MAX_LEVEL`. `ChunkMap.updateChunkScheduling` does not put such a holder
+in `toDrop`; ordinary ticket removal therefore cannot produce the required
+partial eviction while those neighbors remain FULL.
+
+`gametest/ServerChunkEviction.java` supplies an explicitly opt-in, development-only
+fault trigger at the native scheduler boundary. After observing the settled
+level-34 dependency with zero generation references, it invokes
+`ChunkMap.updateChunkScheduling` at `ChunkLevel.MAX_LEVEL + 1` and queues the
+returned holder for the normal `DistanceManager` future update. Reflection is
+limited to these nonpublic runtime interfaces and read-only evidence fields.
+The helper is excluded from the packaged JAR.
+
+The server's ordinary `processUnloads`/`scheduleUnload` code then performs save,
+loaded-flag retirement, NeoForge event delivery, `ServerLevel.unload`, block-entity
+callbacks and chunk-map removal. The harness does **not** directly remove map
+entries, complete save futures, change block entities, invoke unload callbacks,
+post lifecycle events, or replace a neighboring holder. Thus the injected trigger
+bypasses the natural retention policy, while the lifecycle under verification
+remains real Minecraft server execution. This proves fault-driven partial
+eviction, not that player movement can overcome the dependency policy.
+
+The criterion is stronger than the earlier loaded-state observation: success
+requires the unload event, the old LevelChunk's native loaded flag becoming false,
+absence from **visible, updating and pending-unload maps**, `hasChunk=false`,
+`getChunkNow=null`, and 40 consecutive absent observations. The three neighboring
+holders must retain identity and FULL availability throughout; all **80 framework
+parts** must remain the same nonremoved block entities through reload.
+
+#### Reproduced defect and minimal correction
+
+The native trigger first reproduced a real defect:
+`Passive-only eviction retained assembled controller despite missing shell`
+(`.cache/p0-native-eviction-settled.log`). The Buffer callback and its retained
+storage wrapper retired, but no ZeroCore part detached, so the controller still
+reported assembled. Simulated whole-part unload checks had not covered this path.
+
+`ConduitStructure` now queues structural revalidation for server chunk unloads
+intersecting a controller's last validated envelope. The event callback examines
+cached bounds only and performs no block/chunk lookup. Server chunk loads notify
+controllers awaiting restoration; already assembled controllers are not
+unnecessarily revalidated. Existing level-tick delivery and ZeroCore's normal
+validation/disassembly/reassembly authority perform the transition.
+
+`ConduitCuboidController.isMachineWhole` rejects unavailable chunks in the last
+validated envelope **before** ZeroCore enumerates world cells. This prevents
+validation from reacquiring the evicted chunk. Routing, endpoint views and
+renderer-facing descriptors retire through the existing disassembly callbacks;
+no new ownership or persistence model was introduced. The localized status
+message is in `en_us.json`. Reload validates and reforms the same controller with
+the existing parts and fresh Buffer/storage identities.
+
+#### Final runtime evidence
+
+The final serial run used Java 21, Gradle 9.2.1, Minecraft 1.21.1, NeoForge
+21.1.252 and ZeroCore2 2.4.18, bundled defaults and the dedicated
+`.cache/p0-server-runtime` world. Invocation:
+
+```powershell
+.\gradlew.bat build runLifecycleAcceptanceServer -PpassiveOnlyChunkProbe -PisolatedAcceptance --offline
+```
+
+Evidence: `.cache/p0-passive-final-serial.log`, ending `BUILD SUCCESSFUL`.
+The freshly written world receipt reports:
+
+```text
+P0 SERVER PROBE PASSED
+ticks=3361 unloads=9 loads=17
+```
+
+Eight ordinary full-fixture unloads and sixteen loads precede the isolated
+passive-corner cycle. The ninth unload and seventeenth load are exclusively the
+passive-only target `[1040,1040]`. No callback/validation load is permitted before
+the explicit reload trigger.
+
+| Acceptance assertion | Final passive-only evidence |
+| --- | --- |
+| Actual eviction | Native unload event, loaded flag false, all three chunk maps empty, 40 stable absent observations |
+| Neighboring parts preserved | Same three FULL holders and same 80 nonremoved framework parts before, during and after the cycle |
+| Invalid machine authority retired | Controller unassembled; storage clusters empty; render descriptor absent; retained Buffer unavailable and wrapper capacity zero |
+| No stale transaction/transfer | Pre-unload reservation rejects during eviction; a separate reservation held untouched until after reload also rejects; old wrapper stays retired |
+| Exact persisted resources | Every one of the four passive members restores its complete FluidStack and filter, including custom-name components on the 2,500 mB water stack |
+| Reattachment and ownership | New Buffer instances attach to the same revalidated controller; all four member positions appear once, with no duplicate endpoint references |
+| Resumed mutation exactly once | Fresh reservation changes 2,500 to 2,250 mB once and rejects its second commit |
+| Renderer-facing restoration | Empty descriptor while disassembled; fresh descriptor after reassembly |
+| Active I/O regression | Earlier fixture in the same run restores the finite Vat-to-Mixer route and transfers exactly 250 mB after reload |
+
+The runtime helper is version-specific and fails closed if expected scheduler
+interfaces or the settled dependency preconditions differ. It is not production
+ticket manipulation and does not alter normal server chunk policy.
+
+#### Validation, failures retained, and remaining risk
+
+- `spotlessApply`, mechanical diff review and `spotlessCheck` passed. Final
+  build, CPU/resource/provenance checks and development-hook exclusion passed.
+- The final standalone `runGameTestServer -PisolatedAcceptance --offline` passed
+  **all 773 required tests**, with unchanged count:
+  `.cache/p0-passive-final-gametest.log` (`BUILD SUCCESSFUL`).
+- Standard acceptance reruns passed at 5,000 observation ticks:
+  `.cache/p0-passive-acceptance.log` and `.cache/p0-passive-acceptance-final.log`.
+- Minimum-XP acceptance passed at 49,791 ticks with unchanged assertions in
+  `.cache/p0-minimum-xp-trace.log`. Two earlier current-code runs failed the
+  O-09 Armadillo supplied-brush assertion at final verification. A control run
+  compiling only the two committed pre-fix lifecycle classes also passed at
+  49,791 ticks (`.cache/p0-minimum-xp-control.log`). Temporary bounded traces
+  confirmed the same assembled controller stayed disabled, with brush damage
+  and stock unchanged throughout the long waiting interval; its chunk unloaded
+  only at final shutdown. The brush failures remain an **unresolved acceptance
+  intermittency**, not a proven consequence of the passive lifecycle correction.
+  No tool stock, processing balance, recipe or acceptance assertion was changed
+  to obtain a pass. Tracing source is archived in ignored `.cache/` and removed
+  from authored source.
+- An initial combined invocation's endpoint-count assertion assumed one cluster
+  at a Buffer coordinate. The fixture legitimately has differently filtered
+  neighboring clusters. It now verifies four unique physical member positions
+  and nonduplicated endpoint identities; exact per-member contents checks remain.
+- A concurrent control compilation disturbed shared class outputs and caused
+  one startup crash. That also exposed stale receipt reuse in the Gradle check.
+  The task now deletes its prior disposable receipt before launch, so crashes
+  cannot inherit an old pass. Final build/eviction verification ran serially
+  after returning to normal source compilation and removing the temporary
+  tracing class.
+- `git diff --check` passed. Mixer/passive operator defaults retain SHA-256
+  `4174EF9E887AB5417AD9CA9612676F3980C9D52811873073D84F0886BAE8A76C` and
+  `52A1010AB3E6B41833B23057938EFD2CF0A9D2810884501E437A1DC77B780571`.
+  Existing build logs show normal `run/config` Mixer defaults were absent and
+  nothing was invalidated. `-PisolatedAcceptance` now explicitly skips that
+  normal-runtime invalidation step; the final isolated builds log it as SKIPPED.
+
+Nine modified tracked files and six new authored Java files, nothing staged.
+The preceding client changes remain intact; this follow-up adds only the
+passive-server correction, development eviction helper/assertions, localized
+status message, isolated-build/receipt safeguards and this evidence update.
+
+```text
+ M build.gradle
+ M docs/CODE_MAINTAINABILITY_AUDIT.md
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/conduit/ConduitCuboidController.java
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/conduit/ConduitStructure.java
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/conduit/client/FluidBufferRenderer.java
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/mixer/client/render/MixerControllerRenderer.java
+ M src/main/java/net/impactvector/mobvats/gamecontent/multiblock/vat/client/VatClient.java
+ M src/main/java/net/impactvector/mobvats/gametest/client/VatClientSmokeTest.java
+ M src/main/resources/assets/mobvats/lang/en_us.json
+?? src/main/java/net/impactvector/mobvats/gamecontent/multiblock/conduit/client/FluidBufferRenderLifecycle.java
+?? src/main/java/net/impactvector/mobvats/gamecontent/multiblock/mixer/client/MixerRenderLifecycle.java
+?? src/main/java/net/impactvector/mobvats/gametest/ClientLifecycleFixtures.java
+?? src/main/java/net/impactvector/mobvats/gametest/ServerChunkEviction.java
+?? src/main/java/net/impactvector/mobvats/gametest/ServerChunkLifecycleAcceptance.java
+?? src/main/java/net/impactvector/mobvats/gametest/client/ClientLifecycleAcceptance.java
+```
+
 ### P1-A — Formatting depends on an art-generator lexical assumption
 
 **Location/example:** `gradle/procedural-art.gradle:247`–`:249`; `C/ConduitGeometry.java:11`. Whitespace-only Java formatting breaks the exact diameter regex.
