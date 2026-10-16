@@ -57,6 +57,13 @@ public final class MixerState {
     private MixerRecipeDefinition activeDefinition;
     private String savedSignature = "";
     private final MachineMetrics metrics = new MachineMetrics();
+    private MixerMeterRequirements meterRequirements = MixerMeterRequirements.NONE;
+
+    /** Internal configuration seam for manual meters; physical components and persistence are deferred. */
+    public void meterRequirements(MixerMeterRequirements requirements) {
+        meterRequirements = Objects.requireNonNull(requirements);
+        contentsChanged();
+    }
 
     public MixerState(Runnable changed) {
         this.changed = changed;
@@ -460,6 +467,17 @@ public final class MixerState {
                 if (fluidUse[r][i] > 0) stacks.add(snapshot.get(r).copyWithAmount(fluidUse[r][i]));
             consumed.add(stacks);
         }
+        var consumedItems = new ArrayList<List<ItemStack>>();
+        for (int i = 0; i < strategy.items().size(); i++) {
+            var stacks = new ArrayList<ItemStack>();
+            for (int r = 0; r < itemStacks.size(); r++)
+                if (itemUse[r][i] > 0) stacks.add(itemStacks.get(r).copyWithCount(itemUse[r][i]));
+            consumedItems.add(stacks);
+        }
+        if (!meterRequirements.matches(strategy, consumedItems, consumed)) {
+            blocked = "Recipe does not satisfy manual meters";
+            return null;
+        }
         var outputs = new ArrayList<FluidStack>();
         try {
             for (var output : d.fluidOutputs()) outputs.add(d.result(strategy, output, consumed));
@@ -555,6 +573,7 @@ public final class MixerState {
     public final class Reservation {
         private final Plan plan;
         private final MixerRecipeRegistry.Loaded registry;
+        private final MixerMeterRequirements meters;
         private final PhysicalFluidStorage boundStorage;
         private final BlockPos boundEndpoint;
         private final List<FluidTank> connected;
@@ -564,6 +583,7 @@ public final class MixerState {
         private Reservation(Plan plan) {
             this.plan = plan;
             registry = MixerRecipeRegistry.snapshot();
+            meters = meterRequirements;
             boundStorage = storage;
             boundEndpoint = endpoint;
             connected = tanks();
@@ -588,6 +608,7 @@ public final class MixerState {
             if (completed) return false;
             completed = true;
             if (committing
+                    || meters != meterRequirements
                     || registry != MixerRecipeRegistry.snapshot()
                     || boundStorage != storage
                     || !boundEndpoint.equals(endpoint)
