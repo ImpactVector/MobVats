@@ -15,7 +15,6 @@ public final class ProcessContext {
     private final SpecimenProcessState state;
     private final MobProcessRegistry.Profile profile;
     private final List<VatTopology.Assignment> actors, loading;
-    private final List<VatItemPortEntity> feedInputs;
     private final Map<String, List<VatTopology.Assignment>> byUse = new HashMap<>();
     private final Map<BlockPos, VatItemPortEntity> items = new HashMap<>();
     private final Map<BlockPos, VatFluidPortEntity> fluidPorts = new HashMap<>();
@@ -83,13 +82,6 @@ public final class ProcessContext {
                     && port.getMultiblockController()
                             .filter(c -> c == controller())
                             .isPresent()) items.put(pos, port);
-        feedInputs = routes(PassiveUses.FEED).stream()
-                .flatMap(r -> r.itemInputs().stream())
-                .distinct()
-                .sorted(VatTopologyCompiler.POSITION)
-                .map(items::get)
-                .filter(Objects::nonNull)
-                .toList();
     }
 
     private void cacheActor(VatTopology.Assignment route) {
@@ -152,11 +144,23 @@ public final class ProcessContext {
     }
 
     public List<VatTopology.Assignment> routes(String use) {
-        return byUse.getOrDefault(PassiveUses.canonical(use), List.of());
+        return byUse.getOrDefault(PassiveUses.canonical(use), List.of()).stream()
+                .filter(this::actorEnabled)
+                .toList();
+    }
+
+    private boolean actorEnabled(VatTopology.Assignment route) {
+        var actor = actorEntities.get(route.actor());
+        return actor != null && !actor.isRemoved() && !actor.redstoneInhibited();
+    }
+
+    public boolean actorsInhibited(String use) {
+        var assigned = byUse.getOrDefault(PassiveUses.canonical(use), List.of());
+        return !assigned.isEmpty() && assigned.stream().noneMatch(this::actorEnabled);
     }
 
     public List<VatTopology.Assignment> loading() {
-        return loading;
+        return loading.stream().filter(this::actorEnabled).toList();
     }
 
     public List<VatItemPortEntity> inputsFor(String use) {
@@ -177,7 +181,7 @@ public final class ProcessContext {
     }
 
     public List<VatItemPortEntity> itemInputs() {
-        return feedInputs.stream()
+        return inputsFor(PassiveUses.FEED).stream()
                 .filter(p -> p.accepts(p.staging().getStackInSlot(0)))
                 .toList();
     }
@@ -198,6 +202,7 @@ public final class ProcessContext {
         var port = tools.get(route.actor());
         return port != null
                         && !port.isRemoved()
+                        && !port.redstoneInhibited()
                         && port.getMultiblockController()
                                 .filter(c -> c == controller())
                                 .isPresent()

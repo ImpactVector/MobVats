@@ -11,6 +11,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.data.ModelData;
 
 public abstract class AbstractVatEntity extends AbstractMultiblockEntity<MultiblockVat> {
+    public boolean redstoneInhibited() {
+        return net.impactvector.mobvats.gamecontent.multiblock.common.RedstoneControl.inhibited(this);
+    }
+
     private void diagnostic(String event) {
         net.impactvector.mobvats.gamecontent.multiblock.common.SyncDiagnostics.record(
                 "MultiblockVat", event, this, level == null ? Long.MIN_VALUE : level.getGameTime());

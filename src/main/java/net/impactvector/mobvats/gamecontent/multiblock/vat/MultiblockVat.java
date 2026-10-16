@@ -30,6 +30,14 @@ public class MultiblockVat
         implements it.zerono.mods.zerocore.lib.IActivableMachine {
     private boolean active = true;
 
+    public boolean controllerInhibited() {
+        return controllerParts.parts().stream().anyMatch(AbstractVatEntity::redstoneInhibited);
+    }
+
+    public boolean processingEnabled() {
+        return active && !controllerInhibited();
+    }
+
     @Override
     public boolean isMachineActive() {
         return active;
@@ -48,6 +56,9 @@ public class MultiblockVat
     }
 
     private List<MobAssembly> assemblies = List.of();
+    private final AttachedPartCollection<VatControllerEntity> controllerParts = new AttachedPartCollection<>(
+            VatControllerEntity.class,
+            Comparator.comparing(VatControllerEntity::getBlockPos, VatTopologyCompiler.POSITION));
     private final Set<AbstractVatEntity> attachedPorts = new HashSet<>();
     private final AttachedPartCollection<VatBoundaryEntity> boundaryDevices = new AttachedPartCollection<>(
             VatBoundaryEntity.class,
@@ -57,6 +68,7 @@ public class MultiblockVat
             Comparator.comparing(ActiveBoundaryPort::getBlockPos, VatTopologyCompiler.POSITION));
 
     private void retireAttachedParts() {
+        controllerParts.clear();
         attachedPorts.clear();
         boundaryDevices.clear();
         activePorts.clear();
@@ -68,6 +80,7 @@ public class MultiblockVat
     }
 
     private void registerAttachedPart(Object part) {
+        controllerParts.add(part);
         if (part instanceof AbstractVatPortEntity || part instanceof VatActor || part instanceof VatBoundaryEntity)
             attachedPorts.add((AbstractVatEntity) part);
         boundaryDevices.add(part);
@@ -681,6 +694,7 @@ public class MultiblockVat
 
     @Override
     protected void onPartRemoved(IMultiblockPart<MultiblockVat> part) {
+        controllerParts.remove(part);
         invalidateConduitBounds();
         clearConduitGeometry();
         attachedPorts.remove(part);
@@ -721,10 +735,12 @@ public class MultiblockVat
         if (!isAssembled()) return false;
         BoundaryDevices.tickOrdered(this, boundaryDevices.parts());
         metrics.tick();
-        boolean changed = active
+        processEngine.maintainSuspension();
+        boolean processing = processingEnabled();
+        boolean changed = processing
                 ? processEngine.tick()
                 : getWorld().getGameTime() % VatProcessEngine.CADENCE == 0 && processEngine.transferCommittedOutputs();
-        if (!active && changed) processStateChanged(true);
+        if (!processing && changed) processStateChanged(true);
         return ActiveBoundaryPort.tickOrdered(activePorts.parts(), getWorld().getGameTime()) || changed;
     }
 
@@ -806,6 +822,7 @@ public class MultiblockVat
         data.put("mediumPresentationLevels", medium.presentationLevels());
 
         if (reason == SyncReason.FullSync) {
+            processEngine.saveSuspension(data);
             processEngine.save(data, registries);
             data.put("metrics", metrics.save());
             data.put("killOutputs", killOutputs.save(registries));
@@ -841,6 +858,7 @@ public class MultiblockVat
             products.loadLegacyMilk(data.getCompound("fluidBuffer"), registries);
         feedSource = data.contains("feedSource") ? data.getString("feedSource") : "item feed";
         if (reason == SyncReason.FullSync) {
+            processEngine.loadSuspension(data);
             if (data.contains("cowProcesses") || data.contains("specimenProcesses"))
                 processEngine.load(data, registries);
             metrics.load(data.getCompound("metrics"));

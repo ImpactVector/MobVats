@@ -20,6 +20,43 @@ public final class VatProcessEngine {
     private long compiledRevision = -1, registryRevision = -1, legacyXp;
     private int cadence, compilations;
     private BlockPos nextHead;
+    private long suspensionAt = Long.MIN_VALUE;
+
+    /** World-time cooldowns freeze alongside tick-count progress. No signal is persisted.
+     * A powered reload treats the interval since the saved maintenance epoch as suspended. */
+    public void maintainSuspension() {
+        if (!controller.isAssembled() || !(controller.getWorld() instanceof ServerLevel)) return;
+        long now = controller.getWorld().getGameTime();
+        long elapsed = suspensionAt == Long.MIN_VALUE ? 0 : Math.max(0, now - suspensionAt);
+        suspensionAt = now;
+        if (elapsed == 0) return;
+        boolean inhibited = controller.controllerInhibited();
+        for (var tool : controller.toolPorts()) if (inhibited || tool.redstoneInhibited()) tool.pauseCooldown(elapsed);
+        compile();
+        boolean changed = false;
+        for (var context : contexts) {
+            var shifted = new HashSet<String>();
+            for (var definition : context.profile().definitions()) {
+                var state = context.state().existingProcess(definition.stateId());
+                if (state == null || state.data.getAllKeys().stream().noneMatch(VatProcessEngine::cooldownEpoch))
+                    continue;
+                if (!inhibited
+                        && (definition.exclusiveUse() == null || !context.actorsInhibited(definition.exclusiveUse())))
+                    continue;
+                if (!shifted.add(definition.stateId())) continue;
+                for (var key : state.data.getAllKeys())
+                    if (cooldownEpoch(key)) {
+                        state.data.putLong(key, state.data.getLong(key) + elapsed);
+                        changed = true;
+                    }
+            }
+        }
+        if (changed) controller.processStateChanged(false);
+    }
+
+    private static boolean cooldownEpoch(String key) {
+        return key.equals("interactionAt") || key.startsWith("interactionCooldown:");
+    }
 
     public BlockPos nextHead() {
         return nextHead;
@@ -230,9 +267,10 @@ public final class VatProcessEngine {
     }
 
     public boolean tick() {
+        maintainSuspension();
         if (!(controller.getWorld() instanceof ServerLevel)
                 || !controller.isAssembled()
-                || !controller.isMachineActive()) return false;
+                || !controller.processingEnabled()) return false;
         compile();
         boolean changed = controller.processFluids().migrate();
         if (legacyXp > 0) {
@@ -392,6 +430,14 @@ public final class VatProcessEngine {
         return changed;
     }
 
+    public void saveSuspension(CompoundTag data) {
+        data.putLong("redstoneMaintenanceAt", suspensionAt);
+    }
+
+    public void loadSuspension(CompoundTag data) {
+        suspensionAt = data.contains("redstoneMaintenanceAt") ? data.getLong("redstoneMaintenanceAt") : Long.MIN_VALUE;
+    }
+
     public void save(CompoundTag data, HolderLookup.Provider registries) {
         data.putInt("passiveStateVersion", 1);
         data.putLong("legacyXpMigration", legacyXp);
@@ -453,6 +499,7 @@ public final class VatProcessEngine {
 
     public void assimilate(VatProcessEngine source) {
         if (states.isEmpty()) {
+            suspensionAt = source.suspensionAt;
             nextHead = source.nextHead;
             cadence = source.cadence;
         }
@@ -465,6 +512,7 @@ public final class VatProcessEngine {
     }
 
     public void clear() {
+        suspensionAt = Long.MIN_VALUE;
         states.clear();
         stateOwners.clear();
         status.clear();

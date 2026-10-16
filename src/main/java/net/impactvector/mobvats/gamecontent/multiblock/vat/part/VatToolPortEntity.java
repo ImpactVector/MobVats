@@ -74,7 +74,16 @@ public final class VatToolPortEntity extends AbstractVatEntity implements VatAct
 
     public boolean available() {
         return level != null
+                && !redstoneInhibited()
                 && (interactionStart == Long.MIN_VALUE || level.getGameTime() - interactionStart >= INTERACTION_TICKS);
+    }
+
+    /** Shift only the existing epoch; held tools, assignments and remaining cooldown are unchanged. */
+    public void pauseCooldown(long ticks) {
+        if (ticks > 0 && interactionStart != Long.MIN_VALUE) {
+            interactionStart += ticks;
+            setChanged();
+        }
     }
 
     public boolean reaches(

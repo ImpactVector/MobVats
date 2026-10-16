@@ -42,6 +42,183 @@ public final class CowProcessGameTests {
     private static final BlockPos BOTTOM_A = ORIGIN.offset(1, 0, 2);
     private static final BlockPos BOTTOM_B = ORIGIN.offset(3, 0, 2);
 
+    private static void redstoneController(GameTestHelper h, boolean indirect) {
+        rig(h, true);
+        var power = ORIGIN.offset(1, 1, -1);
+        h.runAtTickTime(30, () -> {
+            seed(h, "GROWING", 123, 0, 0, 0, ItemStack.EMPTY);
+            tool(h).setInteractionStart(h.getLevel().getGameTime());
+            MixerRedstoneGameTests.power(h, power, indirect);
+            var c = vat(h);
+            h.assertTrue(c.isMachineActive() && !c.processingEnabled(), "Controller power not derived");
+            item(h, INPUT).externalItems().insertItem(0, new ItemStack(Items.IRON_SWORD), false);
+            h.assertTrue(!item(h, INPUT).staging().getStackInSlot(0).isEmpty(), "Controller power blocked Item Port");
+            var saved = save(h);
+            c.syncDataFrom(saved, h.getLevel().registryAccess(), SyncReason.FullSync);
+        });
+        h.runAtTickTime(50, () -> {
+            var c = vat(h);
+            h.assertTrue(
+                    c.processEngine().state(h.absolutePos(HEAD)).growth().elapsed == 123,
+                    "Powered/reloaded Vat advanced biological progress");
+            h.assertTrue(
+                    !tool(h).available() && h.getLevel().getGameTime() - tool(h).interactionStart() <= 1,
+                    "Absolute tool cooldown expired during controller inhibition");
+            MixerRedstoneGameTests.unpower(h, power);
+        });
+        h.runAtTickTime(60, () -> {
+            h.assertTrue(
+                    vat(h).isMachineActive()
+                            && vat(h).processEngine().state(h.absolutePos(HEAD)).growth().elapsed > 123
+                            && vat(h).processEngine().state(h.absolutePos(HEAD)).growth().elapsed <= 133,
+                    "Biology failed to resume or replayed inhibited ticks");
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 80)
+    public static void redstoneControllerDirectPreservesProgressAndTransport(GameTestHelper h) {
+        redstoneController(h, false);
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 80)
+    public static void redstoneControllerIndirectReloadAndCooldown(GameTestHelper h) {
+        redstoneController(h, true);
+    }
+
+    private static void redstoneActor(GameTestHelper h, boolean blender, boolean indirect) {
+        rig(h, true);
+        if (blender) h.setBlock(BLENDER, Content.state(VatPartType.Blender));
+        else tool(h).setHeldItem(new ItemStack(Items.IRON_SWORD));
+        var p = blender ? BLENDER : TOOL;
+        var power = blender ? p.east() : p.south();
+        h.runAtTickTime(30, () -> {
+            var c = vat(h);
+            seed(h, "READY", 1200, 0, 0, 0, ItemStack.EMPTY);
+            var routes = c.getTopology().actors();
+            var before = tool(h).heldItem();
+            MixerRedstoneGameTests.power(h, power, indirect);
+            for (int i = 0; i < 100; i++) c.processEngine().tick();
+            h.assertTrue(
+                    c.metrics().total(MachineMetrics.BLENDER_HARVESTS) == 0
+                            && tool(h).heldItem().getDamageValue() == before.getDamageValue()
+                            && c.getTopology().actors().equals(routes)
+                            && c.processEngine().state(h.absolutePos(HEAD)).stage() == LifeStage.ADULT,
+                    "Inhibited actor performed work, lost assignment, or changed held resources");
+            h.assertTrue(
+                    c.processEngine().state(h.absolutePos(HEAD)).process(PassiveProcessCompiler.MILK).elapsed > 0,
+                    "Individual actor power stopped independent biological operation");
+            MixerRedstoneGameTests.unpower(h, power);
+            for (int i = 0; i < 10; i++) c.processEngine().tick();
+            h.assertTrue(
+                    blender
+                            ? c.metrics().total(MachineMetrics.BLENDER_HARVESTS) == 1
+                            : tool(h).heldItem().getDamageValue() > before.getDamageValue(),
+                    "Actor failed to resume");
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 60)
+    public static void redstoneToolDirectPauseAndIndependentBiology(GameTestHelper h) {
+        redstoneActor(h, false, false);
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 60)
+    public static void redstoneToolIndirectPauseAndResume(GameTestHelper h) {
+        redstoneActor(h, false, true);
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 60)
+    public static void redstoneBlenderDirectPauseAndResume(GameTestHelper h) {
+        redstoneActor(h, true, false);
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 60)
+    public static void redstoneBlenderIndirectPauseAndResume(GameTestHelper h) {
+        redstoneActor(h, true, true);
+    }
+
+    private static void redstoneToolCooldown(GameTestHelper h, boolean indirect) {
+        rig(h, true);
+        tool(h).setHeldItem(new ItemStack(Items.IRON_SWORD));
+        var p = TOOL.south();
+        h.runAtTickTime(30, () -> {
+            seed(h, "GROWING", 123, 0, 0, 0, ItemStack.EMPTY);
+            tool(h).setInteractionStart(h.getLevel().getGameTime());
+            var state = vat(h).processEngine().state(h.absolutePos(HEAD)).process(PassiveProcessCompiler.HARVEST);
+            state.data.putLong(
+                    "interactionCooldown:mobvats:weapon_harvest", h.getLevel().getGameTime() - 5);
+            state.data.putLong("interactionAt", h.getLevel().getGameTime() - 5);
+            MixerRedstoneGameTests.power(h, p, indirect);
+        });
+        h.runAtTickTime(40, () -> {
+            var saved = save(h);
+            vat(h).syncDataFrom(saved, h.getLevel().registryAccess(), SyncReason.FullSync);
+        });
+        h.runAtTickTime(50, () -> {
+            var state = vat(h).processEngine().state(h.absolutePos(HEAD));
+            h.assertTrue(
+                    !tool(h).available() && state.growth().elapsed > 123,
+                    "Tool inhibition expired its cooldown or stopped unrelated biology");
+            var process = state.process(PassiveProcessCompiler.HARVEST);
+            h.assertTrue(
+                    h.getLevel().getGameTime() - process.data.getLong("interactionAt") <= 6
+                            && h.getLevel().getGameTime()
+                                            - process.data.getLong("interactionCooldown:mobvats:weapon_harvest")
+                                    <= 6,
+                    "Persisted process cooldowns advanced during tool inhibition/reload");
+            MixerRedstoneGameTests.unpower(h, p);
+        });
+        h.runAtTickTime(75, () -> {
+            h.assertTrue(tool(h).available(), "Tool cooldown did not resume");
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 90)
+    public static void redstoneToolDirectCooldownReload(GameTestHelper h) {
+        redstoneToolCooldown(h, false);
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 90)
+    public static void redstoneToolIndirectCooldownReload(GameTestHelper h) {
+        redstoneToolCooldown(h, true);
+    }
+
+    private static void redstoneFeed(GameTestHelper h, boolean indirect) {
+        rig(h, true);
+        h.setBlock(FEED.south(), Blocks.AIR);
+        h.setBlock(FEED, Content.state(VatPartType.FeedPort));
+        h.setBlock(FEED.east(), Content.state(VatPartType.ItemPort));
+        tool(h).setHeldItem(new ItemStack(Items.IRON_SWORD));
+        h.runAtTickTime(30, () -> {
+            var c = vat(h);
+            seed(h, "READY", 1200, 0, 0, 0, ItemStack.EMPTY);
+            item(h, FEED.east()).staging().setStackInSlot(0, new ItemStack(Items.WHEAT));
+            MixerRedstoneGameTests.power(h, FEED.north(), indirect);
+            for (int i = 0; i < 20; i++) c.processEngine().tick();
+            h.assertTrue(
+                    tool(h).heldItem().getDamageValue() == 0
+                            && item(h, FEED.east()).staging().getStackInSlot(0).getCount() == 1,
+                    "Inhibited Feed Port fed replacement operation");
+            MixerRedstoneGameTests.unpower(h, FEED.north());
+            for (int i = 0; i < 10; i++) c.processEngine().tick();
+            h.assertTrue(tool(h).heldItem().getDamageValue() > 0, "Feed Port failed to resume");
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 60)
+    public static void redstoneFeedDirectSuspension(GameTestHelper h) {
+        redstoneFeed(h, false);
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 60)
+    public static void redstoneFeedIndirectSuspension(GameTestHelper h) {
+        redstoneFeed(h, true);
+    }
+
     private static void genericOutput(GameTestHelper h, BlockPos pos) {
         h.setBlock(pos, Content.state(VatPartType.ItemPort));
         item(h, pos).setIoDirection(IoDirection.Output);

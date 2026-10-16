@@ -85,3 +85,28 @@ multi-drive formation and deterministic discovery instead.
 
 R3 validation: Java 21 `format`, diff review, `validate` succeeded; all 890 required
 GameTests passed, including the unchanged deterministic recipe selection suite.
+
+## R4 — Vat controller and processing actors
+
+Controller power gates only the process engine; committed-output transport, boundary
+devices, metrics, and ports retain their existing scheduling. Actor routes are
+filtered at execution time using cached entity references. Compiled assignments
+remain intact. Tool acquisition, use, Blender production, Feed Port feeding, and
+other operations using those routes cannot run through a powered actor. Enabled
+actors and specimen processes continue independently.
+
+Tool `interactionStart` and process `interactionAt`/`interactionCooldown:*` epochs
+are shifted by suspended world ticks. The last maintenance time is saved separately
+from specimen processing state, with no persisted power flag. Powered reloads freeze
+the interval since that saved epoch; history of signal changes while unloaded is
+not reconstructed. Shared per-specimen interaction cooldowns pause when all assigned
+actors for that use are inhibited. Each Tool Port's own cooldown pauses separately.
+Elapsed progress, held tools, pending results, configuration, and assignments are
+preserved. Ordinary unpowered cooldown behavior is unchanged.
+
+Ten new tests cover direct and indirect controller/Tool/Blender/Feed signals,
+biological pause/resume, enabled item transport, assignment preservation, independent
+biology, controller serialization, and Tool/process cooldowns across powered reload.
+
+R4 validation: Java 21 `format`, diff review, `validate` succeeded; all 900 required
+GameTests passed, including the existing lifecycle and processing-state checks.

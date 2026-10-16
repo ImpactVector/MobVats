@@ -36,6 +36,10 @@ public final class SpecimenProcessState {
 
     private final Map<String, ProcessState> processes = new TreeMap<>();
 
+    ProcessState existingProcess(String id) {
+        return processes.get(id);
+    }
+
     public ProcessState process(String id) {
         return processes.computeIfAbsent(id, k -> new ProcessState());
     }
