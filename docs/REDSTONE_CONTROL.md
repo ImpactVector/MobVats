@@ -110,3 +110,65 @@ biology, controller serialization, and Tool/process cooldowns across powered rel
 
 R4 validation: Java 21 `format`, diff review, `validate` succeeded; all 900 required
 GameTests passed, including the existing lifecycle and processing-state checks.
+
+## R5 — Vat resource endpoints and final lifecycle coverage
+
+Item and Fluid Port transfer calls check the endpoint's current signal, including
+simulation, retained passive handlers, active boundary work, native routing, and
+internal item transactions. The Fluid Port gates its ZeroCore forwarding target,
+so retaining an old pipe handler cannot bypass power. Shared tanks and port
+configuration remain intact; enabled endpoints can still use connected storage.
+
+Pull/Push Pumps and Fill/Drain Valves skip their operational entry points when
+powered. Current valves expose no passive fluid capability. Sumps suspend service
+evacuation and collection, including direct production allocation paths. Completed
+production stays pending. Individually powered Tool/Blender service outputs remain
+held. Item and Fluid Voids reject disposal while powered. Controller inhibition
+alone does not apply these endpoint gates.
+
+The shared physical-storage helper adds only an optional per-service evacuation
+predicate. Its existing no-argument path, used by the Mixer, is unchanged. Buffer
+and conduit operation is unaffected. No topology, inventory, filter, or storage
+model is replaced.
+
+Twelve new tests cover direct/indirect pump and valve signals, item/fluid voids,
+retained item/fluid capabilities, both transfer directions, simulation, powered
+endpoint serialization, shared access through another port, active transport
+under controller inhibition, Sump collection/ejection, internal item supply, and
+the actual powered Mixer ZeroCore unload/reassembly path. The latter confirms
+batch/FE/preference retention and the existing rotor restart on chunk restoration.
+
+R5 validation: Java 21 `format`, diff review, `validate` succeeded; all 912 required
+GameTests passed. The initial Sump fixture was corrected to respect the existing
+1,000 mB service-tank capacity; no storage capacity or processing model was changed.
+
+## Changed-file inventory
+
+All implementation paths below are under `src/main/java/net/impactvector/mobvats/`.
+This document is updated in every slice.
+
+| Slice | Changed Java files |
+| --- | --- |
+| R1 | `gamecontent/extruder/ExtruderEntity.java`; `gametest/ExtruderGameTests.java` |
+| R2 | `gamecontent/multiblock/common/RedstoneControl.java`; `mixer/MultiblockMixer.java`, `mixer/part/AbstractMixerDriveEntity.java` under `gamecontent/multiblock/`; `gametest/MixerRedstoneGameTests.java` |
+| R3 | `mixer/MultiblockMixer.java`, `mixer/part/AbstractMixerDriveEntity.java`, `mixer/part/MixerCombustionDriveEntity.java` under `gamecontent/multiblock/`; `gametest/MixerDriveGameTests.java`, `gametest/MixerFeDriveGameTests.java`, `gametest/MixerRedstoneGameTests.java` |
+| R4 | `vat/MultiblockVat.java`, `vat/part/AbstractVatEntity.java`, `vat/part/VatToolPortEntity.java`, `vat/process/ProcessContext.java`, `vat/process/SpecimenProcessState.java`, `vat/process/VatProcessEngine.java` under `gamecontent/multiblock/`; `gametest/CowProcessGameTests.java` |
+| R5 | `conduit/PhysicalFluidStorage.java`; `vat/BoundaryDevices.java`, `vat/MultiblockVat.java`; `vat/part/VatBlenderEntity.java`, `VatBoundaryEntity.java`, `VatFluidPortEntity.java`, `VatItemPortEntity.java`, `VatSumpEntity.java`, `VatToolPortEntity.java`; `vat/process/ItemResultBuffer.java`, `PassiveOperations.java`, `PassiveProcessCompiler.java`, `ProcessContext.java`, `ResourceProcessRuntime.java`, `VatItemTransaction.java`, `VatProcessEngine.java`, all under `gamecontent/multiblock/`; `gametest/BoundaryDeviceGameTests.java`, `CowProcessGameTests.java`, `MixerRedstoneGameTests.java`, `VatRedstoneEndpointGameTests.java` |
+
+The separate mechanical formatting commit `464f370` changes only
+`gametest/ExtruderWorldFixtures.java`, which was unformatted at the starting revision.
+
+## Validation and acceptance limits
+
+Every slice uses the canonical Java 21 launcher: `format`, formatting-diff review,
+then `validate` (`spotlessCheck build runGameTestServer`). Builds include the existing
+CPU/render/resource checks. Required GameTest totals increase from the initial 882
+to 884 (R1), 888 (R2), 890 (R3), 900 (R4), and 912 (R5).
+
+Only autonomous headless testing is performed. Client visual acceptance remains
+with the user. ZeroCore's pre-existing unload/reassembly rotor restart is retained;
+redstone changes alone preserve rotor progress. Extruder opportunities retain the
+existing ten-tick world phase rather than accumulating deferred work. Unloaded
+signal history is not reconstructed; the current world signal is authoritative.
+No production publication, client launch, recipe-ranking change, Blocker/Inscriber
+refactor, or physical rotor refactor is part of this work.

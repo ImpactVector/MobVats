@@ -219,6 +219,29 @@ public final class CowProcessGameTests {
         redstoneFeed(h, true);
     }
 
+    @GameTest(template = "empty", timeoutTicks = 60)
+    public static void redstoneItemInputCannotBeConsumedInternally(GameTestHelper h) {
+        rig(h, true);
+        tool(h).setHeldItem(new ItemStack(Items.IRON_SWORD));
+        h.runAtTickTime(30, () -> {
+            var c = vat(h);
+            seed(h, "READY", 1200, 0, 0, 0, ItemStack.EMPTY);
+            MixerRedstoneGameTests.power(h, FEED.north(), true);
+            h.assertTrue(
+                    !((VatFeedPortEntity) h.getBlockEntity(FEED.south())).redstoneInhibited(),
+                    "Fixture also inhibited Feed actor");
+            for (int i = 0; i < 20; i++) c.processEngine().tick();
+            h.assertTrue(
+                    item(h, FEED).staging().getStackInSlot(0).getCount() == 1
+                            && tool(h).heldItem().getDamageValue() == 0,
+                    "Process consumed an inhibited Item Port's resources");
+            MixerRedstoneGameTests.unpower(h, FEED.north());
+            for (int i = 0; i < 10; i++) c.processEngine().tick();
+            h.assertTrue(tool(h).heldItem().getDamageValue() > 0, "Input port did not resume internal supply");
+            h.succeed();
+        });
+    }
+
     private static void genericOutput(GameTestHelper h, BlockPos pos) {
         h.setBlock(pos, Content.state(VatPartType.ItemPort));
         item(h, pos).setIoDirection(IoDirection.Output);

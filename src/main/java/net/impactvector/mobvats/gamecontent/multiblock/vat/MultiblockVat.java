@@ -731,7 +731,9 @@ public class MultiblockVat
 
     @Override
     protected boolean updateServer() {
-        if (isAssembled()) storage.evacuate();
+        if (isAssembled())
+            storage.evacuate(p ->
+                    !(getWorld().getBlockEntity(p) instanceof AbstractVatEntity actor) || !actor.redstoneInhibited());
         if (!isAssembled()) return false;
         BoundaryDevices.tickOrdered(this, boundaryDevices.parts());
         metrics.tick();

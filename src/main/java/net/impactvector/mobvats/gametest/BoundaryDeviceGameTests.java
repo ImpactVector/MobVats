@@ -29,6 +29,93 @@ import net.neoforged.neoforge.gametest.*;
 public final class BoundaryDeviceGameTests {
     private static final BlockPos P = new BlockPos(3, 3, 3), R = P.east();
 
+    private static void redstoneDevices(GameTestHelper h, boolean indirect) {
+        box(h);
+        var e = device(h, VatPartType.PullPump);
+        source(h);
+        var supply = tank(4000, 0);
+        MixerRedstoneGameTests.power(h, P.west(), indirect);
+        h.assertTrue(
+                !BoundaryDevices.pull(h.getLevel(), h.absolutePos(R), supply, e)
+                        && supply.isEmpty()
+                        && h.getBlockState(R).getFluidState().isSource(),
+                "Powered Pull Pump transferred");
+        MixerRedstoneGameTests.unpower(h, P.west());
+        h.assertTrue(BoundaryDevices.pull(h.getLevel(), h.absolutePos(R), supply, e), "Pull Pump did not resume");
+        e = device(h, VatPartType.PushPump);
+        MixerRedstoneGameTests.power(h, P.west(), indirect);
+        var output = PhysicalFluidStorage.handler(List.of(supply), false, s -> true);
+        h.assertTrue(
+                !BoundaryDevices.push(h.getLevel(), h.absolutePos(R), output, e) && supply.getFluidAmount() == 1000,
+                "Powered Push Pump consumed fluid");
+        MixerRedstoneGameTests.unpower(h, P.west());
+        h.assertTrue(BoundaryDevices.push(h.getLevel(), h.absolutePos(R), output, e), "Push Pump did not resume");
+        for (var pos : BlockPos.betweenClosed(new BlockPos(4, 2, 3), new BlockPos(5, 5, 3)))
+            h.setBlock(pos, Blocks.AIR);
+        supply.setFluid(water(2000));
+        var medium = new VatMediumStorage(() -> {});
+        medium.compile(h.getLevel(), h.absolutePos(new BlockPos(3, 1, 2)), h.absolutePos(new BlockPos(6, 6, 4)));
+        e = device(h, VatPartType.FillValve);
+        e.filter("minecraft:water");
+        MixerRedstoneGameTests.power(h, P.west(), indirect);
+        h.assertTrue(
+                !BoundaryDevices.fill(medium, output, e) && supply.getFluidAmount() == 2000,
+                "Powered Fill Valve spent fluid");
+        MixerRedstoneGameTests.unpower(h, P.west());
+        h.assertTrue(BoundaryDevices.fill(medium, output, e), "Fill Valve did not resume");
+        e = device(h, VatPartType.DrainValve);
+        MixerRedstoneGameTests.power(h, P.west(), indirect);
+        h.assertTrue(
+                !BoundaryDevices.drain(medium, supply, e) && supply.getFluidAmount() == 1000,
+                "Powered Drain Valve transferred medium");
+        MixerRedstoneGameTests.unpower(h, P.west());
+        h.assertTrue(
+                BoundaryDevices.drain(medium, supply, e) && supply.getFluidAmount() == 2000,
+                "Drain Valve did not resume exactly");
+        h.assertTrue(
+                h.getLevel()
+                                .getCapability(
+                                        net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
+                                        h.absolutePos(P),
+                                        null)
+                        == null,
+                "Unexpected passive valve capability");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 10)
+    public static void redstonePumpsAndValvesDirect(GameTestHelper h) {
+        redstoneDevices(h, false);
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 10)
+    public static void redstonePumpsAndValvesIndirect(GameTestHelper h) {
+        redstoneDevices(h, true);
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 10)
+    public static void redstoneVoidsPreserveRemainders(GameTestHelper h) {
+        var e = device(h, VatPartType.ItemVoid);
+        var results = new ItemResultBuffer();
+        results.store(List.of(new ItemStack(Items.EGG, 3)));
+        for (boolean indirect : new boolean[] {false, true}) {
+            MixerRedstoneGameTests.power(h, P.above(), indirect);
+            h.assertTrue(
+                    results.discard(List.of(e)) == 0 && results.itemCount() == 3,
+                    "Powered Item Void discarded resources");
+            MixerRedstoneGameTests.unpower(h, P.above());
+        }
+        h.assertTrue(results.discard(List.of(e)) == 3, "Item Void did not resume");
+        e = device(h, VatPartType.FluidVoid);
+        for (boolean indirect : new boolean[] {false, true}) {
+            MixerRedstoneGameTests.power(h, P.above(), indirect);
+            h.assertTrue(!e.accepts(water(1000)), "Powered Fluid Void accepted disposal");
+            MixerRedstoneGameTests.unpower(h, P.above());
+            h.assertTrue(e.accepts(water(1000)), "Fluid Void did not resume");
+        }
+        h.succeed();
+    }
+
     private static VatBoundaryEntity device(GameTestHelper h, VatPartType type) {
         h.setBlock(P, Content.state(type));
         return (VatBoundaryEntity) h.getBlockEntity(P);

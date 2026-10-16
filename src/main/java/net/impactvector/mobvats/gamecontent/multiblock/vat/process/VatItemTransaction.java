@@ -53,6 +53,7 @@ final class VatItemTransaction {
         for (var slot : slots)
             if (slot.port().isRemoved()
                     || !slot.port().getIoDirection().isOutput()
+                    || slot.port().redstoneInhibited()
                     || !ItemStack.matches(slot.before(), slot.port().staging().getStackInSlot(0))) return false;
         for (var slot : slots)
             if (!ItemStack.matches(slot.before(), slot.after()))

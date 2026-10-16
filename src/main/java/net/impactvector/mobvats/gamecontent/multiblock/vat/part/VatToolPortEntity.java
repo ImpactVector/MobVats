@@ -32,7 +32,7 @@ public final class VatToolPortEntity extends AbstractVatEntity implements VatAct
     }
 
     public boolean routingAvailable() {
-        return !isRemoved();
+        return !isRemoved() && !redstoneInhibited();
     }
 
     private long interactionStart = Long.MIN_VALUE;

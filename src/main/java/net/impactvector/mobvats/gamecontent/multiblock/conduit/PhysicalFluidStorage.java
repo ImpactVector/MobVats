@@ -151,15 +151,20 @@ public final class PhysicalFluidStorage {
     }
 
     public boolean evacuate() {
+        return evacuate(p -> true);
+    }
+
+    public boolean evacuate(java.util.function.Predicate<BlockPos> enabled) {
         boolean movedAny = false;
         for (var e : services.entrySet())
-            for (var tank : e.getValue().tanks())
-                if (!tank.isEmpty()) {
-                    int moved = destination(e.getKey(), true, s -> true)
-                            .fill(tank.getFluid().copy(), IFluidHandler.FluidAction.EXECUTE);
-                    tank.drain(moved, IFluidHandler.FluidAction.EXECUTE);
-                    movedAny |= moved > 0;
-                }
+            if (enabled.test(e.getKey()))
+                for (var tank : e.getValue().tanks())
+                    if (!tank.isEmpty()) {
+                        int moved = destination(e.getKey(), true, s -> true)
+                                .fill(tank.getFluid().copy(), IFluidHandler.FluidAction.EXECUTE);
+                        tank.drain(moved, IFluidHandler.FluidAction.EXECUTE);
+                        movedAny |= moved > 0;
+                    }
         return movedAny;
     }
     /** Only the producing endpoint's stage may accept newly completed production. */

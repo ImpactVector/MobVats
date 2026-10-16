@@ -115,6 +115,48 @@ public final class MixerRedstoneGameTests {
         suspension(h, MixerPartType.Drive, false);
     }
 
+    @GameTest(template = "empty", timeoutTicks = 110)
+    public static void poweredControllerChunkLifecycleRetainsBatchAndSignal(GameTestHelper h) {
+        MixerGameTests.rig(h);
+        h.setBlock(D, MixerContent.state(MixerPartType.FeDrive));
+        int[] energy = {0};
+        h.runAtTickTime(35, () -> {
+            var part = (MixerControllerEntity) h.getBlockEntity(C);
+            var c = part.getMultiblockController().orElseThrow();
+            var drive = (MixerFeDriveEntity) h.getBlockEntity(D);
+            drive.energy().receiveEnergy(MixerFeDriveEntity.CAPACITY, false);
+            MixerCombustionGameTests.ticks(c, c.spinUpTicks());
+            c.state().fluids(true).fill(new FluidStack(Fluids.WATER, 1000), FluidAction.EXECUTE);
+            c.state().depositExperienceMb(250);
+            MixerCombustionGameTests.ticks(c, 37);
+            h.assertTrue(c.state().progress() == 30, "Reload fixture did not begin a batch");
+            power(h, C.west(), true);
+            energy[0] = drive.energy().getEnergyStored();
+            part.onChunkUnloaded();
+            h.assertTrue(c.isPaused(), "ZeroCore unload did not pause the fixture");
+            part.clearRemoved();
+        });
+        h.runAtTickTime(75, () -> {
+            var c = ((MixerControllerEntity) h.getBlockEntity(C))
+                    .getMultiblockController()
+                    .orElseThrow();
+            var drive = (MixerFeDriveEntity) h.getBlockEntity(D);
+            h.assertTrue(
+                    c.isAssembled()
+                            && c.isMachineActive()
+                            && !c.processingEnabled()
+                            && c.state().progress() == 30
+                            && drive.energy().getEnergyStored() == energy[0],
+                    "Powered chunk restoration lost inhibition, batch, preference, or FE");
+            // Keep ZeroCore's established unload restart; redstone adds no additional reset.
+            h.assertTrue(c.startupTicks() == 0, "Powered restoration executed rotor work");
+            unpower(h, C.west());
+            MixerCombustionGameTests.ticks(c, c.spinUpTicks() + 170);
+            h.assertTrue(c.state().amount(2) == 1000, "Retained batch failed to complete after restoration");
+            h.succeed();
+        });
+    }
+
     @GameTest(template = "empty", timeoutTicks = 60)
     public static void multipleDrivePriorityFailoverAndSinglePayment(GameTestHelper h) {
         MixerGameTests.rig(h);

@@ -40,7 +40,7 @@ public final class BoundaryDevices {
         var min = vat.getBoundingBox().getMin();
         var max = vat.getBoundingBox().getMax();
         for (var e : devices) {
-            if (e.isRemoved() || !e.isMachineAssembled()) continue;
+            if (e.isRemoved() || !e.isMachineAssembled() || e.redstoneInhibited()) continue;
             var input = vat.storage().destination(e.getBlockPos(), true, e::accepts);
             var output = vat.storage().handler(e.getBlockPos(), false, e::accepts);
             var face = outward(e.getBlockPos(), min, max);
@@ -63,6 +63,7 @@ public final class BoundaryDevices {
     }
 
     public static boolean pull(Level level, BlockPos root, IFluidHandler destination, VatBoundaryEntity e) {
+        if (e.redstoneInhibited()) return false;
         return WorldFluidPumps.pull(level, root, destination, e);
     }
 
@@ -75,10 +76,12 @@ public final class BoundaryDevices {
     }
 
     public static boolean push(Level level, BlockPos root, IFluidHandler bus, VatBoundaryEntity e) {
+        if (e.redstoneInhibited()) return false;
         return WorldFluidPumps.push(level, root, bus, e);
     }
 
     public static boolean fill(VatMediumStorage medium, IFluidHandler bus, VatBoundaryEntity e) {
+        if (e.redstoneInhibited()) return false;
         int tanks = bus.getTanks(), stage = tanks == 0 ? 0 : 1;
         String failure = tanks == 0 ? "No connected supply" : "No fluid available";
         FluidStack incoming = FluidStack.EMPTY;
@@ -124,6 +127,7 @@ public final class BoundaryDevices {
     }
 
     public static boolean drain(VatMediumStorage medium, IFluidHandler destination, VatBoundaryEntity e) {
+        if (e.redstoneInhibited()) return false;
         var request = medium.drain(BUCKET, SIMULATE);
         if (request.isEmpty() || !e.accepts(request)) {
             e.status("Medium empty or filter blocked");

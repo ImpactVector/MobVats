@@ -163,6 +163,7 @@ public final class ResourceProcessRuntime {
                 if (!tool.results().isEmpty()) return new Plan(null, OUTPUT_BLOCKED);
                 transaction.add(ProcessOutput.buffered(tool.results(), drops));
             } else {
+                if (c.assembly().drain().redstoneInhibited()) return new Plan(null, OUTPUT_BLOCKED);
                 var ports = c.routes(PassiveUses.DRAIN).stream()
                         .flatMap(r -> c.outputs(r).stream())
                         .distinct()
@@ -230,6 +231,7 @@ public final class ResourceProcessRuntime {
             FluidStack request,
             Map<FluidTank, FluidStack> shadows,
             Set<net.impactvector.mobvats.gamecontent.multiblock.vat.part.VatBoundaryEntity> disposal) {
+        if (c.assembly().drain().redstoneInhibited()) return false;
         var tanks = c.controller().storage().outputTanks(c.assembly().drain().getBlockPos(), request);
         int remaining = request.getAmount();
         for (boolean empty : new boolean[] {false, true})

@@ -62,6 +62,7 @@ final class PassiveOperations {
 
     private ProcessTransaction.Step xp(long points, Object excluded) {
         if (points == 0) return null;
+        if (c.assembly().drain().redstoneInhibited()) return null;
         var output = ExperienceFluid.stack(points);
         var tank = vat.storage().selectOutput(c.assembly().drain().getBlockPos(), output, excluded);
         return tank == null ? null : ProcessOutput.fluid(tank, output);

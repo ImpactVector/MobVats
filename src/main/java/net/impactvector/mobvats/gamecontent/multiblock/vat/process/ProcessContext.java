@@ -191,6 +191,7 @@ public final class ProcessContext {
         return port != null
                         && !port.isRemoved()
                         && port.getIoDirection().isInput() == input
+                        && !port.redstoneInhibited()
                         && (!input
                                 || port.staging().getStackInSlot(0).isEmpty()
                                 || port.accepts(port.staging().getStackInSlot(0)))
@@ -227,6 +228,7 @@ public final class ProcessContext {
                         .map(fluidPorts::get)
                         .filter(p -> p != null
                                 && !p.isRemoved()
+                                && !p.redstoneInhibited()
                                 && p.getIoDirection().isInput() == input)
                         .toList();
     }

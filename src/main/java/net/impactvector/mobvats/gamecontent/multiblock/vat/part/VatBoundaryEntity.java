@@ -72,6 +72,7 @@ public final class VatBoundaryEntity extends AbstractVatEntity
 
     public boolean accepts(FluidStack stack) {
         return !itemVoid()
+                && !(isVoid() && redstoneInhibited())
                 && !stack.isEmpty()
                 && (filter.isEmpty()
                         || ResourceSelectors.fluids(java.util.List.of(filter)).test(stack));
@@ -79,6 +80,7 @@ public final class VatBoundaryEntity extends AbstractVatEntity
 
     public boolean accepts(ItemStack stack) {
         return itemVoid()
+                && !redstoneInhibited()
                 && !stack.isEmpty()
                 && (filter.isEmpty()
                         || ResourceSelectors.items(java.util.List.of(filter)).test(stack));
@@ -136,7 +138,7 @@ public final class VatBoundaryEntity extends AbstractVatEntity
         String previous = status;
         return new net.impactvector.mobvats.gamecontent.multiblock.vat.process.ProcessTransaction.Step(
                 this,
-                () -> !isRemoved() && isMachineAssembled(),
+                () -> !isRemoved() && isMachineAssembled() && !redstoneInhibited(),
                 () -> {
                     consumed();
                     return true;

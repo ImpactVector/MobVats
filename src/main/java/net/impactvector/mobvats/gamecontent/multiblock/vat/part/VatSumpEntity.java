@@ -25,7 +25,7 @@ public class VatSumpEntity extends AbstractVatEntity
     }
 
     public boolean routingAvailable() {
-        return !isRemoved();
+        return !isRemoved() && !redstoneInhibited();
     }
 
     public int priority() {

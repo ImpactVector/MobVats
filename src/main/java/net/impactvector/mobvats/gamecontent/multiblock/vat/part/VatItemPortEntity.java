@@ -11,7 +11,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 public final class VatItemPortEntity extends AbstractVatPortEntity
         implements ResourceEndpoint, net.impactvector.mobvats.gamecontent.multiblock.common.ActiveBoundaryPort {
     public int transferBoundary(int limit) {
-        return ejectItems(output);
+        return redstoneInhibited() ? 0 : ejectItems(output);
     }
 
     public java.util.Set<ConduitTopology.Role> roles(ConduitResource resource) {
@@ -26,7 +26,7 @@ public final class VatItemPortEntity extends AbstractVatPortEntity
     }
 
     public boolean routingAvailable() {
-        return !isRemoved();
+        return !isRemoved() && !redstoneInhibited();
     }
 
     private java.util.List<net.minecraft.world.item.ItemStack> outputDemand = java.util.List.of();
@@ -119,11 +119,13 @@ public final class VatItemPortEntity extends AbstractVatPortEntity
 
         public net.minecraft.world.item.ItemStack insertItem(
                 int slot, net.minecraft.world.item.ItemStack stack, boolean simulate) {
-            return current().insertItem(slot, stack, simulate);
+            return redstoneInhibited() ? stack : current().insertItem(slot, stack, simulate);
         }
 
         public net.minecraft.world.item.ItemStack extractItem(int slot, int amount, boolean simulate) {
-            return current().extractItem(slot, amount, simulate);
+            return redstoneInhibited()
+                    ? net.minecraft.world.item.ItemStack.EMPTY
+                    : current().extractItem(slot, amount, simulate);
         }
 
         public int getSlotLimit(int slot) {

@@ -18,7 +18,7 @@ public final class VatBlenderEntity extends AbstractVatEntity implements VatActo
     }
 
     public boolean routingAvailable() {
-        return !isRemoved();
+        return !isRemoved() && !redstoneInhibited();
     }
 
     public VatBlenderEntity(BlockPos pos, BlockState state) {

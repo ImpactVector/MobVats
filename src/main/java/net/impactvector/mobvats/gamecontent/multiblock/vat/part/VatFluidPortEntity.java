@@ -14,7 +14,7 @@ public final class VatFluidPortEntity extends AbstractVatPortEntity
                 ResourceEndpoint,
                 net.impactvector.mobvats.gamecontent.multiblock.common.ActiveBoundaryPort {
     public int transferBoundary(int limit) {
-        return boundary.transfer(limit);
+        return redstoneInhibited() ? 0 : boundary.transfer(limit);
     }
 
     public java.util.Set<ConduitTopology.Role> roles(ConduitResource resource) {
@@ -34,7 +34,7 @@ public final class VatFluidPortEntity extends AbstractVatPortEntity
     }
 
     public boolean routingAvailable() {
-        return !isRemoved();
+        return !isRemoved() && !redstoneInhibited();
     }
 
     private final net.impactvector.mobvats.gamecontent.multiblock.common.MachineFluidPort<
@@ -72,11 +72,46 @@ public final class VatFluidPortEntity extends AbstractVatPortEntity
     }
 
     private IFluidHandler delegated(IoDirection direction) {
-        return getMultiblockController()
+        var target = getMultiblockController()
                 .filter(MultiblockVat::isAssembled)
                 .map(c -> direction.isInput()
                         ? c.storage().destination(getBlockPos(), true, this::accepts)
                         : c.resourceRouting().fluidConsumer(this, this::accepts))
                 .orElse(EmptyFluidHandler.INSTANCE);
+        // Gate the forwarding target itself, including retained ZeroCore and pipe handlers.
+        return new IFluidHandler() {
+            public int getTanks() {
+                return target.getTanks();
+            }
+
+            public net.neoforged.neoforge.fluids.FluidStack getFluidInTank(int tank) {
+                return target.getFluidInTank(tank);
+            }
+
+            public int getTankCapacity(int tank) {
+                return target.getTankCapacity(tank);
+            }
+
+            public boolean isFluidValid(int tank, net.neoforged.neoforge.fluids.FluidStack stack) {
+                return target.isFluidValid(tank, stack);
+            }
+
+            public int fill(net.neoforged.neoforge.fluids.FluidStack stack, FluidAction action) {
+                return redstoneInhibited() ? 0 : target.fill(stack, action);
+            }
+
+            public net.neoforged.neoforge.fluids.FluidStack drain(
+                    net.neoforged.neoforge.fluids.FluidStack stack, FluidAction action) {
+                return redstoneInhibited()
+                        ? net.neoforged.neoforge.fluids.FluidStack.EMPTY
+                        : target.drain(stack, action);
+            }
+
+            public net.neoforged.neoforge.fluids.FluidStack drain(int amount, FluidAction action) {
+                return redstoneInhibited()
+                        ? net.neoforged.neoforge.fluids.FluidStack.EMPTY
+                        : target.drain(amount, action);
+            }
+        };
     }
 }

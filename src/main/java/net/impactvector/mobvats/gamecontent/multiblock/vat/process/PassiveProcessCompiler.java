@@ -37,7 +37,8 @@ public final class PassiveProcessCompiler {
             var fluid = BuiltInRegistries.FLUID.get(ResourceLocation.parse(output.fluid()));
             var requirements = new ArrayList<ProcessRequirement>();
             requirements.add(ProcessRequirement.stage(output.requires_stage()));
-            if (!output.actor_use().isEmpty()) requirements.add(ProcessRequirement.actor(output.actor_use()));
+            requirements.add(
+                    ProcessRequirement.actor(output.actor_use().isEmpty() ? PassiveUses.DRAIN : output.actor_use()));
             definitions.add(new ProcessDefinition(
                     "01_timer_" + index,
                     output.process(),

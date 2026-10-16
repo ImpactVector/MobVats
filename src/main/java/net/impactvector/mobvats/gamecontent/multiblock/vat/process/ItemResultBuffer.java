@@ -100,7 +100,9 @@ public class ItemResultBuffer {
         for (var iterator = stacks.listIterator(); iterator.hasNext(); ) {
             var remaining = iterator.next();
             for (var port : ports) {
-                if (port.isRemoved() || !port.getIoDirection().isOutput()) continue;
+                if (port.isRemoved()
+                        || port.redstoneInhibited()
+                        || !port.getIoDirection().isOutput()) continue;
                 int before = remaining.getCount();
                 // Private one-slot staging only: no arbitrary external handler or simulated acceptance.
                 remaining = port.staging().insertItem(0, remaining, false);
