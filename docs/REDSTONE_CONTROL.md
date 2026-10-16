@@ -57,3 +57,31 @@ redstone itself never invokes that reset path.
 R2 validation: Java 21 `format`, diff review, `validate` succeeded; all 888 required
 GameTests passed. Validation caught and corrected an operator-disabled availability
 regression and normalized the creative test's automatically started fixture epoch.
+
+## R3 — Multiple Mixer drives
+
+Multiple cardinally coupled drives may occupy the existing legal positions around
+the Impeller. Existing attachment geometry, renderer, drive-local inventory/FE
+persistence, and controller assembly persistence need no schema changes. Ownership
+checks are independent of selection. Priority is FE, combustion, creative; equal
+types sort by x, then y, then z. Powered drives are excluded. A combustion drive
+may qualify using a simulated connected-fuel reservation; only the selected drive
+commits a refill and pays for its operating tick.
+
+`drive()` retains an unpowered but empty installed drive for compatibility with
+existing inspection APIs when no motor can run. Such a fallback never executes
+without satisfying its resource requirements. Item ports discover installed fuel
+consumers independently, so backup fuel remains transportable while FE operates.
+
+All providers have equal normalized mechanical output. Continuous failover retains
+spin-up and running cadence. Redstone pauses retain that epoch even when an enabled
+backup is empty. Ordinary fuel/energy exhaustion with no redstone still requires
+the established full restart. Batch progress remains retained in either case.
+
+Two new tests exercise three-type priority, direct/indirect failover, all-inhibited
+pause, exact recipe resume, single payment, equal-type position ties, starvation
+failover, and an empty backup during inhibition. Two old rejection tests now verify
+multi-drive formation and deterministic discovery instead.
+
+R3 validation: Java 21 `format`, diff review, `validate` succeeded; all 890 required
+GameTests passed, including the unchanged deterministic recipe selection suite.

@@ -396,7 +396,7 @@ public final class MixerFeDriveGameTests {
     }
 
     @GameTest(template = "empty", timeoutTicks = 60)
-    public static void mixedDrivesRejected(GameTestHelper h) {
+    public static void mixedDrivesFormWithoutSpendingUnavailableFuel(GameTestHelper h) {
         var p = rig(h, 1);
         h.setBlock(p.west(2), MixerContent.state(MixerPartType.CombustionDrive));
         h.runAtTickTime(35, () -> {
@@ -405,8 +405,10 @@ public final class MixerFeDriveGameTests {
             d.energy().receiveEnergy(10000, false);
             ticks(c, 200);
             h.assertTrue(
-                    !c.isAssembled() && c.drive().isEmpty() && d.energy().getEnergyStored() == 10000,
-                    "Mixed drives formed/consumed FE");
+                    c.isAssembled()
+                            && c.drive().orElseThrow() == d
+                            && d.energy().getEnergyStored() < 10000,
+                    "Mixed drives did not form/select the fueled FE drive");
             h.succeed();
         });
     }

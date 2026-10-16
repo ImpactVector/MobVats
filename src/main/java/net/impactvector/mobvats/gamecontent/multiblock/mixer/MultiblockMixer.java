@@ -56,7 +56,14 @@ public final class MultiblockMixer
             Comparator.comparing(MixerControllerEntity::getBlockPos, ConduitTopology.POSITION));
     private final AttachedPartCollection<AbstractMixerDriveEntity> attachedDrives = new AttachedPartCollection<>(
             AbstractMixerDriveEntity.class,
-            Comparator.comparing(AbstractMixerDriveEntity::getBlockPos, ConduitTopology.POSITION));
+            Comparator.comparingInt(MultiblockMixer::drivePriority)
+                    .thenComparing(AbstractMixerDriveEntity::getBlockPos, ConduitTopology.POSITION));
+
+    // FE primary, combustion backup, creative last; ties use stable x/y/z position order.
+    private static int drivePriority(AbstractMixerDriveEntity drive) {
+        return drive instanceof MixerFeDriveEntity ? 0 : drive instanceof MixerCombustionDriveEntity ? 1 : 2;
+    }
+
     private final AttachedPartCollection<MixerPumpEntity> attachedPumps = new AttachedPartCollection<>(
             MixerPumpEntity.class, Comparator.comparing(MixerPumpEntity::getBlockPos, ConduitTopology.POSITION));
     private final AttachedPartCollection<ActiveBoundaryPort> activePorts = new AttachedPartCollection<>(
@@ -244,18 +251,28 @@ public final class MultiblockMixer
         return attachedDrives.parts();
     }
 
-    public Optional<MixerDrive> drive() {
+    public boolean ownsDrive(AbstractMixerDriveEntity drive) {
         var a = assembly().orElse(null);
-        var drives = driveParts();
-        if (a == null || drives.size() != 1) return Optional.empty();
-        var drive = drives.getFirst();
-        return !drive.isRemoved()
-                        && drive.getMultiblockController()
-                                .filter(c -> c == this)
-                                .isPresent()
-                        && AbstractMixerDriveEntity.couples(drive.getBlockPos(), a.impeller())
-                ? Optional.of(drive)
-                : Optional.empty();
+        return a != null
+                && !drive.isRemoved()
+                && containsPart(drive)
+                && drive.getMultiblockController().filter(c -> c == this).isPresent()
+                && AbstractMixerDriveEntity.couples(drive.getBlockPos(), a.impeller());
+    }
+
+    public Optional<MixerDrive> drive() {
+        var eligible = driveParts().stream()
+                .filter(this::ownsDrive)
+                .filter(d -> !d.redstoneInhibited())
+                .toList();
+        // Keep an unfueled installed drive discoverable for existing diagnostics and fuel intake.
+        return eligible.stream()
+                .filter(d -> d.availableDrive(this) >= 1
+                        || d instanceof MixerCombustionDriveEntity combustion
+                                && combustion.canRefill(resourceRouting()))
+                .findFirst()
+                .or(() -> eligible.stream().findFirst())
+                .map(MixerDrive.class::cast);
     }
 
     public double availableDrive() {
@@ -297,12 +314,16 @@ public final class MultiblockMixer
     }
 
     public net.neoforged.neoforge.items.IItemHandler itemsForPort(MixerPortEntity port) {
-        var motor = drive().filter(MixerCombustionDriveEntity.class::isInstance)
+        // Transport discovers installed consumers independently of current production selection.
+        var motor = driveParts().stream()
+                .filter(this::ownsDrive)
+                .filter(MixerCombustionDriveEntity.class::isInstance)
                 .map(MixerCombustionDriveEntity.class::cast)
                 .filter(d -> conduitTopology
                         .expand(d.getBlockPos(), ConduitResource.ITEM, List.of(), List.of())
                         .inputs()
                         .contains(port.getBlockPos()))
+                .findFirst()
                 .orElse(null);
         boolean input = port.getIoDirection().isInput();
         var recipeItems = state.itemPort(
@@ -398,10 +419,6 @@ public final class MultiblockMixer
                         .filter(AbstractMixerDriveEntity.class::isInstance)
                         .map(AbstractMixerDriveEntity.class::cast)
                         .toList();
-        if (drives.size() > 1) {
-            validator.setLastError("multiblock.mobvats.mixer_drive_count");
-            return null;
-        }
         for (var drive : drives)
             if (!AbstractMixerDriveEntity.couples(drive.getBlockPos(), anchor)) {
                 validator.setLastError(drive.getBlockPos(), "multiblock.mobvats.mixer_drive_position");
@@ -623,17 +640,17 @@ public final class MultiblockMixer
 
     private void tickDrive() {
         var motor = drive().orElse(null);
-        // Redstone freezes the mechanical epoch instead of invoking stopDrive's reset path.
-        if (motor instanceof AbstractMixerDriveEntity part && part.redstoneInhibited()) return;
-        if (motor != activeDrive) {
-            stopDrive();
-            activeDrive = motor;
-        }
+        // All installed motors inhibited: retain the current mechanical epoch and batch.
+        boolean signalPause = driveParts().stream().anyMatch(d -> ownsDrive(d) && d.redstoneInhibited());
+        if (motor == null && signalPause) return;
         if (motor instanceof MixerCombustionDriveEntity combustion) combustion.refill(resourceRouting());
         if (slotCount() == 0 || motor == null || motor.availableDrive(this) < 1 || !motor.driveTick(this)) {
+            if (signalPause && slotCount() > 0) return;
             stopDrive();
             return;
         }
+        // Providers have equal mechanical output; uninterrupted failover retains spin-up.
+        activeDrive = motor;
         if (operatingState != MixerOperatingState.RUNNING) {
             var previous = operatingState;
             operatingState = MixerOperatingState.SPINNING_UP;

@@ -85,6 +85,7 @@ public final class MixerCombustionDriveEntity extends AbstractMixerDriveEntity i
     };
 
     public boolean refill(ResourceRouting routing) {
+        if (redstoneInhibited()) return false;
         if (burnTicks > 0 || !inventory.getStackInSlot(0).isEmpty()) return false;
         var acquisition = routing.prepare(this, demandPlan()).orElse(null);
         if (acquisition == null) return false;
@@ -95,6 +96,13 @@ public final class MixerCombustionDriveEntity extends AbstractMixerDriveEntity i
 
     public MixerCombustionDriveEntity(BlockPos pos, BlockState state) {
         super(MixerPartType.CombustionDrive, pos, state);
+    }
+
+    public boolean canRefill(ResourceRouting routing) {
+        return !redstoneInhibited()
+                && burnTicks == 0
+                && inventory.getStackInSlot(0).isEmpty()
+                && routing.prepare(this, demandPlan()).isPresent();
     }
 
     public static int fuelTicks(ItemStack stack) {

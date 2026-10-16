@@ -33,6 +33,6 @@ public abstract class AbstractMixerDriveEntity extends AbstractMixerEntity imple
                 && level == mixer.getWorld()
                 && mixer.containsPart(this)
                 && getMultiblockController().filter(c -> c == mixer).isPresent()
-                && mixer.drive().filter(d -> d == this).isPresent();
+                && mixer.ownsDrive(this);
     }
 }

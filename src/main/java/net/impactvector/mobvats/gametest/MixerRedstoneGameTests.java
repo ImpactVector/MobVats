@@ -114,4 +114,107 @@ public final class MixerRedstoneGameTests {
     public static void creativeDrivePauseResume(GameTestHelper h) {
         suspension(h, MixerPartType.Drive, false);
     }
+
+    @GameTest(template = "empty", timeoutTicks = 60)
+    public static void multipleDrivePriorityFailoverAndSinglePayment(GameTestHelper h) {
+        MixerGameTests.rig(h);
+        var backup = D.west(2);
+        var creative = D.west().north();
+        h.setBlock(D, MixerContent.state(MixerPartType.FeDrive));
+        h.setBlock(backup, MixerContent.state(MixerPartType.CombustionDrive));
+        h.setBlock(creative, MixerContent.state(MixerPartType.Drive));
+        h.runAtTickTime(35, () -> {
+            var c = ((MixerControllerEntity) h.getBlockEntity(C))
+                    .getMultiblockController()
+                    .orElseThrow();
+            var fe = (MixerFeDriveEntity) h.getBlockEntity(D);
+            var combustion = (MixerCombustionDriveEntity) h.getBlockEntity(backup);
+            c.syncDataFrom(
+                    c.syncDataTo(new CompoundTag(), h.getLevel().registryAccess(), SyncReason.FullSync),
+                    h.getLevel().registryAccess(),
+                    SyncReason.FullSync);
+            fe.energy().receiveEnergy(MixerFeDriveEntity.CAPACITY, false);
+            combustion.fuel().insertItem(0, new ItemStack(Items.COAL, 8), false);
+            h.assertTrue(c.isAssembled() && c.drive().orElseThrow() == fe, "FE priority/formation");
+            MixerCombustionGameTests.ticks(c, 17);
+            h.assertTrue(
+                    combustion.burnTicks() == 0
+                            && combustion.fuel().getStackInSlot(0).getCount() == 8,
+                    "Unselected combustion drive consumed fuel");
+            power(h, D.above(), true);
+            int energy = fe.energy().getEnergyStored();
+            MixerCombustionGameTests.ticks(c, 3);
+            h.assertTrue(
+                    c.drive().orElseThrow() == combustion
+                            && c.startupTicks() == 20
+                            && fe.energy().getEnergyStored() == energy
+                            && combustion.burnTicks() > 0,
+                    "Failover reset spin-up or charged multiple drives");
+            power(h, backup.above(), false);
+            int burn = combustion.burnTicks();
+            MixerCombustionGameTests.ticks(c, c.spinUpTicks() - 20);
+            h.assertTrue(
+                    c.drive().orElseThrow() == h.getBlockEntity(creative)
+                            && c.operatingState() == MixerOperatingState.RUNNING
+                            && combustion.burnTicks() == burn,
+                    "Creative failover consumed backup fuel");
+            c.state().fluids(true).fill(new FluidStack(Fluids.WATER, 1000), FluidAction.EXECUTE);
+            c.state().depositExperienceMb(250);
+            MixerCombustionGameTests.ticks(c, 37);
+            power(h, creative.above(), false);
+            MixerCombustionGameTests.ticks(c, 100);
+            h.assertTrue(
+                    c.drive().isEmpty()
+                            && c.state().progress() == 30
+                            && fe.energy().getEnergyStored() == energy
+                            && combustion.burnTicks() == burn,
+                    "All-inhibited Mixer advanced or spent resources");
+            unpower(h, D.above());
+            MixerCombustionGameTests.ticks(c, 3);
+            h.assertTrue(
+                    c.drive().orElseThrow() == fe && c.state().progress() == 40,
+                    "Primary did not resume the retained running batch/cadence");
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 60)
+    public static void equalDrivePriorityUsesPositionAndOnePayment(GameTestHelper h) {
+        MixerGameTests.rig(h);
+        var west = D.west(2);
+        h.setBlock(D, MixerContent.state(MixerPartType.FeDrive));
+        h.setBlock(west, MixerContent.state(MixerPartType.FeDrive));
+        h.runAtTickTime(35, () -> {
+            var c = ((MixerControllerEntity) h.getBlockEntity(C))
+                    .getMultiblockController()
+                    .orElseThrow();
+            var first = (MixerFeDriveEntity) h.getBlockEntity(west);
+            var second = (MixerFeDriveEntity) h.getBlockEntity(D);
+            first.energy().receiveEnergy(10000, false);
+            second.energy().receiveEnergy(10000, false);
+            MixerCombustionGameTests.ticks(c, 20);
+            h.assertTrue(
+                    c.drive().orElseThrow() == first
+                            && first.energy().getEnergyStored() < 10000
+                            && second.energy().getEnergyStored() == 10000,
+                    "Equal-priority selection/payment not deterministic");
+            var saved = first.saveEnergy();
+            saved.putInt("stored", 0);
+            saved.putInt("credit", 0);
+            first.loadEnergy(saved);
+            MixerCombustionGameTests.ticks(c, 1);
+            h.assertTrue(
+                    c.drive().orElseThrow() == second && c.startupTicks() == 21,
+                    "Available equal-priority backup failed without mechanical reset");
+            power(h, D.above(), false);
+            MixerCombustionGameTests.ticks(c, 50);
+            h.assertTrue(
+                    c.startupTicks() == 21 && c.drive().orElseThrow() == first,
+                    "Empty enabled backup reset a redstone-paused rotor");
+            unpower(h, D.above());
+            MixerCombustionGameTests.ticks(c, 1);
+            h.assertTrue(c.startupTicks() == 22, "Rotor failed to resume after unavailable-backup pause");
+            h.succeed();
+        });
+    }
 }

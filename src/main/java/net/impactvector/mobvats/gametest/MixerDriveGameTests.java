@@ -195,15 +195,17 @@ public final class MixerDriveGameTests {
     }
 
     @GameTest(template = "empty", timeoutTicks = 120)
-    public static void multipleDrivesRejectAndRecover(GameTestHelper h) {
+    public static void multipleDrivesFormAndRecover(GameTestHelper h) {
         rig(h);
         placeDrive(h, IMPELLER.east());
         placeDrive(h, IMPELLER.west());
         h.runAtTickTime(35, () -> {
             var c = mixer(h);
             h.assertTrue(
-                    !c.isAssembled() && c.drive().isEmpty() && c.availableDrive() == 0,
-                    "Multiple drives selected an arbitrary motor");
+                    c.isAssembled()
+                            && c.drive().orElseThrow() == h.getBlockEntity(IMPELLER.west())
+                            && c.availableDrive() == 1,
+                    "Multiple drives did not select by stable position");
             h.setBlock(IMPELLER.west(), MixerContent.state(MixerPartType.Casing));
         });
         h.runAtTickTime(70, () -> {
