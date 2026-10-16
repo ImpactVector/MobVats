@@ -12,7 +12,7 @@ import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 
-/** Standalone products. Fluid forming belongs to the future Extruder. */
+/** Standalone products; fluid forming is provided by the Extruder. */
 public final class ProductContent {
     public static final DeferredItem<Item> RAW_MEAT =
             Content.ITEMS.registerSimpleItem("raw_meat", new Item.Properties().food(Foods.BEEF));

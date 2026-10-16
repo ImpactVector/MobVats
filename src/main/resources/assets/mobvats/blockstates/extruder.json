@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "facing=north,form=portion": {
+      "model": "mobvats:block/extruder_portion",
+      "y": 0
+    },
+    "facing=east,form=portion": {
+      "model": "mobvats:block/extruder_portion",
+      "y": 90
+    },
+    "facing=south,form=portion": {
+      "model": "mobvats:block/extruder_portion",
+      "y": 180
+    },
+    "facing=west,form=portion": {
+      "model": "mobvats:block/extruder_portion",
+      "y": 270
+    },
+    "facing=north,form=block": {
+      "model": "mobvats:block/extruder_block",
+      "y": 0
+    },
+    "facing=east,form=block": {
+      "model": "mobvats:block/extruder_block",
+      "y": 90
+    },
+    "facing=south,form=block": {
+      "model": "mobvats:block/extruder_block",
+      "y": 180
+    },
+    "facing=west,form=block": {
+      "model": "mobvats:block/extruder_block",
+      "y": 270
+    }
+  }
+}

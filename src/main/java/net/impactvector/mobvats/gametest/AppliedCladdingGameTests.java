@@ -257,7 +257,7 @@ public final class AppliedCladdingGameTests {
                 .filter(id -> id.getNamespace().equals("mobvats"))
                 .count();
         h.assertTrue(
-                blocks == 45 && items == 52, "Unexpected registry count: " + blocks + " blocks, " + items + " items");
+                blocks == 46 && items == 53, "Unexpected registry count: " + blocks + " blocks, " + items + " items");
         org.slf4j.LoggerFactory.getLogger(AppliedCladdingGameTests.class)
                 .info("Unified registry: {} blocks, {} items", blocks, items);
         h.succeed();

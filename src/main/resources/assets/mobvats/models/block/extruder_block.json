@@ -1,0 +1,78 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mobvats:blocks/vat_casing_face",
+    "shell": "mobvats:blocks/vat_casing_face",
+    "rim": "mobvats:blocks/tank_rim",
+    "inside": "mobvats:blocks/vat_casing_inner",
+    "indicator": "mobvats:blocks/meat_block"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#shell"
+        },
+        "south": {
+          "texture": "#inside"
+        },
+        "east": {
+          "texture": "#shell"
+        },
+        "west": {
+          "texture": "#shell"
+        },
+        "up": {
+          "texture": "#shell"
+        },
+        "down": {
+          "texture": "#inside"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        3,
+        -0.02
+      ],
+      "to": [
+        13,
+        13,
+        0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rim"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        5,
+        -0.04
+      ],
+      "to": [
+        11,
+        11,
+        -0.02
+      ],
+      "faces": {
+        "north": {
+          "texture": "#indicator"
+        }
+      }
+    }
+  ]
+}

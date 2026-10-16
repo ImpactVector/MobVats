@@ -115,5 +115,6 @@
   "item.mobvats.cooked_meat": "Cooked Meat",
   "item.mobvats.fertilizer": "Fertilizer",
   "block.mobvats.meat_block": "Meat Block",
-  "block.mobvats.waste_block": "Waste Block"
+  "block.mobvats.waste_block": "Waste Block",
+  "block.mobvats.extruder": "Extruder"
 }

@@ -86,6 +86,7 @@ public final class Content {
 
     static {
         net.impactvector.mobvats.gamecontent.product.ProductContent.initialize();
+        net.impactvector.mobvats.gamecontent.extruder.ExtruderContent.initialize();
         net.impactvector.mobvats.gamecontent.multiblock.mixer.MixerContent.initialize();
         net.impactvector.mobvats.gamecontent.multiblock.conduit.ConduitContent.initialize();
         net.impactvector.mobvats.gamecontent.multiblock.conduit.FluidBufferContent.initialize();
@@ -153,6 +154,7 @@ public final class Content {
                             for (var buffer :
                                     net.impactvector.mobvats.gamecontent.multiblock.conduit.FluidBufferContent.blocks())
                                 output.accept(buffer);
+                            output.accept(net.impactvector.mobvats.gamecontent.extruder.ExtruderContent.BLOCK.get());
                             output.accept(SYRINGE.get());
                             for (var product : net.impactvector.mobvats.gamecontent.product.ProductContent.items())
                                 output.accept(product);
