@@ -29,12 +29,17 @@ final class ExtruderWorldFixtures {
         var source = pos.west();
         level.setBlockAndUpdate(source, FluidBufferContent.block().defaultBlockState());
         var buffer = (FluidBufferEntity) level.getBlockEntity(source);
-        buffer.tank.fill(new FluidStack(meat ? ProductFluids.MEAT.get() : ProductFluids.WASTE.get(), 4000),
+        buffer.tank.fill(
+                new FluidStack(meat ? ProductFluids.MEAT.get() : ProductFluids.WASTE.get(), 4000),
                 net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
         level.setBlockAndUpdate(pos.below(), Blocks.BARREL.defaultBlockState());
-        level.setBlockAndUpdate(pos, ExtruderContent.BLOCK.get().defaultBlockState()
-                .setValue(ExtruderBlock.FACING, Direction.EAST)
-                .setValue(ExtruderBlock.FORM, block ? ExtruderBlock.Form.BLOCK : ExtruderBlock.Form.PORTION));
+        level.setBlockAndUpdate(
+                pos,
+                ExtruderContent.BLOCK
+                        .get()
+                        .defaultBlockState()
+                        .setValue(ExtruderBlock.FACING, Direction.EAST)
+                        .setValue(ExtruderBlock.FORM, block ? ExtruderBlock.Form.BLOCK : ExtruderBlock.Form.PORTION));
         ManualTestWorld.sign(level, pos.offset(-2, 1, -2), "EXTRUDER", fluid, form, "Barrel below");
     }
 
@@ -50,8 +55,8 @@ final class ExtruderWorldFixtures {
                 if (radius == 9 || radius == 6) {
                     level.setBlockAndUpdate(center.offset(dx, 0, dz), Blocks.STONE_BRICKS.defaultBlockState());
                 } else if (radius >= 7) {
-                    level.setBlockAndUpdate(center.offset(dx, 0, dz),
-                            fluid.defaultFluidState().createLegacyBlock());
+                    level.setBlockAndUpdate(
+                            center.offset(dx, 0, dz), fluid.defaultFluidState().createLegacyBlock());
                 } else {
                     level.setBlockAndUpdate(center.offset(dx, 0, dz), Blocks.STONE_BRICKS.defaultBlockState());
                 }
@@ -65,7 +70,8 @@ final class ExtruderWorldFixtures {
                     boolean battlement = dy == 5 || dy == 7;
                     boolean crenel = ((dx + dz) & 1) == 0;
                     boolean present = wallCell && (!battlement || crenel || tower);
-                    level.setBlockAndUpdate(center.offset(dx, dy, dz),
+                    level.setBlockAndUpdate(
+                            center.offset(dx, dy, dz),
                             present ? wall.defaultBlockState() : Blocks.AIR.defaultBlockState());
                 }
             }
@@ -77,8 +83,13 @@ final class ExtruderWorldFixtures {
                     for (int dy = 2; dy <= 3; dy++)
                         level.setBlockAndUpdate(center.offset(dx, dy, dz), Blocks.AIR.defaultBlockState());
             }
-        ManualTestWorld.sign(level, center.offset(0, 2, -10),
-                meat ? "MEAT CASTLE" : "WASTE CASTLE", "Fluid moat", "Block fortress", "Extruder showcase");
+        ManualTestWorld.sign(
+                level,
+                center.offset(0, 2, -10),
+                meat ? "MEAT CASTLE" : "WASTE CASTLE",
+                "Fluid moat",
+                "Block fortress",
+                "Extruder showcase");
     }
 
     static void verify(ServerLevel level, StringBuilder manifest) {
@@ -91,8 +102,7 @@ final class ExtruderWorldFixtures {
             boolean produced = false;
             for (int slot = 0; slot < barrel.getContainerSize(); slot++)
                 produced |= !barrel.getItem(slot).isEmpty();
-            if (!produced)
-                throw new IllegalStateException("Extruder demo did not produce into barrel at " + pos);
+            if (!produced) throw new IllegalStateException("Extruder demo did not produce into barrel at " + pos);
         }
         manifest.append("\\nExtruder demonstrations: 4 rear-buffer-fed units, all produced into barrels.\\n");
         manifest.append("Meat Castle: (-53, -60, 30); Waste Castle: (-82, -60, 30).\\n");
