@@ -7,6 +7,7 @@ The repository is an active development implementation, version 0.1.0. No public
 Implemented features include multiple independently scheduled specimens in one Vat, configurable capture and processing definitions, tool interactions and harvesting, culture and feeding, clean/dirty medium, transactional item/fluid routing, physical Fluid Buffers, configurable Mixer recipes, and creative, combustion and FE Mixer Drives. Mechanical functions use universal inventory items with explicitly applied Vat or Mixer T1 casing/glass. T2/T3 are procedural art previews; they are not gameplay tiers.
 
 Mixer [manual Item and Fluid Meters](docs/MIXER_MANUAL_METERS.md) constrain exact ingredient quantities using sampled filters.
+Optional [Mixer Blockers](docs/MIXER_BLOCKER.md) exclude sampled output products, including distinct slurry compositions.
 
 Requirements: Minecraft **1.21.1**, NeoForge **21.1.252** for the development build, and external **ZeroCore2 1.21.1-2.4.18**. ZeroCore2 is mandatory and is not bundled. Build with Java 21 using the included Gradle wrapper:
 

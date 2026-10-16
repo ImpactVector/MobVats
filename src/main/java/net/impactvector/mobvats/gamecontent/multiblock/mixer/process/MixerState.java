@@ -63,6 +63,18 @@ public final class MixerState {
     private String meterProblem = "";
     private boolean continuingBatch;
     private MixerMeterRequirements batchMeters;
+    private java.util.function.Supplier<List<MixerBlockerSample>> blockerSource = List::of;
+    private boolean candidateBlocked;
+
+    public void blockerSource(java.util.function.Supplier<List<MixerBlockerSample>> source) {
+        blockerSource = Objects.requireNonNull(source);
+    }
+
+    private boolean blockedOutputs(MixerRecipeDefinition definition, List<FluidStack> outputs) {
+        return blockerSource.get().stream()
+                .anyMatch(sample -> outputs.stream().anyMatch(sample::matches)
+                        || definition.itemOutputs().stream().anyMatch(o -> sample.matches(o.stack())));
+    }
 
     public void meterSource(java.util.function.Supplier<MixerMeterRequirements> source) {
         meterSource = source;
@@ -393,11 +405,14 @@ public final class MixerState {
     }
 
     private Plan selectPlan() {
+        candidateBlocked = false;
         Plan best = null;
         for (var definition : MixerRecipeRegistry.recipes()) {
             var candidate = plan(definition);
             if (candidate != null && (best == null || comparePlans(candidate, best) < 0)) best = candidate;
         }
+        if (best == null && candidateBlocked)
+            blocked = "All compatible recipes blocked by Mixer Blocker; production idle";
         return best;
     }
 
@@ -469,11 +484,10 @@ public final class MixerState {
             blocked = "Insufficient recipe fluid";
             return null;
         }
-        var reservation = new ResourceReservation();
         var bundle = strategy.bundle(d);
         var itemStacks = new ArrayList<ItemStack>();
         for (int i = 0; i < items.getSlots(); i++)
-            itemStacks.add(reservation.item(items, i).copy());
+            itemStacks.add(items.getStackInSlot(i).copy());
         var itemUse = allocate(
                 itemStacks.stream().mapToInt(ItemStack::getCount).toArray(),
                 bundle.items().stream()
@@ -510,6 +524,12 @@ public final class MixerState {
             blocked = e.getMessage();
             return null;
         }
+        if (!continuingBatch && blockedOutputs(d, outputs)) {
+            candidateBlocked = true;
+            blocked = "Candidate excluded by Mixer Blocker";
+            return null;
+        }
+        var reservation = new ResourceReservation();
         for (int r = 0; r < physical.size(); r++) {
             var s = reservation.fluid(physical.get(r)).copy();
             s.shrink(Arrays.stream(fluidUse[r]).sum());
@@ -635,6 +655,7 @@ public final class MixerState {
             refreshMeters();
             if (committing
                     || (!continuingBatch && !meterProblem.isEmpty())
+                    || (!continuingBatch && blockedOutputs(plan.definition(), plan.outputs()))
                     || meters != meterRequirements
                     || registry != MixerRecipeRegistry.snapshot()
                     || boundStorage != storage
@@ -1016,6 +1037,8 @@ public final class MixerState {
                 + "\nWater: " + amount(0) + " mB | WASTE: " + amount(1) + " mB | XP: " + experienceMb()
                 + " mB | Plants: " + plantCount() + "\nRecipe: " + (recipe.isEmpty() ? "none" : recipe)
                 + " | Progress: " + progress + " | " + blocked
+                + "\nMixer Blocker: "
+                + (blockerSource.get().isEmpty() ? "No Blocker filters configured" : "Sample filters configured")
                 + (meterProblem.isEmpty() ? "" : "\nNext batch blocked: " + meterProblem) + "\nResources: "
                 + tanks().stream()
                         .filter(t -> !t.isEmpty())

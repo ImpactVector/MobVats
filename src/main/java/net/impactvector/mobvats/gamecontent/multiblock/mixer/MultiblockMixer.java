@@ -200,6 +200,12 @@ public final class MultiblockMixer
         super(world);
         if (!world.isClientSide) state.bind(storage, BlockPos.ZERO);
         state.meterSource(this::installedMeters);
+        state.blockerSource(() -> getConnectedParts().stream()
+                .filter(MixerBlockerEntity.class::isInstance)
+                .map(MixerBlockerEntity.class::cast)
+                .map(MixerBlockerEntity::sample)
+                .filter(s -> !s.equals(MixerBlockerSample.EMPTY))
+                .toList());
     }
 
     /** Resolve installed controls at selection time, including invalid controls and post-load changes. */

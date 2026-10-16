@@ -48,7 +48,9 @@ public final class EndpointState {
                     "functionState",
                     net.impactvector.mobvats.gamecontent.multiblock.common.MechanicalState.capture(entity));
         }
-        if (entity
+        if (entity instanceof net.impactvector.mobvats.gamecontent.multiblock.mixer.part.MixerBlockerEntity blocker) {
+            state.put("blockerConfiguration", blocker.configuration());
+        } else if (entity
                 instanceof net.impactvector.mobvats.gamecontent.multiblock.mixer.part.AbstractMixerMeterEntity meter) {
             state.put("meterConfiguration", meter.configuration());
         } else if (entity
@@ -102,6 +104,9 @@ public final class EndpointState {
                     entity, state.getCompound("functionState"));
             return;
         }
+        if (entity instanceof net.impactvector.mobvats.gamecontent.multiblock.mixer.part.MixerBlockerEntity blocker
+                && state.contains("blockerConfiguration"))
+            blocker.loadConfiguration(state.getCompound("blockerConfiguration"));
         if (entity instanceof net.impactvector.mobvats.gamecontent.multiblock.mixer.part.AbstractMixerMeterEntity meter
                 && state.contains("meterConfiguration"))
             meter.loadConfiguration(state.getCompound("meterConfiguration"));

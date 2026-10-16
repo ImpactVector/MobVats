@@ -99,6 +99,8 @@
   "block.mobvats.drain_valve": "Drain Valve",
   "block.mobvats.item_void": "Item Void",
   "block.mobvats.fluid_void": "Fluid Void",
+  "block.mobvats.mixer_blocker": "Mixer Blocker",
+  "message.mobvats.blocker_sample_set": "Mixer Blocker product sample assigned",
   "block.mobvats.mixer_item_meter": "Item Meter",
   "block.mobvats.mixer_fluid_meter": "Fluid Meter",
   "gui.mobvats.meter_quantity": "Quantity",
