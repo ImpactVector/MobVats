@@ -73,7 +73,7 @@ public final class ManualTestWorld {
             level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false, event.getServer());
             level.getGameRules().getRule(GameRules.RULE_SPAWN_RADIUS).set(0, event.getServer());
             // Keep all rows ticking while no players are connected.
-            for (int x = -1; x <= 8; x++) for (int z = -2; z <= 11; z++) level.setChunkForced(x, z, true);
+            for (int x = -7; x <= 8; x++) for (int z = -2; z <= 11; z++) level.setChunkForced(x, z, true);
             var put = (java.util.function.BiConsumer<BlockPos, net.minecraft.world.level.block.state.BlockState>)
                     level::setBlockAndUpdate;
             for (int row = 0; row < 4; row++) {
@@ -177,6 +177,7 @@ public final class ManualTestWorld {
             OperatorVatFixtures.build(level);
             ProductionWorldFixtures.build(level);
             CreativeProductionFixtures.build(level);
+            ExtruderWorldFixtures.build(level);
         } catch (Exception e) {
             fail(event.getServer(), e);
         }
@@ -361,8 +362,10 @@ public final class ManualTestWorld {
             } finally {
                 Files.writeString(Path.of(System.getProperty("mobvats.testWorldPath"), "fixtures.md"), manifest);
             }
+            ExtruderWorldFixtures.verify(level, manifest);
+            Files.writeString(Path.of(System.getProperty("mobvats.testWorldPath"), "fixtures.md"), manifest);
             if (productionFailure != null) throw productionFailure;
-            for (int x = -1; x <= 8; x++) for (int z = -2; z <= 11; z++) level.setChunkForced(x, z, false);
+            for (int x = -7; x <= 8; x++) for (int z = -2; z <= 11; z++) level.setChunkForced(x, z, false);
             Files.writeString(Path.of(System.getProperty("mobvats.testWorldPath"), "fixtures.md"), manifest);
             verified = true;
             LogUtils.getLogger()
@@ -424,7 +427,7 @@ public final class ManualTestWorld {
             OperatorVatFixtures.resume(server.overworld());
             operatorsSuspended = false;
         }
-        for (int x = -1; x <= 8; x++)
+        for (int x = -7; x <= 8; x++)
             for (int z = -2; z <= 11; z++) server.overworld().setChunkForced(x, z, false);
         server.tickRateManager().setTickRate(20);
         server.halt(false);
