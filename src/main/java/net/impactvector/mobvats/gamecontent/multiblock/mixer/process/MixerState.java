@@ -1,5 +1,6 @@
 package net.impactvector.mobvats.gamecontent.multiblock.mixer.process;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.function.BiPredicate;
 import net.impactvector.mobvats.gamecontent.fluid.*;
@@ -101,12 +102,10 @@ public final class MixerState {
                         : net.impactvector.mobvats.gamecontent.multiblock.mixer.MixerLiquidPresentation.select(
                                 selected, List.of(p.strategy()), presentationFluids());
             }
-            for (var definition : MixerRecipeRegistry.recipes()) {
-                var p = plan(definition);
-                if (p != null)
-                    return net.impactvector.mobvats.gamecontent.multiblock.mixer.MixerLiquidPresentation.select(
-                            definition, List.of(p.strategy()), presentationFluids());
-            }
+            var p = selectPlan();
+            if (p != null)
+                return net.impactvector.mobvats.gamecontent.multiblock.mixer.MixerLiquidPresentation.select(
+                        p.definition(), List.of(p.strategy()), presentationFluids());
             return net.impactvector.mobvats.gamecontent.multiblock.mixer.MixerLiquidPresentation.select(
                     null, presentationFluids());
         } finally {
@@ -337,7 +336,44 @@ public final class MixerState {
             List<FluidTank> newTanks,
             List<FluidStack> outputs,
             int itemCount,
+            Consumption consumption,
             PhysicalFluidStorage.OutputReservation routes) {}
+
+    /** Exact sum of allocated item fractions and fluid buckets, including component-defined stack limits. */
+    private record Consumption(BigInteger numerator, BigInteger denominator) implements Comparable<Consumption> {
+        private static final Consumption ZERO = new Consumption(BigInteger.ZERO, BigInteger.ONE);
+
+        Consumption add(int amount, int unit) {
+            var divisor = BigInteger.valueOf(unit);
+            var n = numerator.multiply(divisor).add(BigInteger.valueOf(amount).multiply(denominator));
+            var d = denominator.multiply(divisor);
+            var gcd = n.gcd(d);
+            return new Consumption(n.divide(gcd), d.divide(gcd));
+        }
+
+        public int compareTo(Consumption other) {
+            return numerator.multiply(other.denominator).compareTo(other.numerator.multiply(denominator));
+        }
+    }
+
+    private static int comparePlans(Plan a, Plan b) {
+        int order = Integer.compare(
+                b.strategy().items().size() + b.strategy().fluids().size(),
+                a.strategy().items().size() + a.strategy().fluids().size());
+        if (order == 0) order = b.consumption().compareTo(a.consumption());
+        if (order == 0) order = a.definition().id().compareTo(b.definition().id());
+        if (order == 0) order = a.strategy().id().compareTo(b.strategy().id());
+        return order;
+    }
+
+    private Plan selectPlan() {
+        Plan best = null;
+        for (var definition : MixerRecipeRegistry.recipes()) {
+            var candidate = plan(definition);
+            if (candidate != null && (best == null || comparePlans(candidate, best) < 0)) best = candidate;
+        }
+        return best;
+    }
 
     private static int[][] allocateFluids(
             MixerRecipeDefinition definition, MixerRecipeDefinition.Strategy strategy, List<FluidStack> stacks) {
@@ -385,12 +421,13 @@ public final class MixerState {
     }
 
     private Plan plan(MixerRecipeDefinition d) {
+        Plan best = null;
         for (var strategy : d.strategies())
             if (strategy.enabled()) {
-                var plan = plan(d, strategy);
-                if (plan != null) return plan;
+                var candidate = plan(d, strategy);
+                if (candidate != null && (best == null || comparePlans(candidate, best) < 0)) best = candidate;
             }
-        return null;
+        return best;
     }
 
     private Plan plan(MixerRecipeDefinition d, MixerRecipeDefinition.Strategy strategy) {
@@ -436,8 +473,12 @@ public final class MixerState {
             reservation.fluid(physical.get(r), s);
         }
         int itemCount = 0;
+        var consumption = Consumption.ZERO;
+        for (var input : strategy.fluids()) consumption = consumption.add(input.amount(), 1000);
         for (int i = 0; i < itemStacks.size(); i++) {
             int count = Arrays.stream(itemUse[i]).sum();
+            if (count > 0)
+                consumption = consumption.add(count, itemStacks.get(i).getMaxStackSize());
             itemCount = Math.addExact(itemCount, count);
             var s = itemStacks.get(i).copy();
             s.shrink(count);
@@ -507,7 +548,8 @@ public final class MixerState {
                 return null;
             }
         }
-        return new Plan(d, strategy, reservation, List.copyOf(newTanks), List.copyOf(outputs), itemCount, routes);
+        return new Plan(
+                d, strategy, reservation, List.copyOf(newTanks), List.copyOf(outputs), itemCount, consumption, routes);
     }
     /** Single-use local reservation, invalidated by changed inputs, outputs, topology or registry snapshot. */
     public final class Reservation {
@@ -536,6 +578,10 @@ public final class MixerState {
 
         public String strategy() {
             return plan.strategy().id();
+        }
+
+        public String recipe() {
+            return plan.definition().id();
         }
 
         public boolean commit() {
@@ -587,6 +633,17 @@ public final class MixerState {
     public Optional<Reservation> prepare(MixerRecipeDefinition definition) {
         var p = plan(definition);
         return p == null ? Optional.empty() : Optional.of(new Reservation(p));
+    }
+
+    /** Read-only selection over executable plans; explicit prepare/commit retain their existing status behavior. */
+    public Optional<Reservation> select() {
+        String previousBlocked = blocked;
+        try {
+            var p = selectPlan();
+            return p == null ? Optional.empty() : Optional.of(new Reservation(p));
+        } finally {
+            blocked = previousBlocked;
+        }
     }
 
     public boolean canCommit(MixerRecipeDefinition d) {
@@ -665,27 +722,27 @@ public final class MixerState {
             selected = null;
             activeDefinition = null;
         }
-        if (selected == null) {
+        var candidate = selected == null ? null : plan(selected);
+        if (candidate == null) {
+            candidate = selectPlan();
+            if (candidate == null && selected != null) return false;
             recipe = "";
             progress = 0;
-            selected = MixerRecipeRegistry.recipes().stream()
-                    .filter(this::canCommit)
-                    .findFirst()
-                    .orElse(null);
-            if (selected == null) {
+            activeDefinition = null;
+            if (candidate == null) {
                 if (MixerRecipeRegistry.recipes().isEmpty()) blocked = "No loaded Mixer recipes";
                 return false;
             }
+            selected = candidate.definition();
             recipe = selected.id();
         }
         if (activeDefinition == null && !savedSignature.isEmpty() && !savedSignature.equals(selected.signature()))
             progress = 0;
         activeDefinition = selected;
         savedSignature = "";
-        if (!canCommit(selected)) return false;
         blocked = "";
         progress = (int) Math.min(selected.batchTicks(), (long) progress + SlurryBalance.CADENCE);
-        if (progress == selected.batchTicks() && commit(selected)) {
+        if (progress == selected.batchTicks() && new Reservation(candidate).commit()) {
             recipe = "";
             progress = 0;
             activeDefinition = null;

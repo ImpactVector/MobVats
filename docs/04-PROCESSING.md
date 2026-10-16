@@ -153,7 +153,7 @@ The default culture recipe consumes 1,000 mB water + 250 mB XP and produces
 1,000 mB culture slurry. Its compound composition derives from those inputs.
 Startup and `/mobvats reload_mixer` create a bundled `_defaults.json` only when
 missing; existing files, including historical defaults and authored overrides,
-are never rewritten. Recipe-ID overrides and priority ordering remain unchanged.
+are never rewritten. Recipe-ID overrides remain unchanged.
 
 Every normal development Gradle `build` runs `invalidateDevMixerDefaults`, even
 when compilation and packaging are up-to-date. It deletes only the local
@@ -167,12 +167,10 @@ not apply to production installations.
 {
   "recipes": {
     "example:refine": {
-      "priority": 100,
       "batch_ticks": 200,
       "strategies": [
         {
-          "id": "preferred",
-          "priority": 100,
+          "id": "primary",
           "enabled": true,
           "items": [{ "selector": "minecraft:raw_iron", "amount": 1 }],
           "fluids": [{ "selector": "minecraft:water", "amount": 250 }]
@@ -191,12 +189,19 @@ not apply to production installations.
 }
 ```
 
-Recipe priority defaults to zero. Strategies require unique, nonempty IDs;
-their priority defaults to zero and `enabled` defaults to true. Priorities are
-signed 32-bit integers. Bundled recipes use -1000. Recipes sort by descending
-priority, then ascending recipe ID; strategies sort by descending priority,
-then ascending strategy ID. File order controls overrides only, not execution.
-There is no player or machine priority override in this version.
+At each batch boundary, the Mixer ranks executable strategies by requirement
+slot count descending, normalized consumption descending, then recipe ID
+ascending. Repeated selectors count as separate slots. Item consumption is the
+allocated count divided by that actual stack's maximum size (including components);
+fluid consumption is mB divided by 1,000. These fractions are summed and compared
+exactly with integer arithmetic. Alternatives use the existing integral allocation,
+not an assumed stack size or a search for the highest-scoring possible allocation.
+Each recipe competes using its highest-ranked executable strategy. Equal strategies
+within the same recipe break ties by ascending strategy ID. Strategies require
+unique, nonempty IDs and `enabled` defaults to true. Existing signed-integer
+`priority` fields remain readable for compatibility but have no selection effect.
+File order controls overrides only, not execution. Output capacity and transform
+validation remain part of executability, preserving existing backpressure/fallback.
 
 Every requirement in a strategy must be satisfiable together. At least one
 input and one output are required; item-only and fluid-only operations are
@@ -205,6 +210,16 @@ custom ingredients and alternatives. Fluid alternatives use native objects,
 for example `[{ "fluid": "minecraft:water" }, { "fluid": "mobvats:waste" }]`.
 Input `record_in_composition` defaults to true. Amounts and `batch_ticks` are
 positive 32-bit integers.
+
+Item eligibility uses the existing four recipe input staging slots filled by
+item ports; selection does not pull directly from connected item buffers.
+Fluid eligibility uses currently connected physical buffers and service tanks.
+
+All current input requirements are consumed. There is no non-consumed tool or
+catalyst requirement in the schema, definition, or resource bundle;
+`record_in_composition: false` only omits an input from the derived formula.
+Non-consumed-input ranking and its integration test therefore require a later
+processing change. No arbitrary consumption value is assigned to hypothetical tools.
 
 Outputs execute as one bundle. Item outputs use four private output slots,
 separate from the input inventory, and respect each item's stack limit. They
@@ -235,9 +250,12 @@ and component identity. Other outputs in the same operation are unaffected by
 the transform. Restored ordinary fluid identities become exportable only after
 successful production and remain persisted.
 
-An active recipe keeps progress while its definition remains bound, including
-temporary input or output blocking. The selected strategy is reevaluated in
-authored order each cadence; progress belongs to the recipe, not a strategy.
+An executable active batch keeps its recipe and progress until completion;
+its best executable strategy is reevaluated each cadence. Progress belongs to
+the recipe, not a strategy. If that recipe becomes unavailable, another executable
+recipe can replace it, resetting progress. If none can run, the Mixer idles and
+retains the blocked batch's progress. After completion, all recipes compete again
+without affinity for the previously successful recipe.
 Reloading with a newly parsed definition resets active progress on the next
 cadence, even if its ID remains the same. Removing it also resets progress.
 No input is consumed before successful completion. NBT stores an authored

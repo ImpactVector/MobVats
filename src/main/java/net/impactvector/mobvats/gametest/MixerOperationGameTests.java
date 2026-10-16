@@ -96,7 +96,7 @@ public final class MixerOperationGameTests {
     }
 
     @GameTest(template = "empty")
-    public static void authoredRecipePriorityAndIdOrder(GameTestHelper h) {
+    public static void legacyRecipeOrderRetainedAndSelectionUsesRecipeId(GameTestHelper h) {
         var a = simple();
         a.addProperty("priority", 50);
         var z = simple();
@@ -109,17 +109,17 @@ public final class MixerOperationGameTests {
                             .map(MixerRecipeDefinition::id)
                             .toList()
                             .equals(List.of("test:a", "test:z", "test:low")),
-                    "Recipe precedence changed with map order");
+                    "Legacy recipe enumeration changed with map order");
             var s = state();
             s.itemInput().insertItem(0, new ItemStack(Items.CARROT), false);
             s.cadence();
-            h.assertTrue(s.recipe().equals("test:a") && s.progress() > 0, "Selection ignored authored priority/id");
+            h.assertTrue(s.recipe().equals("test:a") && s.progress() > 0, "Selection ignored recipe ID");
         });
         h.succeed();
     }
 
     @GameTest(template = "empty")
-    public static void strategyPriorityIdEnabledAndFallback(GameTestHelper h) {
+    public static void legacyStrategyOrderRetainedWithDeterministicFallback(GameTestHelper h) {
         var r = simple();
         var original = r.getAsJsonArray("strategies").get(0).getAsJsonObject();
         var strategies = new JsonArray();
@@ -140,7 +140,7 @@ public final class MixerOperationGameTests {
                             .map(MixerRecipeDefinition.Strategy::id)
                             .toList()
                             .equals(List.of("disabled", "missing", "a", "z", "low")),
-                    "Strategy precedence incorrect");
+                    "Legacy strategy enumeration changed");
             var s = state();
             s.itemInput().insertItem(0, new ItemStack(Items.CARROT), false);
             var reservation = s.prepare(d).orElseThrow();
@@ -158,7 +158,7 @@ public final class MixerOperationGameTests {
                     new String(Objects.requireNonNull(in).readAllBytes(), java.nio.charset.StandardCharsets.UTF_8)));
             h.assertTrue(
                     defaults.recipes().values().stream().allMatch(r -> r.priority() < 0),
-                    "Bundled default outranks pack priority zero");
+                    "Legacy bundled priority metadata changed");
         } catch (java.io.IOException e) {
             throw new IllegalStateException(e);
         }
