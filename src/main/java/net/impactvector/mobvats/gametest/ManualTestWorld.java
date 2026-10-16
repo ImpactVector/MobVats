@@ -365,6 +365,23 @@ public final class ManualTestWorld {
             ExtruderWorldFixtures.verify(level, manifest);
             Files.writeString(Path.of(System.getProperty("mobvats.testWorldPath"), "fixtures.md"), manifest);
             if (productionFailure != null) throw productionFailure;
+            manifest.append("\n## Redstone demonstrations\n\n"
+                    + "Controls are saved ON (paused). Flip OFF to watch production; flip ON to pause again.\n"
+                    + "Levers power an adjacent smooth-stone block. Operator settings are preserved.\n"
+                    + "Creative rigs remain running. Linked P-05/P-06 have no controller levers: use P-VAT.\n\n");
+            for (var f : FIXTURES) {
+                boolean vat = f.machine().equals("Vat");
+                var controller = vat ? f.origin().offset(1, 1, 0) : f.probe();
+                WorldRedstoneControls.install(
+                        level,
+                        manifest,
+                        f.id(),
+                        controller,
+                        vat ? net.minecraft.core.Direction.NORTH : net.minecraft.core.Direction.WEST);
+            }
+            OperatorVatFixtures.installRedstoneControls(level, manifest);
+            ProductionWorldFixtures.installRedstoneControls(level, manifest);
+            ExtruderWorldFixtures.installRedstoneControls(level, manifest);
             for (int x = -7; x <= 8; x++) for (int z = -2; z <= 11; z++) level.setChunkForced(x, z, false);
             Files.writeString(Path.of(System.getProperty("mobvats.testWorldPath"), "fixtures.md"), manifest);
             verified = true;

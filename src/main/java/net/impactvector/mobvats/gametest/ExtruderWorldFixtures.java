@@ -108,5 +108,17 @@ final class ExtruderWorldFixtures {
         manifest.append("Meat Castle: (-53, -60, 30); Waste Castle: (-82, -60, 30).\\n");
     }
 
+    static void installRedstoneControls(ServerLevel level, StringBuilder manifest) {
+        for (int i = 0; i < 4; i++) {
+            var pos = DEMOS.offset(0, 0, i * 5);
+            WorldRedstoneControls.install(level, manifest, "E-0" + (i + 1), pos, Direction.EAST);
+            // Acceptance exhausts the finite initial charge. Leave fresh input for the player's lever demonstration.
+            ((FluidBufferEntity) level.getBlockEntity(pos.west()))
+                    .tank.fill(
+                            new FluidStack(i < 2 ? ProductFluids.MEAT.get() : ProductFluids.WASTE.get(), 4000),
+                            net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+        }
+    }
+
     private ExtruderWorldFixtures() {}
 }

@@ -40,13 +40,18 @@ final class OperatorVatFixtures {
         return ROW.size();
     }
 
+    static void installRedstoneControls(ServerLevel level, StringBuilder manifest) {
+        for (var f : ROW)
+            WorldRedstoneControls.install(level, manifest, f.id(), f.origin().offset(0, 1, 1), Direction.WEST);
+    }
+
     static final int SETTLE_TICKS = 5000;
     private static final int ROW_Z = -24;
     private static final Map<BlockPos, Boolean> PAUSED = new LinkedHashMap<>();
     /** Suspend production through the ordinary operator setting during P-06 observation. */
     static void pause(ServerLevel level) {
         for (var fixture : ROW) {
-            var pos = fixture.origin().offset(1, 1, 0);
+            var pos = fixture.origin().offset(0, 1, 1);
             var controller = ((VatControllerEntity) level.getBlockEntity(pos))
                     .getMultiblockController()
                     .orElseThrow();
@@ -195,6 +200,9 @@ final class OperatorVatFixtures {
                     foods[i]);
             ROW.add(f);
             MachineFixtures.vat(level::setBlockAndUpdate, o, 5, 5, 4);
+            // Keep the controller's external lever clear of the front feed hopper.
+            part(level, o.offset(1, 1, 0), VatPartType.Glass);
+            part(level, o.offset(0, 1, 1), VatPartType.Controller);
             storage(level, o);
             var head = (VatHeadEntity) level.getBlockEntity(o.offset(2, 2, 2));
             head.encode(ResourceLocation.withDefaultNamespace(f.entity()));

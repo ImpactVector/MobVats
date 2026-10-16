@@ -147,6 +147,14 @@ final class ProductionWorldFixtures {
             if (f.attached()) serviceModes(level, f.origin(), f.origin().offset(4, 3, 4));
     }
 
+    static void installRedstoneControls(ServerLevel level, StringBuilder manifest) {
+        for (var f : MIXERS)
+            if (!f.attached())
+                WorldRedstoneControls.install(
+                        level, manifest, f.id(), f.origin().offset(0, 1, 2), Direction.WEST);
+        WorldRedstoneControls.install(level, manifest, "P-VAT (linked loop)", VAT.offset(1, 2, 0), Direction.NORTH);
+    }
+
     private static void stripe(ServerLevel level, int z, int end) {
         for (int x = -4; x <= end; x++)
             level.setBlockAndUpdate(new BlockPos(x, -61, z - 7), Blocks.YELLOW_WOOL.defaultBlockState());
