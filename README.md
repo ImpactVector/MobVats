@@ -9,6 +9,9 @@ Implemented features include multiple independently scheduled specimens in one V
 Mixer [manual Item and Fluid Meters](docs/MIXER_MANUAL_METERS.md) constrain exact ingredient quantities using sampled filters.
 Optional [Mixer Blockers](docs/MIXER_BLOCKER.md) exclude sampled output products, including distinct slurry compositions.
 
+[Meat and Waste products](docs/PRODUCTS.md) provide food, Fertilizer and decorative
+building blocks; Extruder manufacturing remains future work.
+
 Requirements: Minecraft **1.21.1**, NeoForge **21.1.252** for the development build, and external **ZeroCore2 1.21.1-2.4.18**. ZeroCore2 is mandatory and is not bundled. Build with Java 21 using the included Gradle wrapper:
 
 ```powershell

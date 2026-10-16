@@ -110,5 +110,10 @@
   "gui.mobvats.meter_stored": "Stored quantity: %s",
   "gui.mobvats.meter_sample": "Shift-right-click with a sample to assign.",
   "message.mobvats.meter_fluid_sample": "Use a filled fluid container to assign this meter.",
-  "message.mobvats.meter_invalid_quantity": "Quantity must be an integer from 1 to 2147483647."
+  "message.mobvats.meter_invalid_quantity": "Quantity must be an integer from 1 to 2147483647.",
+  "item.mobvats.raw_meat": "Raw Meat",
+  "item.mobvats.cooked_meat": "Cooked Meat",
+  "item.mobvats.fertilizer": "Fertilizer",
+  "block.mobvats.meat_block": "Meat Block",
+  "block.mobvats.waste_block": "Waste Block"
 }

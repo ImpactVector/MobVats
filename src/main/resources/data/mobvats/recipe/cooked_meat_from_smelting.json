@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": {
+    "item": "mobvats:raw_meat"
+  },
+  "result": {
+    "id": "mobvats:cooked_meat",
+    "count": 1
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

@@ -85,6 +85,7 @@ public final class Content {
             ITEMS.register("essence", () -> new ItemEssence(new Item.Properties().stacksTo(16)));
 
     static {
+        net.impactvector.mobvats.gamecontent.product.ProductContent.initialize();
         net.impactvector.mobvats.gamecontent.multiblock.mixer.MixerContent.initialize();
         net.impactvector.mobvats.gamecontent.multiblock.conduit.ConduitContent.initialize();
         net.impactvector.mobvats.gamecontent.multiblock.conduit.FluidBufferContent.initialize();
@@ -153,6 +154,8 @@ public final class Content {
                                     net.impactvector.mobvats.gamecontent.multiblock.conduit.FluidBufferContent.blocks())
                                 output.accept(buffer);
                             output.accept(SYRINGE.get());
+                            for (var product : net.impactvector.mobvats.gamecontent.product.ProductContent.items())
+                                output.accept(product);
                             for (var type : net.impactvector.mobvats.gamecontent.creative.CreativeDeviceType.values())
                                 if (type != net.impactvector.mobvats.gamecontent.creative.CreativeDeviceType.DRIVE)
                                     output.accept(
