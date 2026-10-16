@@ -71,9 +71,6 @@ public final class VatControllerScreen extends AbstractContainerScreen<VatContro
         for (int i = scroll; i < Math.min(lines.size(), scroll + visibleLines()); ++i)
             g.drawString(font, lines.get(i), 12, 52 + (i - scroll) * 10, 0xffe2e8e8, false);
         g.drawString(font, "Scroll to inspect / " + TABS[page], 8, 198, 0xff202020, false);
-        if (!menu.displayedTool().isEmpty()) {
-            g.renderItem(menu.displayedTool(), imageWidth - 24, 195);
-        }
     }
 
     @Override
@@ -87,10 +84,5 @@ public final class VatControllerScreen extends AbstractContainerScreen<VatContro
     public void render(GuiGraphics g, int mouseX, int mouseY, float tick) {
         activation.setMessage(Component.literal(menu.active() ? "Disable" : "Enable"));
         super.render(g, mouseX, mouseY, tick);
-        if (!menu.displayedTool().isEmpty()
-                && mouseX >= leftPos + imageWidth - 24
-                && mouseX < leftPos + imageWidth - 8
-                && mouseY >= topPos + 195
-                && mouseY < topPos + 211) g.renderTooltip(font, menu.displayedTool(), mouseX, mouseY);
     }
 }

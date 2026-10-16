@@ -10,11 +10,11 @@ public final class CowProcesses {
 
     static Snapshot snapshot(SpecimenProcessState specimen) {
         if (specimen == null) return new Snapshot("IDLE", 0, 0, 0);
-        var replacement = specimen.process(PassiveProcessCompiler.HARVEST);
+        var replacement = specimen.readProcess(PassiveProcessCompiler.HARVEST);
         return new Snapshot(
                 specimen.stage() == LifeStage.JUVENILE ? "GROWING" : "IDLE",
-                specimen.growth().elapsed,
-                specimen.process(PassiveProcessCompiler.MILK).elapsed,
+                specimen.readProcess(PassiveProcessCompiler.GROWTH).elapsed,
+                specimen.readProcess(PassiveProcessCompiler.MILK).elapsed,
                 replacement.pending == null
                         ? 0
                         : replacement.pending.items().stream()

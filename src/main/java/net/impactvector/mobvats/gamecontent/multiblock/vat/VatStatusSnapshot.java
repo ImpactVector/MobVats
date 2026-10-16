@@ -146,8 +146,9 @@ public record VatStatusSnapshot(List<String> pages) {
                                     ? "passive lifecycle"
                                     : "configured processes / no replacement lifecycle"));
             production.add("Stage: " + (stage == LifeStage.ADULT ? "Adult" : "Juvenile"));
-            production.add("Growth: " + (runtime == null ? 0 : runtime.growth().elapsed) + " / "
-                    + (passive == null ? 0 : passive.juvenile_growth_ticks()));
+            production.add(
+                    "Growth: " + (runtime == null ? 0 : runtime.readProcess(PassiveProcessCompiler.GROWTH).elapsed)
+                            + " / " + (passive == null ? 0 : passive.juvenile_growth_ticks()));
             production.add("Adult secondary outputs: " + (stage == LifeStage.ADULT ? "Active" : "Paused (juvenile)"));
             var harvest = topology.actors().stream()
                     .filter(a -> a.head().equals(head)
@@ -172,14 +173,15 @@ public record VatStatusSnapshot(List<String> pages) {
                     production.add(process.id() + ": "
                             + (runtime == null
                                     ? "inactive"
-                                    : runtime.process(process.id()).phase + " / "
-                                            + runtime.process(process.id()).elapsed + " of " + process.duration_ticks()
+                                    : runtime.readProcess(process.id()).phase + " / "
+                                            + runtime.readProcess(process.id()).elapsed + " of "
+                                            + process.duration_ticks()
                                             + " ticks"));
             if (passive != null)
                 for (var output : passive.secondary_outputs())
                     production.add(output.process() + ": "
                             + (output.requires_stage().accepts(stage) ? "Active" : "Paused (juvenile)") + " / "
-                            + (runtime == null ? 0 : runtime.process(output.process()).elapsed) + " of "
+                            + (runtime == null ? 0 : runtime.readProcess(output.process()).elapsed) + " of "
                             + output.interval_ticks() + " ticks");
             for (var contact : topology.itemContacts())
                 if (contact.head().equals(head)) {

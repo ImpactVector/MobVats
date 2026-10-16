@@ -40,6 +40,12 @@ public final class SpecimenProcessState {
         return processes.get(id);
     }
 
+    /** Detached fallback for presentation readers; never installs missing timers. */
+    public ProcessState readProcess(String id) {
+        var state = processes.get(id);
+        return state == null ? new ProcessState() : state;
+    }
+
     public ProcessState process(String id) {
         return processes.computeIfAbsent(id, k -> new ProcessState());
     }

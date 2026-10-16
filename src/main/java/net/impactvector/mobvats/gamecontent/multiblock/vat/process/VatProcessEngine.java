@@ -186,6 +186,102 @@ public final class VatProcessEngine {
         return states.get(head);
     }
 
+    public SpecimenProcessState presentationState(BlockPos head, UUID owner) {
+        return Objects.equals(stateOwners.get(head), owner) ? states.get(head) : null;
+    }
+
+    /** Availability through the same enabled endpoints used by passive feeding, without reserving inputs. */
+    public String feedingStatus(BlockPos head) {
+        var context = contextsByHead.get(head);
+        if (context == null
+                || !Objects.equals(
+                        stateOwners.get(head), context.assembly().head().specimenId()))
+            return "Feeding data unavailable";
+        var definition = PassiveMobDefinitionRegistry.resolve(context.identity());
+        if (definition == null || !definition.lifecycle()) return "Feeding not required";
+        if (definition.feeding_slurry().supported()
+                && context.routes(PassiveUses.FEED).stream()
+                        .anyMatch(r -> controller.storage().connected(r.actor()).stream()
+                                .anyMatch(t -> t.getFluid()
+                                                .is(net.impactvector.mobvats.gamecontent.fluid.ProductFluids
+                                                        .FEEDING_SLURRY
+                                                        .get())
+                                        && t.getFluidAmount()
+                                                >= definition.feeding_slurry().cost())))
+            return "Feeding slurry available";
+        if (context.itemInputs().stream()
+                .anyMatch(p -> definition.feed().accepts(p.staging().getStackInSlot(0))
+                        && p.staging().getStackInSlot(0).getCount()
+                                >= definition.feed().count())) return "Item feed available";
+        return "Waiting for feed";
+    }
+
+    /** Read compiled timers and their last evaluations, without executing requirements or creating state. */
+    public List<VatSpecimenSnapshot.Process> presentation(BlockPos head) {
+        var context = contextsByHead.get(head);
+        if (context == null
+                || !Objects.equals(
+                        stateOwners.get(head), context.assembly().head().specimenId())) return List.of();
+        var result = new ArrayList<VatSpecimenSnapshot.Process>();
+        var groups = new LinkedHashMap<String, List<ProcessDefinition>>();
+        for (var definition : context.profile().definitions())
+            groups.computeIfAbsent(definition.stateId(), k -> new ArrayList<>()).add(definition);
+        for (var entry : groups.entrySet()) {
+            var definitions = entry.getValue();
+            var state = context.state().existingProcess(entry.getKey());
+            var timer = definitions.stream()
+                    .filter(d -> d.progress() != null)
+                    .findFirst()
+                    .orElse(null);
+            var evaluated = timer == null ? null : status(head).get(timer.id());
+            if (evaluated == null
+                    || (evaluated.reason() != ProcessResult.Reason.RUNNING
+                            && evaluated.reason() != ProcessResult.Reason.OUTPUT_BLOCKED
+                            && evaluated.reason() != ProcessResult.Reason.BACKPRESSURE)) {
+                var action = definitions.stream()
+                        .filter(d -> d.progress() == null)
+                        // Optional tool interactions can share a timer's state id. Their availability
+                        // belongs to the actor view, rather than masking the timed process's result.
+                        .filter(d -> timer == null || d.exclusiveUse() == null)
+                        .map(d -> status(head).get(d.id()))
+                        .filter(Objects::nonNull)
+                        .filter(r -> r.reason() != ProcessResult.Reason.CONDITION_FAILED
+                                && r.reason() != ProcessResult.Reason.IDLE)
+                        .reduce((a, b) -> b)
+                        .orElse(null);
+                if (action != null) evaluated = action;
+            }
+            int elapsed = state == null ? 0 : state.elapsed;
+            int duration = timer == null ? 0 : timer.progress().duration();
+            double rate = timer == null ? 0 : timer.progress().rate().applyAsDouble(context);
+            boolean suspended =
+                    !controller.processingEnabled() || !controller.getTopology().operational(head);
+            boolean running = !suspended
+                    && state != null
+                    && state.phase == ProcessState.Phase.RUNNING
+                    && evaluated != null
+                    && evaluated.reason() == ProcessResult.Reason.RUNNING;
+            String text = !controller.processingEnabled()
+                    ? (controller.controllerInhibited() ? "Redstone inhibited" : "Paused")
+                    : !controller.getTopology().operational(head)
+                            ? "Harness obstructed"
+                            : evaluated == null ? "Waiting" : VatSpecimenSnapshot.reason(evaluated.reason());
+            String name =
+                    entry.getKey().substring(entry.getKey().indexOf(':') + 1).replace('/', ' ');
+            result.add(new VatSpecimenSnapshot.Process(
+                    entry.getKey(),
+                    state == null ? "IDLE" : state.phase.name(),
+                    VatSpecimenSnapshot.label(name) + ": " + text,
+                    elapsed,
+                    duration,
+                    rate,
+                    running && rate > 0 && duration > 0
+                            ? (long) Math.ceil(Math.max(0, duration - elapsed) / rate)
+                            : -1));
+        }
+        return List.copyOf(result);
+    }
+
     public void assembled() {
         states.keySet().retainAll(controller.getTopology().assemblies());
         stateOwners.keySet().retainAll(states.keySet());

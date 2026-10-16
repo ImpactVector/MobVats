@@ -565,6 +565,15 @@ public class MultiblockVat
                 .count();
     }
 
+    public List<VatSpecimenSnapshot> specimenSnapshots() {
+        return getConnectedParts().stream()
+                .filter(VatHeadEntity.class::isInstance)
+                .map(VatHeadEntity.class::cast)
+                .sorted(Comparator.comparing(VatHeadEntity::getBlockPos, VatTopologyCompiler.POSITION))
+                .map(head -> VatSpecimenSnapshot.capture(this, head))
+                .toList();
+    }
+
     @Override
     protected boolean isMachineWhole(IMultiblockValidator validator) {
         assemblies = List.of();
