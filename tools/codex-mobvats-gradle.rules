@@ -1,0 +1,40 @@
+# Host-local rule for this checkout. Install as ~/.codex/rules/mobvats-gradle.rules.
+# No general PowerShell, Gradle, client, publication, or arbitrary-argument approval.
+prefix_rule(
+    pattern = [
+        "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "C:\\Projects\\MobVats\\src\\tools\\gradle-java21.ps1",
+        "-Mode",
+        ["version", "format", "check", "build", "gametest", "validate"],
+    ],
+    decision = "allow",
+    match = [
+        '"C:\\Program Files\\PowerShell\\7\\pwsh.exe" -NoProfile -File "C:\\Projects\\MobVats\\src\\tools\\gradle-java21.ps1" -Mode version',
+        '"C:\\Program Files\\PowerShell\\7\\pwsh.exe" -NoProfile -File "C:\\Projects\\MobVats\\src\\tools\\gradle-java21.ps1" -Mode validate',
+    ],
+    not_match = [
+        'pwsh.exe -Command "Get-Process"',
+        '"C:\\Program Files\\PowerShell\\7\\pwsh.exe" -NoProfile -File "C:\\Projects\\MobVats\\src\\tools\\other.ps1" -Mode build',
+        '"C:\\Program Files\\PowerShell\\7\\pwsh.exe" -NoProfile -File "C:\\Projects\\MobVats\\src\\tools\\gradle-java21.ps1" -Mode publish',
+    ],
+)
+
+# exec_command may present the canonical call inside its PowerShell -Command
+# wrapper. Match the entire literal command argument, never a general -Command.
+prefix_rule(
+    pattern = [
+        "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+        "-Command",
+        [
+            "& 'C:\\Program Files\\PowerShell\\7\\pwsh.exe' -NoProfile -File C:\\Projects\\MobVats\\src\\tools\\gradle-java21.ps1 -Mode version",
+            "& 'C:\\Program Files\\PowerShell\\7\\pwsh.exe' -NoProfile -File C:\\Projects\\MobVats\\src\\tools\\gradle-java21.ps1 -Mode format",
+            "& 'C:\\Program Files\\PowerShell\\7\\pwsh.exe' -NoProfile -File C:\\Projects\\MobVats\\src\\tools\\gradle-java21.ps1 -Mode check",
+            "& 'C:\\Program Files\\PowerShell\\7\\pwsh.exe' -NoProfile -File C:\\Projects\\MobVats\\src\\tools\\gradle-java21.ps1 -Mode build",
+            "& 'C:\\Program Files\\PowerShell\\7\\pwsh.exe' -NoProfile -File C:\\Projects\\MobVats\\src\\tools\\gradle-java21.ps1 -Mode gametest",
+            "& 'C:\\Program Files\\PowerShell\\7\\pwsh.exe' -NoProfile -File C:\\Projects\\MobVats\\src\\tools\\gradle-java21.ps1 -Mode validate",
+        ],
+    ],
+    decision = "allow",
+)

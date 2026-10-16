@@ -11,6 +11,56 @@ are unavailable; retain the testing restrictions in `README.md`.
 - Keep IntelliJ and Minecraft generated files ignored.
 - The standard Gradle wrappers default `GRADLE_USER_HOME` to the writable `../workspace/.cache/gradle` directory. Do not override it with the protected `../.codex/gradle` cache.
 
+## Consistent Windows Java 21 validation
+
+Use this exact command form for routine agent Gradle work (from any directory):
+
+```powershell
+& 'C:\Program Files\PowerShell\7\pwsh.exe' -NoProfile -File C:\Projects\MobVats\src\tools\gradle-java21.ps1 -Mode version
+```
+
+Replace only the mode with one of:
+
+| Mode | Fixed Gradle invocation |
+| --- | --- |
+| `version` | `--version` (verify launcher and daemon JVM) |
+| `format` | `spotlessApply` |
+| `check` | `spotlessCheck check` (CPU/resource checks, no game server) |
+| `build` | `spotlessCheck build` |
+| `gametest` | `runGameTestServer` (autonomous headless tests) |
+| `validate` | `spotlessCheck build runGameTestServer` |
+
+The launcher fixes the working directory to this repository and the Gradle cache
+to `../workspace/.cache/gradle`. It selects an installed Java 21 JDK, preferring
+that cache's `jdks`, then the user's `.gradle/jdks`, then a Java 21 `JAVA_HOME`.
+It fails if none exists, preserves Gradle's exit status, restores the caller's
+environment, and rejects extra arguments. Do not prepend environment assignments,
+add a manual `-Command` wrapper, or append shell commands/redirection to an approved call.
+Keep inspection commands separate so the approval prefix stays consistent.
+
+Finish Java edits before validation. Run `format`, inspect the formatting diff,
+then run `validate` once when the slice requires the full build and GameTests.
+Use `check`/`build` for smaller changes where GameTests add no relevant coverage.
+Do not rerun completed checks unless a subsequent change or failure warrants it.
+
+The host-local reusable allow rule is
+`C:\Users\Dan\.codex\rules\mobvats-gradle.rules`; its reviewable source is
+`tools/codex-mobvats-gradle.rules`. It permits only the absolute PowerShell
+executable, `-NoProfile -File`, this launcher path, and the six listed modes.
+It also recognizes the execution tool's PowerShell `-Command` wrapper, but only
+when the entire wrapped command is one of the six exact canonical calls above.
+It does not approve arbitrary PowerShell, arbitrary Gradle tasks/options, client
+runs, publication, or another checkout. The launcher/build files are trusted
+executable project code: review changes to them before using the allowance.
+
+When the sandbox cannot connect to Gradle's localhost daemon, retry the same
+canonical command with `sandbox_permissions="require_escalated"`; the installed
+rule can allow it without another interactive prompt. Do not broaden permissions
+or revive old `.codex/gradle` command approvals. A session already open during
+installation may need a new session to pick up the installed rule.
+On another host/checkout, review and adapt the absolute paths before installing
+the rule; `AGENTS.md` alone does not grant executable permissions.
+
 ## Java formatting
 
 Follow `docs/CODE_STYLE.md`. Spotless 8.10.4 / Palantir Java Format 2.102.0
