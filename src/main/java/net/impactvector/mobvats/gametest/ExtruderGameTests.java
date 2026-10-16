@@ -127,6 +127,67 @@ public final class ExtruderGameTests {
         return new FluidStack(ProductFluids.MEAT.get(), amount);
     }
 
+    @GameTest(template = "empty", timeoutTicks = 10)
+    public static void redstoneDirectPauseResume(GameTestHelper h) {
+        var f = fixture(h, meat(1000));
+        f.entity.processCycle();
+        h.setBlock(P.below(), Blocks.BARREL);
+        h.setBlock(P.above(), Blocks.REDSTONE_BLOCK);
+        for (int i = 0; i < 5; i++) f.entity.processCycle();
+        output(h, f, ProductContent.RAW_MEAT.get(), 1);
+        h.assertTrue(
+                f.source.executions == 1 && f.source.getFluidInTank(0).getAmount() == 750,
+                "Powered Extruder consumed fluid");
+        var barrel = (BarrelBlockEntity) h.getBlockEntity(P.below());
+        h.assertTrue(barrel.isEmpty(), "Powered Extruder actively ejected output");
+        var cap = h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(P), Direction.DOWN);
+        h.assertTrue(
+                cap != null && cap.extractItem(0, 1, false).getCount() == 1,
+                "Powered Extruder blocked passive extraction");
+        h.setBlock(P.above(), Blocks.AIR);
+        f.entity.processCycle();
+        f.entity.processCycle();
+        h.assertTrue(!barrel.isEmpty() && f.source.executions == 3, "Extruder did not resume normally");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 10)
+    public static void redstoneIndirectAndReload(GameTestHelper h) {
+        var f = fixture(h, meat(2000));
+        form(h, ExtruderBlock.Form.BLOCK);
+        f.entity.processCycle();
+        // A floor lever strongly powers the solid block beside the machine.
+        h.setBlock(P.east(), Blocks.STONE);
+        h.setBlock(
+                P.east().above(),
+                Blocks.LEVER
+                        .defaultBlockState()
+                        .setValue(
+                                net.minecraft.world.level.block.state.properties.BlockStateProperties.ATTACH_FACE,
+                                net.minecraft.world.level.block.state.properties.AttachFace.FLOOR)
+                        .setValue(LeverBlock.POWERED, true));
+        h.assertTrue(h.getLevel().hasNeighborSignal(h.absolutePos(P)), "Fixture lacks indirect power");
+        var registries = h.getLevel().registryAccess();
+        var tag = f.entity.saveWithFullMetadata(registries);
+        h.getLevel().removeBlockEntity(h.absolutePos(P));
+        var restored = (ExtruderEntity) BlockEntity.loadStatic(h.absolutePos(P), h.getBlockState(P), tag, registries);
+        h.getLevel().setBlockEntity(restored);
+        for (var facing : Direction.Plane.HORIZONTAL) {
+            h.setBlock(P, h.getBlockState(P).setValue(ExtruderBlock.FACING, facing));
+            restored.processCycle();
+        }
+        h.assertTrue(
+                restored.output().getStackInSlot(0).getCount() == 1
+                        && f.source.getFluidInTank(0).getAmount() == 1000
+                        && h.getBlockState(P).getValue(ExtruderBlock.FORM) == ExtruderBlock.Form.BLOCK,
+                "Indirect power/reload lost inhibition or state");
+        h.setBlock(P.east().above(), Blocks.AIR);
+        h.setBlock(P, h.getBlockState(P).setValue(ExtruderBlock.FACING, Direction.NORTH));
+        restored.processCycle();
+        h.assertTrue(restored.output().getStackInSlot(0).getCount() == 2, "Reloaded Extruder did not resume");
+        h.succeed();
+    }
+
     private static FluidStack waste(int amount) {
         return new FluidStack(ProductFluids.WASTE.get(), amount);
     }

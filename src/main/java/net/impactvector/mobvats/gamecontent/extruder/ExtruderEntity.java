@@ -65,7 +65,9 @@ public final class ExtruderEntity extends BlockEntity {
     }
 
     public void processCycle() {
-        if (!(level instanceof ServerLevel server)) return;
+        // Query at execution time: retained capabilities and reloads cannot leave a stale signal.
+        // Vanilla also checks strong power through neighboring conducting blocks.
+        if (!(level instanceof ServerLevel server) || server.hasNeighborSignal(worldPosition)) return;
         var facing = getBlockState().getValue(ExtruderBlock.FACING);
         if (inputCache == null || facing != cachedFacing) {
             cachedFacing = facing;
