@@ -47,13 +47,13 @@ final class ExtruderWorldFixtures {
                 var floor = center.offset(dx, -1, dz);
                 level.setBlockAndUpdate(floor, Blocks.STONE_BRICKS.defaultBlockState());
                 int radius = Math.max(Math.abs(dx), Math.abs(dz));
-                if (radius == 9) {
+                if (radius == 9 || radius == 6) {
                     level.setBlockAndUpdate(center.offset(dx, 0, dz), Blocks.STONE_BRICKS.defaultBlockState());
                 } else if (radius >= 7) {
                     level.setBlockAndUpdate(center.offset(dx, 0, dz),
                             fluid.defaultFluidState().createLegacyBlock());
                 } else {
-                    level.setBlockAndUpdate(center.offset(dx, 0, dz), Blocks.AIR.defaultBlockState());
+                    level.setBlockAndUpdate(center.offset(dx, 0, dz), Blocks.STONE_BRICKS.defaultBlockState());
                 }
             }
         // Hollow keep with corner towers and crenellated parapet.
