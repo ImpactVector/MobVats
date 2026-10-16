@@ -12,6 +12,8 @@ public enum MixerPartType implements IMultiblockPartType {
     Glass,
     FluidPort,
     ItemPort,
+    ItemMeter,
+    FluidMeter,
     Intake,
     Impeller,
     Shaft,
@@ -43,6 +45,8 @@ public enum MixerPartType implements IMultiblockPartType {
             case Glass -> new MixerGlassEntity(pos, state);
             case FluidPort -> new MixerFluidPortEntity(this, pos, state);
             case ItemPort -> new MixerItemPortEntity(this, pos, state);
+            case ItemMeter -> new MixerItemMeterEntity(pos, state);
+            case FluidMeter -> new MixerFluidMeterEntity(pos, state);
             case Intake -> new MixerIntakeEntity(pos, state);
             case Impeller -> new MixerImpellerEntity(pos, state);
             case Shaft -> new MixerShaftEntity(pos, state);

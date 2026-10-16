@@ -51,6 +51,15 @@ public final class Content {
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MobVats.MOD_ID);
     public static final DeferredRegister<net.minecraft.world.inventory.MenuType<?>> MENUS =
             DeferredRegister.create(Registries.MENU, MobVats.MOD_ID);
+    public static final net.neoforged.neoforge.registries.DeferredHolder<
+                    net.minecraft.world.inventory.MenuType<?>,
+                    net.minecraft.world.inventory.MenuType<
+                            net.impactvector.mobvats.gamecontent.multiblock.mixer.menu.MixerMeterMenu>>
+            METER_MENU = MENUS.register(
+                    "mixer_meter",
+                    () -> net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create(
+                            net.impactvector.mobvats.gamecontent.multiblock.mixer.menu.MixerMeterMenu::new));
+
     public static final DeferredHolder<
                     net.minecraft.world.inventory.MenuType<?>,
                     net.minecraft.world.inventory.MenuType<
@@ -179,6 +188,7 @@ public final class Content {
         ENTITIES.register(bus);
         TABS.register(bus);
         MENUS.register(bus);
+        net.impactvector.mobvats.gamecontent.multiblock.mixer.menu.MixerMeterNetworking.register(bus);
         RECIPES.register(bus);
     }
 

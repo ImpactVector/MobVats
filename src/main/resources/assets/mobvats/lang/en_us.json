@@ -98,5 +98,15 @@
   "block.mobvats.fill_valve": "Fill Valve",
   "block.mobvats.drain_valve": "Drain Valve",
   "block.mobvats.item_void": "Item Void",
-  "block.mobvats.fluid_void": "Fluid Void"
+  "block.mobvats.fluid_void": "Fluid Void",
+  "block.mobvats.mixer_item_meter": "Item Meter",
+  "block.mobvats.mixer_fluid_meter": "Fluid Meter",
+  "gui.mobvats.meter_quantity": "Quantity",
+  "gui.mobvats.meter_quantity_mb": "Quantity (mB)",
+  "gui.mobvats.meter_apply": "Apply",
+  "gui.mobvats.meter_no_filter": "Filter: None (blocks processing)",
+  "gui.mobvats.meter_stored": "Stored quantity: %s",
+  "gui.mobvats.meter_sample": "Shift-right-click with a sample to assign.",
+  "message.mobvats.meter_fluid_sample": "Use a filled fluid container to assign this meter.",
+  "message.mobvats.meter_invalid_quantity": "Quantity must be an integer from 1 to 2147483647."
 }

@@ -199,6 +199,21 @@ public final class MultiblockMixer
     public MultiblockMixer(Level world) {
         super(world);
         if (!world.isClientSide) state.bind(storage, BlockPos.ZERO);
+        state.meterSource(this::installedMeters);
+    }
+
+    /** Resolve installed controls at selection time, including invalid controls and post-load changes. */
+    private MixerMeterRequirements installedMeters() {
+        var items = new ArrayList<ItemMeterRequirement>();
+        var fluids = new ArrayList<FluidMeterRequirement>();
+        for (var part : getConnectedParts()) {
+            if (!(part instanceof AbstractMixerMeterEntity meter)) continue;
+            String problem = meter.problem();
+            if (!problem.isEmpty()) throw new IllegalArgumentException(problem);
+            if (meter.itemMeter()) items.add(new ItemMeterRequirement(meter.filter(), meter.quantity()));
+            else fluids.add(new FluidMeterRequirement(meter.filter(), meter.quantity()));
+        }
+        return new MixerMeterRequirements(items, fluids);
     }
 
     public MixerState state() {

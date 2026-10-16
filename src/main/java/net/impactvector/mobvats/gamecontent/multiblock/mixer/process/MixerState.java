@@ -59,7 +59,26 @@ public final class MixerState {
     private final MachineMetrics metrics = new MachineMetrics();
     private MixerMeterRequirements meterRequirements = MixerMeterRequirements.NONE;
 
-    /** Internal configuration seam for manual meters; physical components and persistence are deferred. */
+    private java.util.function.Supplier<MixerMeterRequirements> meterSource;
+    private String meterProblem = "";
+    private boolean continuingBatch;
+    private MixerMeterRequirements batchMeters;
+
+    public void meterSource(java.util.function.Supplier<MixerMeterRequirements> source) {
+        meterSource = source;
+    }
+
+    private void refreshMeters() {
+        if (meterSource == null) return;
+        try {
+            var current = meterSource.get();
+            if (!current.equals(meterRequirements)) meterRequirements = current;
+            meterProblem = "";
+        } catch (IllegalArgumentException e) {
+            meterProblem = e.getMessage();
+        }
+    }
+    /** Transient eligibility constraints; configured state belongs to physical parts. */
     public void meterRequirements(MixerMeterRequirements requirements) {
         meterRequirements = Objects.requireNonNull(requirements);
         contentsChanged();
@@ -102,7 +121,7 @@ public final class MixerState {
         try {
             var selected = MixerRecipeRegistry.recipe(recipe);
             if (selected != null) {
-                var p = plan(selected);
+                var p = continuingPlan(selected);
                 return p == null
                         ? net.impactvector.mobvats.gamecontent.multiblock.mixer.MixerLiquidPresentation.select(
                                 selected, presentationFluids())
@@ -428,6 +447,11 @@ public final class MixerState {
     }
 
     private Plan plan(MixerRecipeDefinition d) {
+        refreshMeters();
+        if (!continuingBatch && !meterProblem.isEmpty()) {
+            blocked = meterProblem;
+            return null;
+        }
         Plan best = null;
         for (var strategy : d.strategies())
             if (strategy.enabled()) {
@@ -474,7 +498,8 @@ public final class MixerState {
                 if (itemUse[r][i] > 0) stacks.add(itemStacks.get(r).copyWithCount(itemUse[r][i]));
             consumedItems.add(stacks);
         }
-        if (!meterRequirements.matches(strategy, consumedItems, consumed)) {
+        if (!(continuingBatch && batchMeters != null ? batchMeters : meterRequirements)
+                .matches(strategy, consumedItems, consumed)) {
             blocked = "Recipe does not satisfy manual meters";
             return null;
         }
@@ -607,7 +632,9 @@ public final class MixerState {
         public boolean commit() {
             if (completed) return false;
             completed = true;
+            refreshMeters();
             if (committing
+                    || (!continuingBatch && !meterProblem.isEmpty())
                     || meters != meterRequirements
                     || registry != MixerRecipeRegistry.snapshot()
                     || boundStorage != storage
@@ -734,6 +761,15 @@ public final class MixerState {
         }
     }
 
+    private Plan continuingPlan(MixerRecipeDefinition definition) {
+        continuingBatch = true;
+        try {
+            return plan(definition);
+        } finally {
+            continuingBatch = false;
+        }
+    }
+
     private boolean advanceCadence() {
         migrate();
         var selected = MixerRecipeRegistry.recipe(recipe);
@@ -742,20 +778,25 @@ public final class MixerState {
             progress = 0;
             selected = null;
             activeDefinition = null;
+            batchMeters = null;
         }
-        var candidate = selected == null ? null : plan(selected);
+        Plan candidate = null;
+        // Meter edits affect the next batch. Resource/output replanning remains unchanged.
+        if (selected != null) candidate = continuingPlan(selected);
         if (candidate == null) {
             candidate = selectPlan();
             if (candidate == null && selected != null) return false;
             recipe = "";
             progress = 0;
             activeDefinition = null;
+            batchMeters = null;
             if (candidate == null) {
                 if (MixerRecipeRegistry.recipes().isEmpty()) blocked = "No loaded Mixer recipes";
                 return false;
             }
             selected = candidate.definition();
             recipe = selected.id();
+            batchMeters = meterRequirements;
         }
         if (activeDefinition == null && !savedSignature.isEmpty() && !savedSignature.equals(selected.signature()))
             progress = 0;
@@ -763,10 +804,20 @@ public final class MixerState {
         savedSignature = "";
         blocked = "";
         progress = (int) Math.min(selected.batchTicks(), (long) progress + SlurryBalance.CADENCE);
-        if (progress == selected.batchTicks() && new Reservation(candidate).commit()) {
+        boolean finished = false;
+        if (progress == selected.batchTicks()) {
+            continuingBatch = true;
+            try {
+                finished = new Reservation(candidate).commit();
+            } finally {
+                continuingBatch = false;
+            }
+        }
+        if (finished) {
             recipe = "";
             progress = 0;
             activeDefinition = null;
+            batchMeters = null;
             return true;
         }
         return false;
@@ -796,6 +847,26 @@ public final class MixerState {
         tag.put("producedItems", producedItems.serializeNBT(registries));
         tag.putString("recipeSignature", activeDefinition == null ? savedSignature : activeDefinition.signature());
         tag.putString("recipe", recipe);
+        if (!recipe.isEmpty() && batchMeters != null) {
+            var snapshot = new CompoundTag();
+            var itemMeters = new ListTag();
+            for (var meter : batchMeters.itemRequirements()) {
+                var entry = new CompoundTag();
+                entry.putString("filter", meter.filter());
+                entry.putInt("quantity", meter.exactCount());
+                itemMeters.add(entry);
+            }
+            var fluidMeters = new ListTag();
+            for (var meter : batchMeters.fluidRequirements()) {
+                var entry = new CompoundTag();
+                entry.putString("filter", meter.filter());
+                entry.putInt("quantity", meter.exactAmountMb());
+                fluidMeters.add(entry);
+            }
+            snapshot.put("items", itemMeters);
+            snapshot.put("fluids", fluidMeters);
+            tag.put("batchMeters", snapshot);
+        }
         tag.putInt("progress", progress);
         tag.putString("blocked", blocked);
         tag.put("metrics", metrics.save());
@@ -842,12 +913,35 @@ public final class MixerState {
         metrics.load(tag.getCompound("metrics"));
         savedSignature = tag.getString("recipeSignature");
         activeDefinition = MixerRecipeRegistry.recipe(recipe);
+        batchMeters = null;
+        if (!recipe.isEmpty()) {
+            try {
+                var snapshot = tag.getCompound("batchMeters");
+                var itemMeters = new ArrayList<ItemMeterRequirement>();
+                for (var entry : snapshot.getList("items", Tag.TAG_COMPOUND)) {
+                    var meter = (CompoundTag) entry;
+                    itemMeters.add(new ItemMeterRequirement(meter.getString("filter"), meter.getInt("quantity")));
+                }
+                var fluidMeters = new ArrayList<FluidMeterRequirement>();
+                for (var entry : snapshot.getList("fluids", Tag.TAG_COMPOUND)) {
+                    var meter = (CompoundTag) entry;
+                    fluidMeters.add(new FluidMeterRequirement(meter.getString("filter"), meter.getInt("quantity")));
+                }
+                batchMeters = new MixerMeterRequirements(itemMeters, fluidMeters);
+            } catch (RuntimeException e) {
+                recipe = "";
+                progress = 0;
+                activeDefinition = null;
+                blocked = "Invalid saved batch meter requirements";
+            }
+        }
         if (activeDefinition != null
                 && !savedSignature.isEmpty()
                 && !savedSignature.equals(activeDefinition.signature())) {
             recipe = "";
             progress = 0;
             activeDefinition = null;
+            batchMeters = null;
         }
     }
 
@@ -892,6 +986,7 @@ public final class MixerState {
             recipe = source.recipe;
             progress = source.progress;
             activeDefinition = source.activeDefinition;
+            batchMeters = source.batchMeters;
         }
         metrics.assimilate(source.metrics);
         changed.run();
@@ -906,6 +1001,7 @@ public final class MixerState {
         recipe = "";
         progress = 0;
         activeDefinition = null;
+        batchMeters = null;
         savedSignature = "";
         metrics.load(new CompoundTag());
     }
@@ -915,10 +1011,12 @@ public final class MixerState {
     }
 
     public String status(boolean formed, boolean active) {
+        refreshMeters();
         return (formed ? (active ? "Mixer formed / active" : "Mixer formed / disabled") : "Mixer unformed / inactive")
                 + "\nWater: " + amount(0) + " mB | WASTE: " + amount(1) + " mB | XP: " + experienceMb()
                 + " mB | Plants: " + plantCount() + "\nRecipe: " + (recipe.isEmpty() ? "none" : recipe)
-                + " | Progress: " + progress + " | " + blocked + "\nResources: "
+                + " | Progress: " + progress + " | " + blocked
+                + (meterProblem.isEmpty() ? "" : "\nNext batch blocked: " + meterProblem) + "\nResources: "
                 + tanks().stream()
                         .filter(t -> !t.isEmpty())
                         .map(t -> t.getFluid().getHoverName().getString() + " " + t.getFluidAmount() + " mB")

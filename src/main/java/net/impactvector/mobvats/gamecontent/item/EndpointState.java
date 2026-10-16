@@ -48,7 +48,11 @@ public final class EndpointState {
                     "functionState",
                     net.impactvector.mobvats.gamecontent.multiblock.common.MechanicalState.capture(entity));
         }
-        if (entity instanceof net.impactvector.mobvats.gamecontent.multiblock.mixer.part.MixerFeDriveEntity drive) {
+        if (entity
+                instanceof net.impactvector.mobvats.gamecontent.multiblock.mixer.part.AbstractMixerMeterEntity meter) {
+            state.put("meterConfiguration", meter.configuration());
+        } else if (entity
+                instanceof net.impactvector.mobvats.gamecontent.multiblock.mixer.part.MixerFeDriveEntity drive) {
             state.put("feDrive", drive.saveEnergy());
         } else if (entity
                 instanceof
@@ -98,6 +102,9 @@ public final class EndpointState {
                     entity, state.getCompound("functionState"));
             return;
         }
+        if (entity instanceof net.impactvector.mobvats.gamecontent.multiblock.mixer.part.AbstractMixerMeterEntity meter
+                && state.contains("meterConfiguration"))
+            meter.loadConfiguration(state.getCompound("meterConfiguration"));
         if (entity instanceof net.impactvector.mobvats.gamecontent.multiblock.mixer.part.MixerFeDriveEntity drive
                 && state.contains("feDrive")) drive.loadEnergy(state.getCompound("feDrive"));
         if (entity

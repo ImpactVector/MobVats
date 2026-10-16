@@ -15,6 +15,13 @@ import net.neoforged.neoforge.client.event.*;
 @EventBusSubscriber(modid = MobVats.MOD_ID, value = Dist.CLIENT)
 public final class MixerClient {
     @SubscribeEvent
+    public static void registerScreens(RegisterMenuScreensEvent event) {
+        event.register(
+                net.impactvector.mobvats.gamecontent.Content.METER_MENU.get(),
+                net.impactvector.mobvats.gamecontent.multiblock.mixer.client.screen.MixerMeterScreen::new);
+    }
+
+    @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(
                 MixerContent.entityType(MixerPartType.Controller), MixerControllerRenderer::new);

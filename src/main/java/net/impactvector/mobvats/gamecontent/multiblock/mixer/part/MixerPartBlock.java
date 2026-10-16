@@ -99,6 +99,8 @@ public final class MixerPartBlock extends MultiblockPartBlock<MultiblockMixer, M
                         });
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
+        if (level.getBlockEntity(pos) instanceof AbstractMixerMeterEntity meter && meter.configure(player, hand))
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
         if (level.getBlockEntity(pos) instanceof MixerPumpEntity pump && pump.configure(player, hand))
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
         if (level.getBlockEntity(pos) instanceof MixerFluidVoidEntity sink && sink.configure(player, hand))
@@ -132,6 +134,12 @@ public final class MixerPartBlock extends MultiblockPartBlock<MultiblockMixer, M
 
     protected InteractionResult useWithoutItem(
             BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (level.getBlockEntity(pos) instanceof AbstractMixerMeterEntity meter) {
+            if (meter.configure(player, InteractionHand.MAIN_HAND))
+                return InteractionResult.sidedSuccess(level.isClientSide);
+            if (player instanceof ServerPlayer server) server.openMenu(meter, pos);
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
         if (level.getBlockEntity(pos) instanceof MixerPumpEntity pump
                 && pump.configure(player, InteractionHand.MAIN_HAND))
             return InteractionResult.sidedSuccess(level.isClientSide);
