@@ -17,6 +17,10 @@ public abstract class AbstractMixerDriveEntity extends AbstractMixerEntity imple
                 && Math.abs((long) drive.getX() - impeller.getX()) + Math.abs((long) drive.getZ() - impeller.getZ())
                         == 1;
     }
+
+    public boolean redstoneInhibited() {
+        return net.impactvector.mobvats.gamecontent.multiblock.common.RedstoneControl.inhibited(this);
+    }
     /** Motors declare their supply resource without changing attachment geometry. */
     public Set<ConduitResource> conduitResources() {
         return Set.of(ConduitResource.ITEM);
@@ -24,6 +28,8 @@ public abstract class AbstractMixerDriveEntity extends AbstractMixerEntity imple
 
     protected boolean attachedTo(MultiblockMixer mixer) {
         return !isRemoved()
+                && !redstoneInhibited()
+                && !mixer.controllerInhibited()
                 && level == mixer.getWorld()
                 && mixer.containsPart(this)
                 && getMultiblockController().filter(c -> c == mixer).isPresent()

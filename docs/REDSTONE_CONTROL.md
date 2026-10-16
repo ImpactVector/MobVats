@@ -35,3 +35,25 @@ is accumulated. Passive bottom extraction remains available.
 Two additional headless tests cover direct power, lever-through-stone power,
 horizontal orientations, serialized entity replacement while powered, forming state,
 retained output, fluid conservation, passive extraction, ejection, and resume.
+
+R1 validation: Java 21 `format`, diff review, `validate` succeeded; all 884 required
+GameTests passed (882 existing plus two new).
+
+## R2 — Mixer controller and single-drive inhibition
+
+Controller entities are held in an attached-part role collection. `processingEnabled`
+combines the unchanged operator preference with derived controller power. Drive
+execution is skipped while the controller or installed drive is powered; spin-up,
+running cadence, batch progress, FE credit, and burning fuel are retained. Resource
+evacuation, boundary ports, pumps, intakes and metrics continue on the existing loop.
+Drive APIs also reject operational use when inhibited. No signal is serialized.
+
+Four new tests cover the controller and all three drive types, direct and indirect
+power, exact resume cadence, saved drive state, FE/fuel preservation, operator
+preference, and connected fluid input under controller inhibition. Existing chunk
+unload still follows ZeroCore's established mechanical stop/reassembly lifecycle;
+redstone itself never invokes that reset path.
+
+R2 validation: Java 21 `format`, diff review, `validate` succeeded; all 888 required
+GameTests passed. Validation caught and corrected an operator-disabled availability
+regression and normalized the creative test's automatically started fixture epoch.

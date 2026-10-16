@@ -25,6 +25,15 @@ public final class MultiblockMixer
         implements it.zerono.mods.zerocore.lib.IActivableMachine {
     private boolean active = true;
 
+    public boolean processingEnabled() {
+        return active && !controllerInhibited();
+    }
+
+    public boolean controllerInhibited() {
+        return controllerParts.parts().stream()
+                .anyMatch(net.impactvector.mobvats.gamecontent.multiblock.common.RedstoneControl::inhibited);
+    }
+
     @Override
     public boolean isMachineActive() {
         return active;
@@ -42,6 +51,9 @@ public final class MultiblockMixer
     }
 
     private final MixerState state = new MixerState(this::changed);
+    private final AttachedPartCollection<MixerControllerEntity> controllerParts = new AttachedPartCollection<>(
+            MixerControllerEntity.class,
+            Comparator.comparing(MixerControllerEntity::getBlockPos, ConduitTopology.POSITION));
     private final AttachedPartCollection<AbstractMixerDriveEntity> attachedDrives = new AttachedPartCollection<>(
             AbstractMixerDriveEntity.class,
             Comparator.comparing(AbstractMixerDriveEntity::getBlockPos, ConduitTopology.POSITION));
@@ -51,12 +63,14 @@ public final class MultiblockMixer
             ActiveBoundaryPort.class, Comparator.comparing(ActiveBoundaryPort::getBlockPos, ConduitTopology.POSITION));
 
     private void registerAttachedPart(Object part) {
+        controllerParts.add(part);
         attachedDrives.add(part);
         attachedPumps.add(part);
         activePorts.add(part);
     }
 
     private void retireAttachedParts() {
+        controllerParts.clear();
         attachedDrives.clear();
         attachedPumps.clear();
         activePorts.clear();
@@ -571,6 +585,7 @@ public final class MultiblockMixer
     }
 
     protected void onPartRemoved(IMultiblockPart<MultiblockMixer> part) {
+        controllerParts.remove(part);
         attachedDrives.remove(part);
         attachedPumps.remove(part);
         activePorts.remove(part);
@@ -583,7 +598,7 @@ public final class MultiblockMixer
         if (!isAssembled()) return false;
         boolean storageChanged = storage.evacuate();
         state.activeTick();
-        if (active) tickDrive();
+        if (processingEnabled()) tickDrive();
         boolean pumpsChanged = MixerPumps.tickOrdered(this, attachedPumps.parts());
         boolean boundaryChanged = storageChanged
                 | pumpsChanged
@@ -608,6 +623,8 @@ public final class MultiblockMixer
 
     private void tickDrive() {
         var motor = drive().orElse(null);
+        // Redstone freezes the mechanical epoch instead of invoking stopDrive's reset path.
+        if (motor instanceof AbstractMixerDriveEntity part && part.redstoneInhibited()) return;
         if (motor != activeDrive) {
             stopDrive();
             activeDrive = motor;
