@@ -216,23 +216,144 @@ public final class VatSpecimenMenuGameTests {
             var first = VatSpecimenNetworking.View.capture(c);
             m.applyView(first);
             var id = m.selectedId();
+            var preview = new VatSpecimenPreview();
+            var visual = preview.update(m.selected(), h.getLevel());
             m.applyView(VatSpecimenNetworking.View.decode(first.encode()));
             h.assertTrue(m.selectedId().equals(id) && m.selected().id().equals(id), "Refresh lost selection");
+            h.assertTrue(
+                    visual != null && preview.update(m.selected(), h.getLevel()) == visual,
+                    "Snapshot round trip unnecessarily rebuilt preview");
             h.assertTrue(
                     m.page(0).contains("Simulacra") && !m.page(3).isBlank() && m.slots.isEmpty(),
                     "Diagnostics/inventory contract changed");
             head(h).encode(ResourceLocation.parse("minecraft:pig"));
             var replaced = VatSpecimenNetworking.View.capture(c);
             m.applyView(replaced);
+            var replacement = preview.update(m.selected(), h.getLevel());
+            h.assertTrue(
+                    replacement != null
+                            && replacement != visual
+                            && replacement.getType() == net.minecraft.world.entity.EntityType.PIG,
+                    "Replacement did not rebuild selected preview identity");
             h.assertTrue(
                     !m.selectedId().equals(id) && m.selected().id().equals(head(h).specimenId()),
                     "Replacement inherited identity");
             m.applyView(VatSpecimenNetworking.View.EMPTY);
+            h.assertTrue(preview.update(m.selected(), h.getLevel()) == null, "Empty view retained preview");
             h.assertTrue(
                     m.selected() == null && m.view().specimens().isEmpty(),
                     "Removal/disconnection retained stale rows");
             h.succeed();
         });
+    }
+
+    private static VatSpecimenSnapshot previewRow(UUID id, String type, boolean adult, String appearance) {
+        return new VatSpecimenSnapshot(
+                id,
+                0,
+                type,
+                "Preview",
+                adult,
+                "Operational",
+                1,
+                1,
+                1,
+                1,
+                "None",
+                "Waiting",
+                List.of(),
+                List.of(),
+                appearance);
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 10)
+    public static void previewAgeAppearanceAndDetachedConstruction(GameTestHelper h) {
+        var cache = new VatSpecimenPreview();
+        var id = UUID.randomUUID();
+        var row = previewRow(id, "minecraft:sheep", false, "{Color:14b,Sheared:1b,Baby:1b}");
+        var view = new VatSpecimenNetworking.View(true, true, false, List.of(row), List.of("a", "b", "c", "d"));
+        var decoded =
+                VatSpecimenNetworking.View.decode(view.encode()).specimens().getFirst();
+        var sheep = (net.minecraft.world.entity.animal.Sheep) cache.update(decoded, h.getLevel());
+        h.assertTrue(
+                sheep != null
+                        && sheep.isBaby()
+                        && sheep.isSheared()
+                        && sheep.getColor() == net.minecraft.world.item.DyeColor.RED,
+                "Captured appearance or juvenile stage lost");
+        h.assertTrue(
+                h.getLevel().getEntity(sheep.getUUID()) == null && sheep.isNoAi(), "Preview entered world simulation");
+        h.assertTrue(
+                sheep.yBodyRot == sheep.yHeadRot && sheep.yBodyRotO == sheep.yHeadRotO && sheep.getXRot() == 0,
+                "Preview head/body pose diverged");
+        var adult = cache.update(previewRow(id, "minecraft:sheep", true, row.appearance()), h.getLevel());
+        h.assertTrue(adult != sheep && !adult.isBaby(), "Runtime adult stage did not override captured baby flag");
+        var cow = cache.update(previewRow(id, "minecraft:cow", false, "{}"), h.getLevel());
+        h.assertTrue(
+                cow != null && cow.isBaby() && cow.getType() == net.minecraft.world.entity.EntityType.COW,
+                "Species change with stable UUID did not rebuild");
+        cache.clear();
+        h.assertTrue(cache.update(row, h.getLevel()) != sheep, "Close/reopen retained old preview");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 10)
+    public static void previewRefreshInvalidationAndFailureCaching(GameTestHelper h) {
+        var cache = new VatSpecimenPreview();
+        var id = UUID.randomUUID();
+        var row = previewRow(id, "minecraft:sheep", true, "{Color:0b}");
+        var first = cache.update(row, h.getLevel());
+        h.assertTrue(
+                first != null
+                        && cache.update(previewRow(id, row.species(), true, row.appearance()), h.getLevel()) == first,
+                "Equal render identity rebuilt entity");
+        var changed = cache.update(previewRow(id, row.species(), true, "{Color:14b}"), h.getLevel());
+        h.assertTrue(
+                changed != first
+                        && ((net.minecraft.world.entity.animal.Sheep) changed).getColor()
+                                == net.minecraft.world.item.DyeColor.RED,
+                "Appearance refresh retained stale model");
+        var replaced = cache.update(previewRow(UUID.randomUUID(), row.species(), true, "{Color:14b}"), h.getLevel());
+        h.assertTrue(replaced != changed, "New UUID retained old entity");
+        cache.failed(new IllegalStateException("Simulated renderer failure"));
+        h.assertTrue(
+                cache.update(previewRow(id, row.species(), true, row.appearance()), h.getLevel()) != null,
+                "New key failed to recover");
+        cache.failed(new IllegalStateException("Simulated renderer failure"));
+        h.assertTrue(cache.update(row, h.getLevel()) == null, "Failed key retried every frame");
+        cache.clear();
+        h.assertTrue(cache.update(row, h.getLevel()) != null, "Cleared cache did not recover");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 10)
+    public static void previewMissingInvalidAndFilteredStateSafe(GameTestHelper h) {
+        var cache = new VatSpecimenPreview();
+        var id = UUID.randomUUID();
+        h.assertTrue(cache.update(null, h.getLevel()) == null, "Missing selection failed");
+        for (var type : List.of("Unknown", "invalid:missing", "minecraft:item"))
+            h.assertTrue(
+                    cache.update(previewRow(id, type, true, "{}"), h.getLevel()) == null,
+                    "Unrenderable type accepted: " + type);
+        h.assertTrue(
+                cache.update(previewRow(id, "minecraft:cow", true, "malformed{"), h.getLevel()) == null,
+                "Malformed appearance did not fall back");
+        var row = previewRow(id, "minecraft:cow", true, "{}");
+        h.assertTrue(
+                cache.update(row, null) == null && cache.update(row, h.getLevel()) != null,
+                "Unavailable world recovery failed");
+        var state = new CompoundTag();
+        state.putByte("Color", (byte) 14);
+        state.putString("Brain", "private");
+        net.impactvector.mobvats.gamecontent.mob.CapturedSpecimen.registerInteractionStateField("PreviewTestPrivate");
+        state.putString("PreviewTestPrivate", "private");
+        var appearance = net.impactvector.mobvats.gamecontent.mob.CapturedSpecimen.appearance(state);
+        h.assertTrue(
+                appearance.getByte("Color") == 14
+                        && !appearance.contains("Brain")
+                        && !appearance.contains("PreviewTestPrivate"),
+                "Projection exposed non-presentation state");
+        h.succeed();
     }
 
     @GameTest(template = "empty", timeoutTicks = 60)
@@ -271,7 +392,8 @@ public final class VatSpecimenMenuGameTests {
                     "None",
                     "Waiting",
                     List.of(new VatSpecimenSnapshot.Process("milk", "RUNNING", "running", 30, 100, 1, 70)),
-                    List.of()));
+                    List.of(),
+                    "{}"));
         var view = new VatSpecimenNetworking.View(
                 true, true, false, rows, List.of("Overview", "Production", "Efficiency", "Diagnostics"));
         var chunks = VatSpecimenNetworking.chunks(7, 1, view.encode());

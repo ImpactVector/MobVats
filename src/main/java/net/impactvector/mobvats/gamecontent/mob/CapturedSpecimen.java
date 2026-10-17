@@ -45,6 +45,15 @@ public record CapturedSpecimen(ResourceLocation identity, SimulacrumGeometry geo
     }
 
     public static CompoundTag filter(CompoundTag source) {
+        var result = appearance(source);
+        if (source != null)
+            for (var field : INTERACTION_FIELDS)
+                if (source.contains(field)) result.put(field, source.get(field).copy());
+        return result;
+    }
+
+    /** Fixed presentation allowlist, excluding adapter-owned interaction state. */
+    public static CompoundTag appearance(CompoundTag source) {
         var result = new CompoundTag();
         if (source != null)
             for (var key : FIELDS)
@@ -61,9 +70,6 @@ public record CapturedSpecimen(ResourceLocation identity, SimulacrumGeometry geo
         }
         if (source != null && source.contains("CustomName", 8))
             result.putString("CustomName", source.getString("CustomName"));
-        if (source != null)
-            for (var field : INTERACTION_FIELDS)
-                if (source.contains(field)) result.put(field, source.get(field).copy());
         return result;
     }
     /** Reject changes to unpersisted state instead of silently losing a mod's interaction state. */

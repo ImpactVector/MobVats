@@ -24,7 +24,8 @@ public record VatSpecimenSnapshot(
         String feedSource,
         String feeding,
         List<Process> processes,
-        List<Actor> actors) {
+        List<Actor> actors,
+        String appearance) {
     public VatSpecimenSnapshot {
         processes = List.copyOf(processes);
         actors = List.copyOf(actors);
@@ -130,7 +131,9 @@ public record VatSpecimenSnapshot(
                 runtime == null ? "None" : runtime.feedSource(),
                 valid ? vat.processEngine().feedingStatus(pos) : "Feeding data unavailable",
                 processes,
-                actors);
+                actors,
+                net.impactvector.mobvats.gamecontent.mob.CapturedSpecimen.appearance(h.specimenState())
+                        .toString());
     }
 
     private static void addActor(MultiblockVat vat, List<Actor> result, BlockPos pos, String use, BlockPos head) {

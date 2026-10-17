@@ -3,6 +3,7 @@ package net.impactvector.mobvats.gamecontent.multiblock.vat.client.screen;
 import java.util.*;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.VatSpecimenSnapshot;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.menu.VatControllerMenu;
+import net.impactvector.mobvats.gamecontent.multiblock.vat.menu.VatSpecimenPreview;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.process.PassiveProcessCompiler;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -19,6 +20,8 @@ public final class VatControllerScreen extends AbstractContainerScreen<VatContro
     private static final String[] PAGES = {"Overview", "Production", "Efficiency", "Diagnostics"};
     private static final int TEXT = 0xffdce6e7, MUTED = 0xff9baeb2, ACCENT = 0xff67b6aa;
     private boolean diagnostics;
+    private static final int PREVIEW_HEIGHT = 88;
+    private final VatSpecimenPreview preview = new VatSpecimenPreview();
     private int page, listScroll, detailScroll, diagnosticScroll, detailHeight, diagnosticHeight, listWidth;
     private Button activation, mode, diagnosticPage;
     private VatSpecimenSnapshot cachedSpecimen;
@@ -237,8 +240,14 @@ public final class VatControllerScreen extends AbstractContainerScreen<VatContro
             var selected = menu.selected();
             int x = listWidth + 16, available = imageWidth - x - 12;
             if (selected == null) {
-                g.drawString(font, "No simulacra installed", x, 62, TEXT, false);
-                g.drawString(font, "Install a captured specimen.", x, 76, MUTED, false);
+                g.drawString(
+                        font,
+                        fit(view.specimens().isEmpty() ? "No simulacra installed" : "Specimen unavailable", available),
+                        x,
+                        62,
+                        TEXT,
+                        false);
+                g.drawString(font, fit("Select or install a specimen.", available), x, 76, MUTED, false);
             } else {
                 if (cachedSpecimen != selected || cachedWidth != available) {
                     if (cachedSpecimen == null || !cachedSpecimen.id().equals(selected.id())) detailScroll = 0;
@@ -248,11 +257,15 @@ public final class VatControllerScreen extends AbstractContainerScreen<VatContro
                 }
                 var lines = cachedDetails;
                 detailHeight = lines.stream()
-                        .mapToInt(l -> !l.item.isEmpty() ? 20 : l.progress >= 0 ? 18 : 12)
-                        .sum();
+                                .mapToInt(l -> !l.item.isEmpty() ? 20 : l.progress >= 0 ? 18 : 12)
+                                .sum()
+                        + PREVIEW_HEIGHT
+                        + 6;
                 detailScroll = Math.clamp(detailScroll, 0, Math.max(0, detailHeight - bodyHeight() + 8));
                 g.enableScissor(leftPos + x, topPos + 55, leftPos + imageWidth - 8, topPos + imageHeight - 23);
                 int y = 58 - detailScroll;
+                renderPreview(g, x, y, available);
+                y += PREVIEW_HEIGHT + 6;
                 for (var line : lines) {
                     int size = !line.item.isEmpty() ? 20 : line.progress >= 0 ? 18 : 12;
                     if (y + size >= 55 && y < imageHeight - 23) {
@@ -286,6 +299,32 @@ public final class VatControllerScreen extends AbstractContainerScreen<VatContro
                 imageHeight - 14,
                 MUTED,
                 false);
+    }
+
+    private void renderPreview(GuiGraphics g, int x, int y, int width) {
+        if (y + PREVIEW_HEIGHT < 55 || y >= imageHeight - 23) return;
+        g.fill(x, y, x + width, y + PREVIEW_HEIGHT, 0xff52646b);
+        g.fill(x + 1, y + 1, x + width - 1, y + PREVIEW_HEIGHT - 1, 0xff172127);
+        g.enableScissor(leftPos + x + 1, topPos + y + 1, leftPos + x + width - 1, topPos + y + PREVIEW_HEIGHT - 1);
+        boolean available = false;
+        try {
+            var entity = preview.update(menu.selected(), minecraft.level);
+            if (entity != null) {
+                VatSpecimenPreviewRenderer.render(g, entity, x, y, width, PREVIEW_HEIGHT);
+                available = true;
+            }
+        } catch (Exception error) {
+            preview.failed(error);
+        } finally {
+            g.disableScissor();
+        }
+        if (!available) g.drawString(font, fit("Preview unavailable", width - 12), x + 6, y + 38, MUTED, false);
+    }
+
+    @Override
+    public void removed() {
+        preview.clear();
+        super.removed();
     }
 
     @Override
@@ -323,6 +362,7 @@ public final class VatControllerScreen extends AbstractContainerScreen<VatContro
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float tick) {
+        preview.update(menu.selected(), minecraft.level);
         activation.setMessage(Component.literal(menu.active() ? "Disable" : "Enable"));
         diagnosticPage.visible = diagnostics;
         super.render(g, mouseX, mouseY, tick);
