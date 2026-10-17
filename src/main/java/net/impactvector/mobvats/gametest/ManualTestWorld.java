@@ -35,6 +35,8 @@ public final class ManualTestWorld {
             BlockPos probe) {}
 
     private static final List<Fixture> FIXTURES = new ArrayList<>();
+    private static final boolean ACCEPTANCE = Boolean.getBoolean("mobvats.worldAcceptance");
+    private static final int SETTLE_TICKS = ACCEPTANCE ? OperatorVatFixtures.SETTLE_TICKS : 200;
     private static int ticks;
     private static long performanceStart;
     private static boolean active;
@@ -257,10 +259,14 @@ public final class ManualTestWorld {
         if (!active) return;
         try {
             var level = event.getServer().overworld();
-            if (!operatorsSuspended && (operatorsResumeTick == 0 || ticks >= operatorsResumeTick))
-                OperatorVatFixtures.observe(level);
-            ProductionWorldFixtures.observe(level);
-            CreativeProductionFixtures.observe(level);
+            if (ACCEPTANCE) {
+                if (!operatorsSuspended && (operatorsResumeTick == 0 || ticks >= operatorsResumeTick))
+                    OperatorVatFixtures.observe(level);
+                ProductionWorldFixtures.observe(level);
+                CreativeProductionFixtures.observe(level);
+            } else {
+                ProductionWorldFixtures.prepareSupplies(level);
+            }
             if (net.impactvector.mobvats.gamecontent.multiblock.conduit.ConduitPerformance.ENABLED
                     && (ticks + 1) % 100 == 0) {
                 LogUtils.getLogger()
@@ -273,14 +279,15 @@ public final class ManualTestWorld {
                 performanceStart = System.nanoTime();
             }
             if (++ticks == 100) OperatorVatFixtures.verifyFormation(level);
-            if (ticks == OperatorVatFixtures.SETTLE_TICKS - 200) {
+            if (ticks == SETTLE_TICKS - (ACCEPTANCE ? 200 : 100)) {
                 OperatorVatFixtures.prepareFeedDemo(level);
                 ProductionWorldFixtures.prepareRun(level);
             }
-            if (ticks < OperatorVatFixtures.SETTLE_TICKS) return;
+            if (ticks < SETTLE_TICKS) return;
             // Four initial cow kills can yield only 160 mB XP; culture requires 250 mB.
             // Keep native processing running for a replacement cohort instead of depending on luck.
-            if (!ProductionWorldFixtures.cultureObserved(level)
+            if (ACCEPTANCE
+                    && !ProductionWorldFixtures.cultureObserved(level)
                     && ticks < ProductionWorldFixtures.observationDeadline()) {
                 // Extended headless observation can exceed eight minutes at 100 TPS.
                 // Advance ordinary ticks faster; biology still takes its full configured tick count.
@@ -346,25 +353,30 @@ public final class ManualTestWorld {
                         + fixture.description().replace('|', ' ') + "\n");
             }
             // Forced chunks are only needed during generation. The saved world behaves like a normal creative world.
-            OperatorVatFixtures.verify(level, manifest);
-            // Preserve the existing fixture evidence even when production acceptance finds a gap.
-            Files.writeString(Path.of(System.getProperty("mobvats.testWorldPath"), "fixtures.md"), manifest);
-            IllegalStateException productionFailure = null;
-            try {
-                ProductionWorldFixtures.verify(level, manifest);
-            } catch (IllegalStateException failure) {
-                productionFailure = failure;
-            } finally {
+            if (ACCEPTANCE) {
+                OperatorVatFixtures.verify(level, manifest);
+                // Preserve the existing fixture evidence even when production acceptance finds a gap.
                 Files.writeString(Path.of(System.getProperty("mobvats.testWorldPath"), "fixtures.md"), manifest);
-            }
-            try {
-                CreativeProductionFixtures.verify(level, manifest);
-            } finally {
+                IllegalStateException productionFailure = null;
+                try {
+                    ProductionWorldFixtures.verify(level, manifest);
+                } catch (IllegalStateException failure) {
+                    productionFailure = failure;
+                } finally {
+                    Files.writeString(Path.of(System.getProperty("mobvats.testWorldPath"), "fixtures.md"), manifest);
+                }
+                try {
+                    CreativeProductionFixtures.verify(level, manifest);
+                } finally {
+                    Files.writeString(Path.of(System.getProperty("mobvats.testWorldPath"), "fixtures.md"), manifest);
+                }
+                ExtruderWorldFixtures.verify(level, manifest);
                 Files.writeString(Path.of(System.getProperty("mobvats.testWorldPath"), "fixtures.md"), manifest);
+                if (productionFailure != null) throw productionFailure;
+            } else {
+                manifest.append("\nPrepared for manual inspection after " + ticks
+                        + " setup ticks. Automated production acceptance was not run.\n");
             }
-            ExtruderWorldFixtures.verify(level, manifest);
-            Files.writeString(Path.of(System.getProperty("mobvats.testWorldPath"), "fixtures.md"), manifest);
-            if (productionFailure != null) throw productionFailure;
             manifest.append("\n## Redstone demonstrations\n\n"
                     + "Controls are saved ON (paused). Flip OFF to watch production; flip ON to pause again.\n"
                     + "Levers power an adjacent smooth-stone block. Operator settings are preserved.\n"
@@ -387,7 +399,7 @@ public final class ManualTestWorld {
             verified = true;
             LogUtils.getLogger()
                     .info(
-                            "MOBVATS TEST WORLD VERIFIED: {} mirrored fixtures, {} operator Vats, {} observation ticks",
+                            "MOBVATS TEST WORLD PREPARED: {} mirrored fixtures, {} operator Vats, {} setup/observation ticks",
                             FIXTURES.size(),
                             OperatorVatFixtures.count(),
                             ticks);
@@ -423,8 +435,10 @@ public final class ManualTestWorld {
             if (verified)
                 Files.writeString(
                         world.resolve("generation-complete.txt"),
-                        "Verified " + FIXTURES.size() + " mirrored fixtures\nVerified " + OperatorVatFixtures.count()
-                                + " operator fixtures\nSaved creative superflat, cheats enabled, structures disabled\n");
+                        "Prepared " + FIXTURES.size() + " mirrored fixtures and " + OperatorVatFixtures.count()
+                                + " operator fixtures\nAutomated production acceptance: "
+                                + (ACCEPTANCE ? "passed" : "not run")
+                                + "\nSaved creative superflat, cheats enabled, structures disabled\n");
         } catch (Exception error) {
             LogUtils.getLogger().error("MOBVATS TEST WORLD SAVE VALIDATION FAILED", error);
         }

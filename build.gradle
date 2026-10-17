@@ -106,6 +106,7 @@ neoForge {
             gameDirectory = manualServerDir
             programArguments.addAll '--nogui', '--universe', manualSaves.toString(), '--world', manualWorldName
             systemProperty 'mobvats.buildTestWorld', 'true'
+            systemProperty 'mobvats.worldAcceptance', providers.gradleProperty('worldAcceptance').getOrElse('false')
             systemProperty 'mobvats.conduitPerformance', providers.gradleProperty('conduitPerformance').getOrElse('false')
             systemProperty 'mobvats.acceptanceMinimumCowXp', providers.gradleProperty('acceptanceMinimumCowXp').getOrElse('false')
             systemProperty 'mobvats.testWorldPath', manualWorld.toString()

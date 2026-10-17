@@ -525,7 +525,7 @@ final class ProductionWorldFixtures {
 
     /** One-time external supply through the exposed boundary capability, after formation. It does
      * not advance recipes, fill a process tank, or transport Vat products back to a Mixer. */
-    static void observe(ServerLevel level) {
+    static void prepareSupplies(ServerLevel level) {
         for (var f : MIXERS) {
             var mixer = controller(level, f);
             if (mixer == null || !mixer.isAssembled()) continue;
@@ -563,6 +563,14 @@ final class ProductionWorldFixtures {
                 }
                 SEEDED.add(f.id());
             }
+        }
+    }
+
+    static void observe(ServerLevel level) {
+        prepareSupplies(level);
+        for (var f : MIXERS) {
+            var mixer = controller(level, f);
+            if (mixer == null || !mixer.isAssembled()) continue;
             if (mixer.state().plantCount() > 0) ITEMS.add(f.id());
             if (mixer.state().recipe().equals(f.recipe()) && mixer.state().progress() > 0) RECIPES.add(f.id());
         }
