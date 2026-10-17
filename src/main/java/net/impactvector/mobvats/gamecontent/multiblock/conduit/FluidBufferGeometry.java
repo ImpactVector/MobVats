@@ -21,8 +21,30 @@ public final class FluidBufferGeometry {
 
     public record Volume(BlockPos owner, Kind kind, AABB bounds) {}
 
+    /** Only fully occupied clusters spanning multiple axes may close the spaces between bridges. */
+    public static boolean rectangular(Collection<BlockPos> positions) {
+        if (positions.isEmpty()) return false;
+        int x0 = Integer.MAX_VALUE, y0 = Integer.MAX_VALUE, z0 = Integer.MAX_VALUE;
+        int x1 = Integer.MIN_VALUE, y1 = Integer.MIN_VALUE, z1 = Integer.MIN_VALUE;
+        for (var pos : positions) {
+            x0 = Math.min(x0, pos.getX());
+            y0 = Math.min(y0, pos.getY());
+            z0 = Math.min(z0, pos.getZ());
+            x1 = Math.max(x1, pos.getX());
+            y1 = Math.max(y1, pos.getY());
+            z1 = Math.max(z1, pos.getZ());
+        }
+        int axes = (x1 > x0 ? 1 : 0) + (y1 > y0 ? 1 : 0) + (z1 > z0 ? 1 : 0);
+        return axes >= 2 && (long) (x1 - x0 + 1) * (y1 - y0 + 1) * (z1 - z0 + 1) == positions.size();
+    }
+
     public static List<Volume> envelope(
             BlockPos pos, boolean supported, Set<Direction> mounts, Set<Direction> bridges) {
+        return envelope(pos, supported, mounts, bridges, false);
+    }
+
+    public static List<Volume> envelope(
+            BlockPos pos, boolean supported, Set<Direction> mounts, Set<Direction> bridges, boolean rectangular) {
         var result = new ArrayList<Volume>();
         result.add(new Volume(pos.immutable(), Kind.BODY, BODY.move(pos)));
         if (supported)
@@ -30,8 +52,21 @@ public final class FluidBufferGeometry {
                     pos.immutable(),
                     Kind.SUPPORT,
                     new AABB(6.0 / 16, 0, 6.0 / 16, 10.0 / 16, 2.0 / 16, 10.0 / 16).move(pos)));
+        if (rectangular)
+            result.add(new Volume(
+                    pos.immutable(),
+                    Kind.BRIDGE,
+                    new AABB(
+                                    bridges.contains(Direction.WEST) ? 0 : BODY.minX,
+                                    bridges.contains(Direction.DOWN) ? 0 : BODY.minY,
+                                    bridges.contains(Direction.NORTH) ? 0 : BODY.minZ,
+                                    bridges.contains(Direction.EAST) ? 1 : BODY.maxX,
+                                    bridges.contains(Direction.UP) ? 1 : BODY.maxY,
+                                    bridges.contains(Direction.SOUTH) ? 1 : BODY.maxZ)
+                            .move(pos)));
         for (var face : Direction.values()) {
             if (bridges.contains(face)) {
+                if (rectangular) continue;
                 // Each member owns its half of a continuous 10-pixel tank bridge.
                 result.add(new Volume(
                         pos.immutable(),
@@ -68,8 +103,14 @@ public final class FluidBufferGeometry {
         var storage = new PhysicalFluidStorage();
         storage.compile(members, ConduitTopology.EMPTY);
         var groups = new HashMap<BlockPos, Integer>();
-        for (int i = 0; i < storage.clusters().size(); i++)
-            for (var member : storage.clusters().get(i).members()) groups.put(member.getBlockPos(), i);
+        var rectangles = new HashSet<Integer>();
+        for (int i = 0; i < storage.clusters().size(); i++) {
+            var cluster = storage.clusters().get(i);
+            if (rectangular(cluster.members().stream()
+                    .map(FluidBufferEntity::getBlockPos)
+                    .toList())) rectangles.add(i);
+            for (var member : cluster.members()) groups.put(member.getBlockPos(), i);
+        }
         var result = new ArrayList<Volume>();
         for (var member : members) {
             var pos = member.getBlockPos();
@@ -85,7 +126,12 @@ public final class FluidBufferGeometry {
                         || block.cladding(level.getBlockState(pos)) != ConduitCladding.BARE && shell.outward(face))
                     mounts.add(face);
             }
-            result.addAll(envelope(pos, !level.getBlockState(pos.below()).isAir(), mounts, bridges));
+            result.addAll(envelope(
+                    pos,
+                    !level.getBlockState(pos.below()).isAir(),
+                    mounts,
+                    bridges,
+                    rectangles.contains(groups.get(pos))));
         }
         return List.copyOf(result);
     }

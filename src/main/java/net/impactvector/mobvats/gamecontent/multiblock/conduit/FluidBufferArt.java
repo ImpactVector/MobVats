@@ -7,6 +7,7 @@ import net.minecraft.world.phys.AABB;
 /** Presentation geometry only; never used for placement, collision, routing or capacity. */
 public final class FluidBufferArt {
     public static final AABB BODY = new AABB(3. / 16, 3. / 16, 3. / 16, 13. / 16, 13. / 16, 13. / 16);
+    public static final int RECTANGULAR = 1 << 6;
 
     public enum Material {
         GLASS,
@@ -42,6 +43,14 @@ public final class FluidBufferArt {
     }
 
     public static List<AABB> volumes(int joins) {
+        if ((joins & RECTANGULAR) != 0)
+            return List.of(new AABB(
+                    has(joins, Direction.WEST) ? 0 : BODY.minX,
+                    has(joins, Direction.DOWN) ? 0 : BODY.minY,
+                    has(joins, Direction.NORTH) ? 0 : BODY.minZ,
+                    has(joins, Direction.EAST) ? 1 : BODY.maxX,
+                    has(joins, Direction.UP) ? 1 : BODY.maxY,
+                    has(joins, Direction.SOUTH) ? 1 : BODY.maxZ));
         var boxes = new ArrayList<AABB>();
         boxes.add(BODY);
         for (var face : Direction.values()) if (has(joins, face)) boxes.add(extension(face));
@@ -49,7 +58,7 @@ public final class FluidBufferArt {
     }
 
     public static synchronized List<Panel> mesh(int joins) {
-        return CACHE.computeIfAbsent(joins & 63, FluidBufferArt::bake);
+        return CACHE.computeIfAbsent(joins & 127, FluidBufferArt::bake);
     }
 
     private static List<Panel> bake(int joins) {
@@ -174,7 +183,7 @@ public final class FluidBufferArt {
         }
         // Cross-sections are disjoint body/arm rectangles; no internal liquid walls.
         for (var b : volumes(joins))
-            if (height > b.minY && height < b.maxY) {
+            if (height > b.minY && (height < b.maxY || height == 1 && b.maxY == 1)) {
                 double x0 = b.minX == 3. / 16 ? b.minX + epsilon : b.minX,
                         x1 = b.maxX == 13. / 16 ? b.maxX - epsilon : b.maxX;
                 double z0 = b.minZ == 3. / 16 ? b.minZ + epsilon : b.minZ,

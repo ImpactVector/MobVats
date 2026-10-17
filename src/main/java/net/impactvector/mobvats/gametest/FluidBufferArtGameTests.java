@@ -27,6 +27,59 @@ public final class FluidBufferArtGameTests {
         FluidBufferPresentation.refresh(h.getLevel(), List.of(e.getBlockPos()));
     }
 
+    @GameTest(template = "empty", timeoutTicks = 10)
+    public static void rectangularReservoirClosesCornersAndRecoversAfterRemoval(GameTestHelper h) {
+        var members = new ArrayList<FluidBufferEntity>();
+        for (int x = 0; x < 2; x++)
+            for (int y = 0; y < 2; y++)
+                for (int z = 0; z < 2; z++) {
+                    var member = buffer(h, P.offset(x, y, z));
+                    member.filter("minecraft:water");
+                    member.tank.setFluid(new FluidStack(Fluids.WATER, 2000));
+                    members.add(member);
+                }
+        var first = members.getFirst();
+        refresh(h, first);
+        for (var member : members) {
+            h.assertTrue((member.visualJoins() & FluidBufferArt.RECTANGULAR) != 0, "Box retained open junctions");
+            close(
+                    h,
+                    member.getBlockPos().getY() + member.visualHeight(),
+                    h.absolutePos(P).getY() + 1,
+                    "Rectangular reservoir has unequal liquid levels");
+            var restored = new FluidBufferEntity(member.getBlockPos(), member.getBlockState());
+            restored.handleUpdateTag(
+                    member.getUpdateTag(h.getLevel().registryAccess()),
+                    h.getLevel().registryAccess());
+            h.assertTrue(restored.visualJoins() == member.visualJoins(), "Packet lost rectangular shell state");
+        }
+        var volumes = FluidBufferGeometry.compile(h.getLevel(), h.absolutePos(P), h.absolutePos(P.offset(1, 1, 1)));
+        var junction =
+                net.minecraft.world.phys.Vec3.atLowerCornerOf(h.absolutePos(P)).add(.95, .95, .95);
+        h.assertTrue(volumes.stream().anyMatch(v -> v.bounds().contains(junction)), "Closed junction is not reserved");
+        h.assertTrue(
+                members.stream().mapToInt(m -> m.tank.getFluidAmount()).sum() == 16000,
+                "Rectangular rendering changed stored contents");
+        h.assertTrue(
+                members.stream().mapToInt(m -> m.tank.getCapacity()).sum() == 32000,
+                "Rectangular rendering changed capacity");
+        h.setBlock(P.offset(1, 1, 1), net.minecraft.world.level.block.Blocks.AIR);
+        refresh(h, first);
+        for (var member : members.subList(0, 7))
+            h.assertTrue(
+                    (member.visualJoins() & FluidBufferArt.RECTANGULAR) == 0, "Missing corner retained closed box");
+        var replacement = buffer(h, P.offset(1, 1, 1));
+        replacement.filter("minecraft:lava");
+        refresh(h, first);
+        h.assertTrue(
+                (first.visualJoins() & FluidBufferArt.RECTANGULAR) == 0,
+                "Incompatible corner incorrectly completed reservoir");
+        replacement.filter("minecraft:water");
+        refresh(h, first);
+        h.assertTrue((first.visualJoins() & FluidBufferArt.RECTANGULAR) != 0, "Replaced corner did not restore box");
+        h.succeed();
+    }
+
     private static void close(GameTestHelper h, double a, double b, String message) {
         h.assertTrue(Math.abs(a - b) < 1e-10, message);
     }

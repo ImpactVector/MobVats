@@ -1,19 +1,19 @@
 {
   "variants": {
     "cladding_material=none": {
-      "model": "mobvats:block/procedural/t1/fluid_buffer"
+      "model": "mobvats:block/procedural/t1/fluid_buffer_frame"
     },
     "cladding_material=vat_t1_casing": {
-      "model": "mobvats:block/procedural/t1/casing_fluid_buffer"
+      "model": "mobvats:block/procedural/t1/casing_fluid_buffer_frame"
     },
     "cladding_material=vat_t1_glass": {
-      "model": "mobvats:block/procedural/t1/glass_fluid_buffer"
+      "model": "mobvats:block/procedural/t1/glass_fluid_buffer_frame"
     },
     "cladding_material=mixer_t1_casing": {
-      "model": "mobvats:block/procedural/t1/mixer_casing_fluid_buffer"
+      "model": "mobvats:block/procedural/t1/mixer_casing_fluid_buffer_frame"
     },
     "cladding_material=mixer_t1_glass": {
-      "model": "mobvats:block/procedural/t1/mixer_glass_fluid_buffer"
+      "model": "mobvats:block/procedural/t1/mixer_glass_fluid_buffer_frame"
     }
   }
 }

@@ -118,6 +118,21 @@ public final class FluidBufferArtGeometryTest {
                 BlockPos.ZERO.above(),
                 FluidBufferArt.bit(Direction.DOWN));
         require(Math.abs(FluidBufferArt.level(vertical, .5) - 1) < 1e-12, "Vertical shared level");
+        int exposedRoof = FluidBufferArt.bit(Direction.UP) | FluidBufferArt.bit(Direction.EAST);
+        for (var liquid : FluidBufferArt.liquid(exposedRoof, FluidBufferArt.BODY.maxY))
+            if (liquid.face() == Direction.UP)
+                for (var shell : FluidBufferArt.mesh(exposedRoof)) {
+                    if (shell.face() != Direction.UP) continue;
+                    var a = liquid.bounds();
+                    var b = shell.bounds();
+                    require(
+                            a.minY != b.minY
+                                    || a.maxX <= b.minX
+                                    || a.minX >= b.maxX
+                                    || a.maxZ <= b.minZ
+                                    || a.minZ >= b.maxZ,
+                            "Liquid cap overlaps an exposed reservoir roof");
+                }
         var scenes = new ArrayList<Map<String, Object>>();
         scenes.add(scene("Standalone portable / no mounting orientation", List.of(BlockPos.ZERO), true));
         for (var face : Direction.values())
@@ -138,6 +153,14 @@ public final class FluidBufferArtGeometryTest {
                 true));
         scenes.add(scene("Buffer beside casing", List.of(BlockPos.ZERO), true));
         scenes.add(scene("Buffer beside conduit", List.of(BlockPos.ZERO), true));
+        for (var size : new int[][] {{2, 2, 1}, {2, 1, 2}, {1, 2, 2}, {2, 2, 2}, {3, 3, 3}}) {
+            var positions = new ArrayList<BlockPos>();
+            for (int x = 0; x < size[0]; x++)
+                for (int y = 0; y < size[1]; y++)
+                    for (int z = 0; z < size[2]; z++) positions.add(new BlockPos(x, y, z));
+            verifyRectangle(positions, size);
+            scenes.add(scene("Continuous " + size[0] + "x" + size[1] + "x" + size[2] + " reservoir", positions, true));
+        }
         examples.put("buffer_scenes", scenes);
         System.out.println(
                 "PASS: centered buffer, equal six-way surfaces, all 64 joins inside physical envelopes, internal cap suppression, cache identity and shared levels.");
@@ -146,7 +169,7 @@ public final class FluidBufferArtGeometryTest {
     private static Map<String, Object> scene(String name, List<BlockPos> positions, boolean compatible) {
         var joins = new LinkedHashMap<BlockPos, Integer>();
         for (var pos : positions) {
-            int mask = 0;
+            int mask = compatible && FluidBufferGeometry.rectangular(positions) ? FluidBufferArt.RECTANGULAR : 0;
             for (var face : Direction.values())
                 if (compatible && positions.contains(pos.relative(face))) mask |= FluidBufferArt.bit(face);
             joins.put(pos, mask);
@@ -192,5 +215,68 @@ public final class FluidBufferArtGeometryTest {
                 cells,
                 "context",
                 name.contains("beside casing") ? "casing" : name.contains("beside conduit") ? "conduit" : "");
+    }
+
+    private static void verifyRectangle(List<BlockPos> positions, int[] size) {
+        require(FluidBufferGeometry.rectangular(positions), "Filled box not recognized");
+        var joins = new LinkedHashMap<BlockPos, Integer>();
+        for (var pos : positions) {
+            int mask = FluidBufferArt.RECTANGULAR;
+            for (var face : Direction.values())
+                if (positions.contains(pos.relative(face))) mask |= FluidBufferArt.bit(face);
+            joins.put(pos, mask);
+        }
+        var bounds = new AABB(3. / 16, 3. / 16, 3. / 16, size[0] - 3. / 16, size[1] - 3. / 16, size[2] - 3. / 16);
+        double[] areas = new double[6], metal = new double[6];
+        double height = FluidBufferArt.level(joins, .5), liquidArea = 0;
+        require(Math.abs(height - size[1] / 2.) < 1e-9, "Rectangular shared liquid level differs");
+        for (var entry : joins.entrySet()) {
+            var pos = entry.getKey();
+            int mask = entry.getValue();
+            var reserved = FluidBufferGeometry.envelope(pos, false, Set.of(), directions(mask), true);
+            for (var volume : FluidBufferArt.volumes(mask))
+                for (double x : new double[] {volume.minX + 1e-6, volume.maxX - 1e-6})
+                    for (double y : new double[] {volume.minY + 1e-6, volume.maxY - 1e-6})
+                        for (double z : new double[] {volume.minZ + 1e-6, volume.maxZ - 1e-6}) {
+                            var point =
+                                    new net.minecraft.world.phys.Vec3(x, y, z).add(pos.getX(), pos.getY(), pos.getZ());
+                            require(
+                                    reserved.stream().anyMatch(v -> v.bounds().contains(point)),
+                                    "Merged art exceeds reserved geometry");
+                        }
+            for (var panel : FluidBufferArt.mesh(mask)) {
+                var face = panel.face();
+                var world = panel.bounds().move(pos);
+                double expected = face.getAxisDirection() == Direction.AxisDirection.POSITIVE
+                        ? bounds.max(face.getAxis())
+                        : bounds.min(face.getAxis());
+                require(
+                        Math.abs(world.min(face.getAxis()) - expected) < 1e-9,
+                        "Internal rim or recessed face in rectangular cluster");
+                areas[face.ordinal()] += area(panel);
+                if (panel.material() == FluidBufferArt.Material.METAL) metal[face.ordinal()] += area(panel);
+            }
+            for (var panel : FluidBufferArt.liquid(mask, height - pos.getY()))
+                if (panel.face() == Direction.UP) {
+                    require(Math.abs(panel.bounds().minY + pos.getY() - height) < 1e-9, "Internal liquid cap");
+                    liquidArea += area(panel);
+                }
+        }
+        for (var face : Direction.values()) {
+            var axis = face.getAxis();
+            double a = axis == Direction.Axis.X ? bounds.getYsize() : bounds.getXsize();
+            double b = axis == Direction.Axis.Z ? bounds.getYsize() : bounds.getZsize();
+            require(Math.abs(areas[face.ordinal()] - a * b) < 1e-9, "Hole or duplicate in rectangular outer wall");
+            require(
+                    Math.abs(metal[face.ordinal()] - (a * b - (a - 2. / 16) * (b - 2. / 16))) < 1e-9,
+                    "Metal trim is not confined to the outside perimeter");
+        }
+        double inset = .25 / 16;
+        require(
+                Math.abs(liquidArea - (bounds.getXsize() - 2 * inset) * (bounds.getZsize() - 2 * inset)) < 1e-9,
+                "Liquid surface has junction holes or overlaps");
+        var incomplete = new ArrayList<>(positions);
+        incomplete.remove(incomplete.size() - 1);
+        require(!FluidBufferGeometry.rectangular(incomplete), "Missing corner incorrectly closes irregular cluster");
     }
 }

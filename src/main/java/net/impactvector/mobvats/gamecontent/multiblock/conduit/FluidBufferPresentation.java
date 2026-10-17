@@ -65,8 +65,9 @@ public final class FluidBufferPresentation {
                 var joins = new LinkedHashMap<BlockPos, Integer>();
                 var positions = new HashSet<BlockPos>();
                 cluster.members().forEach(m -> positions.add(m.getBlockPos()));
+                boolean rectangular = FluidBufferGeometry.rectangular(positions);
                 for (var member : cluster.members()) {
-                    int mask = 0;
+                    int mask = rectangular ? FluidBufferArt.RECTANGULAR : 0;
                     for (var face : Direction.values())
                         if (positions.contains(member.getBlockPos().relative(face))) mask |= FluidBufferArt.bit(face);
                     joins.put(member.getBlockPos(), mask);

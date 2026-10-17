@@ -282,6 +282,26 @@ tasks.register('verifyRenderResources') {
                 if (variant?.model != 'mobvats:block/vat_head' || (variant.y ?: 0) != angle)
                     throw new GradleException("Head model facing/rotation mismatch: ${facing}")
             }
+            // The BER owns the reservoir in every assembly state. World models may only add cladding.
+            def bufferStates = parser.parse(archive.getInputStream(archive.getEntry('assets/mobvats/blockstates/fluid_buffer.json')))
+            bufferStates.variants.each { state, variant ->
+                def modelPath = 'assets/mobvats/models/' + variant.model.substring('mobvats:'.length()) + '.json'
+                def entry = archive.getEntry(modelPath)
+                if (entry == null) throw new GradleException("Missing buffer world model: ${modelPath}")
+                def model = parser.parse(archive.getInputStream(entry))
+                if (state == 'cladding_material=none' && !model.elements.isEmpty())
+                    throw new GradleException('Bare buffer chunk model duplicates the BER reservoir')
+                model.elements.each { element ->
+                    if (!(0..2).any { axis -> element.to[axis] < 3 || element.from[axis] > 13 })
+                        throw new GradleException("Buffer world model overlaps the BER reservoir: ${state}")
+                }
+            }
+            def bufferItem = parser.parse(archive.getInputStream(archive.getEntry('assets/mobvats/models/item/fluid_buffer.json')))
+            def itemModel = parser.parse(archive.getInputStream(archive.getEntry(
+                    'assets/mobvats/models/' + bufferItem.parent.substring('mobvats:'.length()) + '.json')))
+            if (!itemModel.elements.any { element -> element.faces.values().any { it.texture == '#glass' } })
+                throw new GradleException('Buffer inventory model lost its reservoir')
+            logger.lifecycle('Verified frame-only buffer world models for all claddings and preserved inventory reservoir.')
             ['vat_casing_face', 'vat_casing_edge', 'vat_casing_inner', 'tank_surface', 'tank_rim'].each { texture ->
                 def path = "assets/mobvats/textures/blocks/${texture}.png"
                 def entry = archive.getEntry(path)
