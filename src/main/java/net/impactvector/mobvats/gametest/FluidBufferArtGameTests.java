@@ -41,7 +41,7 @@ public final class FluidBufferArtGameTests {
         var first = members.getFirst();
         refresh(h, first);
         for (var member : members) {
-            h.assertTrue((member.visualJoins() & FluidBufferArt.RECTANGULAR) != 0, "Box retained open junctions");
+            h.assertTrue((member.visualJoins() & ~63) != 0, "Snapshot lost diagonal neighbors");
             close(
                     h,
                     member.getBlockPos().getY() + member.visualHeight(),
@@ -65,23 +65,69 @@ public final class FluidBufferArtGameTests {
                 "Rectangular rendering changed capacity");
         h.setBlock(P.offset(1, 1, 1), net.minecraft.world.level.block.Blocks.AIR);
         refresh(h, first);
-        for (var member : members.subList(0, 7))
-            h.assertTrue(
-                    (member.visualJoins() & FluidBufferArt.RECTANGULAR) == 0, "Missing corner retained closed box");
+        var closedEdge = new net.minecraft.world.phys.Vec3(.95, .95, .5);
+        var openCorner = new net.minecraft.world.phys.Vec3(.95, .95, .95);
+        h.assertTrue(
+                FluidBufferShape.contains(first.visualJoins(), closedEdge, FluidBufferArt.BODY),
+                "Missing corner reopened an unrelated completed junction");
+        h.assertTrue(
+                !FluidBufferShape.contains(first.visualJoins(), openCorner, FluidBufferArt.BODY),
+                "Missing member was filled over");
         var replacement = buffer(h, P.offset(1, 1, 1));
         replacement.filter("minecraft:lava");
         refresh(h, first);
         h.assertTrue(
-                (first.visualJoins() & FluidBufferArt.RECTANGULAR) == 0,
+                !FluidBufferShape.contains(first.visualJoins(), openCorner, FluidBufferArt.BODY),
                 "Incompatible corner incorrectly completed reservoir");
         replacement.filter("minecraft:water");
         refresh(h, first);
-        h.assertTrue((first.visualJoins() & FluidBufferArt.RECTANGULAR) != 0, "Replaced corner did not restore box");
+        h.assertTrue(
+                FluidBufferShape.contains(first.visualJoins(), openCorner, FluidBufferArt.BODY),
+                "Replaced corner did not restore junction");
         h.succeed();
     }
 
     private static void close(GameTestHelper h, double a, double b, String message) {
         h.assertTrue(Math.abs(a - b) < 1e-10, message);
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 10)
+    public static void missingDistantCornerDoesNotReopenCompletedJunctions(GameTestHelper h) {
+        for (int x = 0; x < 3; x++)
+            for (int y = 0; y < 3; y++)
+                for (int z = 0; z < 3; z++) buffer(h, P.offset(x, y, z)).filter("minecraft:water");
+        var first = (FluidBufferEntity) h.getBlockEntity(P);
+        refresh(h, first);
+        int before = first.visualJoins();
+        var mesh = FluidBufferArt.mesh(before);
+        var junction = new net.minecraft.world.phys.Vec3(.95, .95, .95);
+        h.assertTrue(FluidBufferShape.contains(before, junction, FluidBufferArt.BODY), "Initial junction is open");
+        h.setBlock(P.offset(2, 2, 2), net.minecraft.world.level.block.Blocks.AIR);
+        refresh(h, first);
+        h.assertTrue(
+                first.visualJoins() == before && FluidBufferArt.mesh(first.visualJoins()) == mesh,
+                "Distant removal changed an unaffected local shell");
+        var nearMissing = (FluidBufferEntity) h.getBlockEntity(P.offset(1, 1, 1));
+        h.assertTrue(
+                !FluidBufferShape.contains(nearMissing.visualJoins(), junction, FluidBufferArt.BODY),
+                "Shell covers a missing corner");
+        var copy = new FluidBufferEntity(nearMissing.getBlockPos(), nearMissing.getBlockState());
+        copy.handleUpdateTag(
+                nearMissing.getUpdateTag(h.getLevel().registryAccess()),
+                h.getLevel().registryAccess());
+        h.assertTrue(copy.visualJoins() == nearMissing.visualJoins(), "Packet lost irregular neighborhood");
+        var restored = buffer(h, P.offset(2, 2, 2));
+        restored.filter("minecraft:lava");
+        refresh(h, first);
+        h.assertTrue(
+                !FluidBufferShape.contains(nearMissing.visualJoins(), junction, FluidBufferArt.BODY),
+                "Incompatible corner closed the junction");
+        restored.filter("minecraft:water");
+        refresh(h, first);
+        h.assertTrue(
+                FluidBufferShape.contains(nearMissing.visualJoins(), junction, FluidBufferArt.BODY),
+                "Compatible replacement failed to close the junction");
+        h.succeed();
     }
 
     @GameTest(template = "empty", timeoutTicks = 10)

@@ -7,7 +7,6 @@ import net.minecraft.world.phys.AABB;
 /** Presentation geometry only; never used for placement, collision, routing or capacity. */
 public final class FluidBufferArt {
     public static final AABB BODY = new AABB(3. / 16, 3. / 16, 3. / 16, 13. / 16, 13. / 16, 13. / 16);
-    public static final int RECTANGULAR = 1 << 6;
 
     public enum Material {
         GLASS,
@@ -43,37 +42,25 @@ public final class FluidBufferArt {
     }
 
     public static List<AABB> volumes(int joins) {
-        if ((joins & RECTANGULAR) != 0)
-            return List.of(new AABB(
-                    has(joins, Direction.WEST) ? 0 : BODY.minX,
-                    has(joins, Direction.DOWN) ? 0 : BODY.minY,
-                    has(joins, Direction.NORTH) ? 0 : BODY.minZ,
-                    has(joins, Direction.EAST) ? 1 : BODY.maxX,
-                    has(joins, Direction.UP) ? 1 : BODY.maxY,
-                    has(joins, Direction.SOUTH) ? 1 : BODY.maxZ));
-        var boxes = new ArrayList<AABB>();
-        boxes.add(BODY);
-        for (var face : Direction.values()) if (has(joins, face)) boxes.add(extension(face));
-        return List.copyOf(boxes);
+        return FluidBufferShape.volumes(joins, BODY);
     }
 
     public static synchronized List<Panel> mesh(int joins) {
-        return CACHE.computeIfAbsent(joins & 127, FluidBufferArt::bake);
+        return CACHE.computeIfAbsent(joins & FluidBufferShape.MASK, FluidBufferArt::bake);
     }
 
     private static List<Panel> bake(int joins) {
-        var boxes = volumes(joins);
         var panels = new ArrayList<Panel>();
         for (var face : Direction.values())
-            for (int plane = 0; plane <= 16; plane++) {
+            for (int plane : new int[] {0, 3, 13, 16}) {
                 var mask = new int[16][16];
                 for (int u = 0; u < 16; u++)
                     for (int v = 0; v < 16; v++) {
-                        if (!surface(boxes, joins, face, plane, u + .5, v + .5)) continue;
-                        boolean edge = !surface(boxes, joins, face, plane, u - .5, v + .5)
-                                || !surface(boxes, joins, face, plane, u + 1.5, v + .5)
-                                || !surface(boxes, joins, face, plane, u + .5, v - .5)
-                                || !surface(boxes, joins, face, plane, u + .5, v + 1.5);
+                        if (!surface(joins, face, plane, u + .5, v + .5)) continue;
+                        boolean edge = !surface(joins, face, plane, u - .5, v + .5)
+                                || !surface(joins, face, plane, u + 1.5, v + .5)
+                                || !surface(joins, face, plane, u + .5, v - .5)
+                                || !surface(joins, face, plane, u + .5, v + 1.5);
                         mask[u][v] = edge ? 2 : 1;
                     }
                 rectangles(mask, face, plane, panels);
@@ -81,27 +68,14 @@ public final class FluidBufferArt {
         return List.copyOf(panels);
     }
 
-    private static boolean surface(List<AABB> boxes, int joins, Direction face, int plane, double u, double v) {
+    private static boolean surface(int joins, Direction face, int plane, double u, double v) {
         var axis = face.getAxis();
         var ua = net.impactvector.mobvats.gamecontent.multiblock.vat.VatCasingState.uAxis(face);
         var va = net.impactvector.mobvats.gamecontent.multiblock.vat.VatCasingState.vAxis(face);
-        // Continue the face outline across joined block boundaries instead of adding a seam ring.
-        for (var tangent : List.of(ua, va)) {
-            double value = tangent == ua ? u : v;
-            if (value < 0 || value > 16) {
-                var direction = Direction.fromAxisAndDirection(
-                        tangent, value < 0 ? Direction.AxisDirection.NEGATIVE : Direction.AxisDirection.POSITIVE);
-                if (!has(joins, direction)) return false;
-                if (tangent == ua) u = Math.clamp(u, .5, 15.5);
-                else v = Math.clamp(v, .5, 15.5);
-            }
-        }
-        if ((plane == 0 || plane == 16) && has(joins, face)) return false;
         double sign = face.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -1;
         var inward = point(axis, (plane - sign * .01) / 16, ua, u / 16, va, v / 16);
         var outward = point(axis, (plane + sign * .01) / 16, ua, u / 16, va, v / 16);
-        return boxes.stream().anyMatch(b -> b.contains(inward))
-                && !boxes.stream().anyMatch(b -> b.contains(outward));
+        return FluidBufferShape.contains(joins, inward, BODY) && !FluidBufferShape.contains(joins, outward, BODY);
     }
 
     private static net.minecraft.world.phys.Vec3 point(
@@ -156,7 +130,7 @@ public final class FluidBufferArt {
         }
         return changes.lastKey();
     }
-    /** Clip the cached surface and add one horizontal surface through the union. */
+    /** Inset the same cluster union, then clip it at the shared liquid height. */
     public static List<Panel> liquid(int joins, double height) {
         if (height <= 0) return List.of();
         var panels = new ArrayList<Panel>();
@@ -166,35 +140,38 @@ public final class FluidBufferArt {
         if (!has(joins, Direction.UP)) height = Math.min(height, top - epsilon);
         if (!has(joins, Direction.DOWN) && height < bottom + epsilon)
             height = bottom + epsilon + (height - bottom) / 1000;
-        for (var panel : mesh(joins)) {
-            var b = panel.bounds();
-            if (b.minY > height || b.minY == height && panel.face() != Direction.UP) continue;
-            double[] f = {b.minX, b.minY, b.minZ}, t = {b.maxX, Math.min(b.maxY, height), b.maxZ};
-            for (int axis = 0; axis < 3; axis++) {
-                // Inset outer glass surfaces, leaving shared block boundaries exactly aligned.
-                for (int end = 0; end < 2; end++) {
-                    var p = end == 0 ? f : t;
-                    if (p[axis] == 3. / 16) p[axis] += epsilon;
-                    else if (p[axis] == 13. / 16) p[axis] -= epsilon;
-                }
-            }
-            if (t[1] < f[1]) continue;
-            panels.add(new Panel(new AABB(f[0], f[1], f[2], t[0], t[1], t[2]), panel.face(), Material.GLASS));
+        var body = BODY.deflate(epsilon);
+        var cuts = new ArrayList<List<Double>>();
+        for (var axis : Direction.Axis.values()) {
+            var values = new TreeSet<>(List.of(0., body.min(axis), body.max(axis), 1.));
+            if (axis == Direction.Axis.Y && height > 0 && height < 1) values.add(height);
+            cuts.add(List.copyOf(values));
         }
-        // Cross-sections are disjoint body/arm rectangles; no internal liquid walls.
-        for (var b : volumes(joins))
-            if (height > b.minY && (height < b.maxY || height == 1 && b.maxY == 1)) {
-                double x0 = b.minX == 3. / 16 ? b.minX + epsilon : b.minX,
-                        x1 = b.maxX == 13. / 16 ? b.maxX - epsilon : b.maxX;
-                double z0 = b.minZ == 3. / 16 ? b.minZ + epsilon : b.minZ,
-                        z1 = b.maxZ == 13. / 16 ? b.maxZ - epsilon : b.maxZ;
-                // Horizontal arms meet the inset body without a gap.
-                if (b.maxX == 3. / 16) x1 = b.maxX + epsilon;
-                if (b.minX == 13. / 16) x0 = b.minX - epsilon;
-                if (b.maxZ == 3. / 16) z1 = b.maxZ + epsilon;
-                if (b.minZ == 13. / 16) z0 = b.minZ - epsilon;
-                panels.add(new Panel(new AABB(x0, height, z0, x1, height, z1), Direction.UP, Material.GLASS));
-            }
+        for (var face : Direction.values()) {
+            var axis = face.getAxis();
+            var ua = net.impactvector.mobvats.gamecontent.multiblock.vat.VatCasingState.uAxis(face);
+            var va = net.impactvector.mobvats.gamecontent.multiblock.vat.VatCasingState.vAxis(face);
+            var us = cuts.get(ua.ordinal());
+            var vs = cuts.get(va.ordinal());
+            double sign = face.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -1;
+            for (double plane : cuts.get(axis.ordinal()))
+                for (int u = 0; u + 1 < us.size(); u++)
+                    for (int v = 0; v + 1 < vs.size(); v++) {
+                        double midU = (us.get(u) + us.get(u + 1)) / 2;
+                        double midV = (vs.get(v) + vs.get(v + 1)) / 2;
+                        var inside = point(axis, plane - sign * 1e-6, ua, midU, va, midV);
+                        var outside = point(axis, plane + sign * 1e-6, ua, midU, va, midV);
+                        if (inside.y > height
+                                || !FluidBufferShape.contains(joins, inside, body)
+                                || outside.y <= height && FluidBufferShape.contains(joins, outside, body)) continue;
+                        panels.add(new Panel(
+                                new AABB(
+                                        point(axis, plane, ua, us.get(u), va, vs.get(v)),
+                                        point(axis, plane, ua, us.get(u + 1), va, vs.get(v + 1))),
+                                face,
+                                Material.GLASS));
+                    }
+        }
         return List.copyOf(panels);
     }
 

@@ -161,6 +161,20 @@ public final class FluidBufferArtGeometryTest {
             verifyRectangle(positions, size);
             scenes.add(scene("Continuous " + size[0] + "x" + size[1] + "x" + size[2] + " reservoir", positions, true));
         }
+        var cube = new ArrayList<BlockPos>();
+        for (int x = 0; x < 3; x++)
+            for (int y = 0; y < 3; y++) for (int z = 0; z < 3; z++) cube.add(new BlockPos(x, y, z));
+        for (var removed : List.of(
+                Set.of(new BlockPos(2, 2, 2)),
+                Set.of(new BlockPos(2, 2, 2), new BlockPos(2, 1, 2)),
+                Set.of(new BlockPos(1, 0, 1), new BlockPos(1, 1, 1), new BlockPos(1, 2, 1)),
+                Set.of(new BlockPos(1, 1, 1)))) {
+            var irregular = cube.stream().filter(p -> !removed.contains(p)).toList();
+            verifyIrregular(irregular);
+            scenes.add(scene("Irregular merged reservoir / removed " + removed, irregular, true));
+        }
+        verifyIrregular(List.of(
+                BlockPos.ZERO, BlockPos.ZERO.east(), BlockPos.ZERO.east().south()));
         examples.put("buffer_scenes", scenes);
         System.out.println(
                 "PASS: centered buffer, equal six-way surfaces, all 64 joins inside physical envelopes, internal cap suppression, cache identity and shared levels.");
@@ -169,9 +183,7 @@ public final class FluidBufferArtGeometryTest {
     private static Map<String, Object> scene(String name, List<BlockPos> positions, boolean compatible) {
         var joins = new LinkedHashMap<BlockPos, Integer>();
         for (var pos : positions) {
-            int mask = compatible && FluidBufferGeometry.rectangular(positions) ? FluidBufferArt.RECTANGULAR : 0;
-            for (var face : Direction.values())
-                if (compatible && positions.contains(pos.relative(face))) mask |= FluidBufferArt.bit(face);
+            int mask = compatible ? FluidBufferShape.neighbors(new HashSet<>(positions), pos) : 0;
             joins.put(pos, mask);
         }
         var cells = new ArrayList<Map<String, Object>>();
@@ -218,12 +230,9 @@ public final class FluidBufferArtGeometryTest {
     }
 
     private static void verifyRectangle(List<BlockPos> positions, int[] size) {
-        require(FluidBufferGeometry.rectangular(positions), "Filled box not recognized");
         var joins = new LinkedHashMap<BlockPos, Integer>();
         for (var pos : positions) {
-            int mask = FluidBufferArt.RECTANGULAR;
-            for (var face : Direction.values())
-                if (positions.contains(pos.relative(face))) mask |= FluidBufferArt.bit(face);
+            int mask = FluidBufferShape.neighbors(new HashSet<>(positions), pos);
             joins.put(pos, mask);
         }
         var bounds = new AABB(3. / 16, 3. / 16, 3. / 16, size[0] - 3. / 16, size[1] - 3. / 16, size[2] - 3. / 16);
@@ -233,7 +242,7 @@ public final class FluidBufferArtGeometryTest {
         for (var entry : joins.entrySet()) {
             var pos = entry.getKey();
             int mask = entry.getValue();
-            var reserved = FluidBufferGeometry.envelope(pos, false, Set.of(), directions(mask), true);
+            var reserved = FluidBufferGeometry.envelope(pos, false, Set.of(), directions(mask), mask);
             for (var volume : FluidBufferArt.volumes(mask))
                 for (double x : new double[] {volume.minX + 1e-6, volume.maxX - 1e-6})
                     for (double y : new double[] {volume.minY + 1e-6, volume.maxY - 1e-6})
@@ -277,6 +286,117 @@ public final class FluidBufferArtGeometryTest {
                 "Liquid surface has junction holes or overlaps");
         var incomplete = new ArrayList<>(positions);
         incomplete.remove(incomplete.size() - 1);
-        require(!FluidBufferGeometry.rectangular(incomplete), "Missing corner incorrectly closes irregular cluster");
+        verifyIrregular(incomplete);
+    }
+
+    private static void verifyIrregular(List<BlockPos> positions) {
+        var members = new HashSet<>(positions);
+        var joins = new LinkedHashMap<BlockPos, Integer>();
+        for (var pos : positions) joins.put(pos, FluidBufferShape.neighbors(members, pos));
+        var world = joins.entrySet().stream()
+                .flatMap(e -> FluidBufferArt.volumes(e.getValue()).stream().map(b -> b.move(e.getKey())))
+                .toList();
+        var occupied = new HashSet<BlockPos>();
+        for (var b : world)
+            for (int x = (int) Math.round(b.minX * 16); x < Math.round(b.maxX * 16); x++)
+                for (int y = (int) Math.round(b.minY * 16); y < Math.round(b.maxY * 16); y++)
+                    for (int z = (int) Math.round(b.minZ * 16); z < Math.round(b.maxZ * 16); z++)
+                        require(occupied.add(new BlockPos(x, y, z)), "Reservoir volumes overlap");
+        var expected = new HashSet<SurfacePixel>();
+        for (var voxel : occupied)
+            for (var face : Direction.values())
+                if (!occupied.contains(voxel.relative(face))) expected.add(new SurfacePixel(voxel, face));
+        var actual = new HashSet<SurfacePixel>();
+        for (var entry : joins.entrySet()) {
+            var pos = entry.getKey();
+            int mask = entry.getValue();
+            var reserved = FluidBufferGeometry.envelope(pos, false, Set.of(), directions(mask), mask);
+            for (var box : FluidBufferArt.volumes(mask)) {
+                require(
+                        reserved.stream()
+                                .anyMatch(v ->
+                                        v.bounds().contains(box.getCenter().add(pos.getX(), pos.getY(), pos.getZ()))),
+                        "Irregular reservoir exceeds reserved space");
+            }
+            for (var panel : FluidBufferArt.mesh(mask)) {
+                var face = panel.face();
+                var b = panel.bounds();
+                var normal = new net.minecraft.world.phys.Vec3(face.getStepX(), face.getStepY(), face.getStepZ())
+                        .scale(1e-6);
+                // Check every pixel: no hidden faces, and trim only beside an actual change of exposed surface.
+                var ua = net.impactvector.mobvats.gamecontent.multiblock.vat.VatCasingState.uAxis(face);
+                var va = net.impactvector.mobvats.gamecontent.multiblock.vat.VatCasingState.vAxis(face);
+                for (double u = b.min(ua) + .5 / 16; u < b.max(ua); u += 1. / 16)
+                    for (double v = b.min(va) + .5 / 16; v < b.max(va); v += 1. / 16) {
+                        double[] p = {b.minX, b.minY, b.minZ};
+                        p[ua.ordinal()] = u;
+                        p[va.ordinal()] = v;
+                        var center = new net.minecraft.world.phys.Vec3(p[0], p[1], p[2])
+                                .add(pos.getX(), pos.getY(), pos.getZ());
+                        var inward = new net.minecraft.world.phys.Vec3(
+                                        face.getStepX(), face.getStepY(), face.getStepZ())
+                                .scale(.5 / 16);
+                        require(
+                                actual.add(new SurfacePixel(
+                                        BlockPos.containing(
+                                                center.subtract(inward).scale(16)),
+                                        face)),
+                                "Duplicate coplanar reservoir panel");
+                        require(exposed(world, center, normal), "Hidden internal wall in irregular cluster");
+                        boolean edge = false;
+                        for (var tangent : new Direction.Axis[] {ua, va})
+                            for (double delta : new double[] {-1. / 16, 1. / 16}) {
+                                double[] offset = {0, 0, 0};
+                                offset[tangent.ordinal()] = delta;
+                                if (!exposed(world, center.add(offset[0], offset[1], offset[2]), normal)) edge = true;
+                            }
+                        require(
+                                (panel.material() == FluidBufferArt.Material.METAL) == edge,
+                                "Trim follows a member seam instead of the exposed irregular edge");
+                    }
+            }
+        }
+        require(actual.equals(expected), "Irregular shell has missing faces or internal partitions");
+        for (double fraction : new double[] {.001, .5, 1}) {
+            double height = FluidBufferArt.level(joins, fraction);
+            var liquid = new ArrayList<FluidBufferArt.Panel>();
+            for (var entry : joins.entrySet())
+                for (var panel : FluidBufferArt.liquid(
+                        entry.getValue(), height - entry.getKey().getY()))
+                    liquid.add(new FluidBufferArt.Panel(
+                            panel.bounds().move(entry.getKey()), panel.face(), panel.material()));
+            require(new HashSet<>(liquid).size() == liquid.size(), "Duplicate liquid faces across member boundaries");
+            var wet = joins.entrySet().stream()
+                    .flatMap(e -> FluidBufferShape.volumes(e.getValue(), FluidBufferArt.BODY.deflate(.25 / 16)).stream()
+                            .map(b -> b.move(e.getKey())))
+                    .filter(b -> b.minY < height)
+                    .map(b -> new AABB(b.minX, b.minY, b.minZ, b.maxX, Math.min(height, b.maxY), b.maxZ))
+                    .toList();
+            for (var panel : liquid) {
+                // The tiny-amount visibility adjustment intentionally raises the first surface above the inset floor.
+                if (fraction == .001) continue;
+                var face = panel.face();
+                var normal = new net.minecraft.world.phys.Vec3(face.getStepX(), face.getStepY(), face.getStepZ())
+                        .scale(1e-6);
+                require(exposed(wet, panel.bounds().getCenter(), normal), "Liquid retained an internal cap or wall");
+            }
+        }
+        // The 2x2 junction opposite a removed corner must remain full rather than reverting to thin bridges.
+        if (members.containsAll(List.of(
+                BlockPos.ZERO,
+                BlockPos.ZERO.east(),
+                BlockPos.ZERO.south(),
+                BlockPos.ZERO.east().south())))
+            require(
+                    world.stream().anyMatch(b -> b.contains(new net.minecraft.world.phys.Vec3(.95, .5, .95))),
+                    "Removing a distant member reopened a completed junction");
+    }
+
+    private record SurfacePixel(BlockPos voxel, Direction face) {}
+
+    private static boolean exposed(
+            List<AABB> volumes, net.minecraft.world.phys.Vec3 center, net.minecraft.world.phys.Vec3 normal) {
+        return volumes.stream().anyMatch(b -> b.contains(center.subtract(normal)))
+                && volumes.stream().noneMatch(b -> b.contains(center.add(normal)));
     }
 }
