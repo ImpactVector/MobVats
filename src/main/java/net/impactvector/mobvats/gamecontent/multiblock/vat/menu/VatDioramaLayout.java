@@ -9,7 +9,7 @@ public record VatDioramaLayout(
         float specimenHeight,
         float actorX,
         float actorScale) {
-    public static final float BODY_YAW = 145;
+    public static final float BODY_YAW = 180;
     public static final float CAMERA_PITCH = 12;
 
     public static VatDioramaLayout fit(

@@ -200,7 +200,7 @@ final class OperatorVatFixtures {
                     foods[i]);
             ROW.add(f);
             MachineFixtures.vat(level::setBlockAndUpdate, o, 5, 5, 4);
-            // Keep the controller's external lever clear of the front feed hopper.
+            // Keep the controller and its wall-mounted lever clear of the front feed hopper.
             part(level, o.offset(1, 1, 0), VatPartType.Glass);
             part(level, o.offset(0, 1, 1), VatPartType.Controller);
             storage(level, o);

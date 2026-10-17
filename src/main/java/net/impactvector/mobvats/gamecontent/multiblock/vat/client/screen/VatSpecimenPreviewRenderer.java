@@ -6,12 +6,19 @@ import com.mojang.math.Axis;
 import net.impactvector.mobvats.gamecontent.Content;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.VatPartType;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.VatSpecimenSnapshot;
+import net.impactvector.mobvats.gamecontent.multiblock.vat.client.render.ToolViseArt;
+import net.impactvector.mobvats.gamecontent.multiblock.vat.client.render.VatMechanismRenderer;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.menu.VatDioramaLayout;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.menu.VatSpecimenPreview;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.joml.Quaternionf;
 
 /** Fixed schematic scene. Each element has an independent scale and an isolated pose stack. */
@@ -80,10 +87,11 @@ final class VatSpecimenPreviewRenderer {
                         throw new IllegalStateException("Actor model unavailable");
                     var pose = pose(g, x + layout.actorX(), y + layout.centerY() + 6, layout.actorScale());
                     pose.mulPose(Axis.XP.rotationDegrees(20));
-                    // North functional face points left toward the mob and forward toward the viewer.
-                    pose.mulPose(Axis.YP.rotationDegrees(45));
+                    // Show the working face at a 45-degree angle toward the viewer and the mob.
+                    pose.mulPose(Axis.YP.rotationDegrees(135));
                     pose.translate(-.5, -.5, -.5);
                     renderer.renderSingleBlock(state, pose, g.bufferSource(), 15728880, OverlayTexture.NO_OVERLAY);
+                    if (type == VatPartType.ToolPort) renderTool(g, pose, actor);
                 } catch (Exception error) {
                     failedActor = type;
                     com.mojang.logging.LogUtils.getLogger().debug("Vat diorama actor unavailable: {}", type, error);
@@ -94,6 +102,29 @@ final class VatSpecimenPreviewRenderer {
         } finally {
             dispatcher.overrideCameraOrientation(camera);
             Lighting.setupFor3DItems();
+        }
+    }
+
+    private static void renderTool(GuiGraphics g, PoseStack pose, VatSpecimenSnapshot.Actor actor) {
+        var id = ResourceLocation.tryParse(actor.item());
+        var item = id == null ? null : BuiltInRegistries.ITEM.getOptional(id).orElse(null);
+        if (item == null) return;
+        var held = new ItemStack(item);
+        if (held.isEmpty()) return;
+        var mc = Minecraft.getInstance();
+        var model = mc.getItemRenderer().getModel(held, mc.level, null, Long.hashCode(actor.position()));
+        var scale = model.getTransforms().getTransform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND).scale;
+        boolean container = item instanceof net.minecraft.world.item.BucketItem
+                || item instanceof net.minecraft.world.item.MilkBucketItem;
+        var center = ToolViseArt.center(scale, 0, held.is(ItemTags.SWORDS), held.is(Content.SYRINGE.get()), container);
+        pose.pushPose();
+        try {
+            // The construction model's fixed vise is centered in its block.
+            pose.translate(.5 - center.x, .5 - center.y, .5 - center.z);
+            VatMechanismRenderer.renderMountedItem(
+                    held, model, scale, 0, pose, g.bufferSource(), 15728880, OverlayTexture.NO_OVERLAY);
+        } finally {
+            pose.popPose();
         }
     }
 

@@ -379,7 +379,7 @@ public final class ManualTestWorld {
             }
             manifest.append("\n## Redstone demonstrations\n\n"
                     + "Controls are saved ON (paused). Flip OFF to watch production; flip ON to pause again.\n"
-                    + "Levers power an adjacent smooth-stone block. Operator settings are preserved.\n"
+                    + "Controller levers mount on adjacent machine wall casing, leaving GUI faces clear. Operator settings are preserved.\n"
                     + "Creative rigs remain running. Linked P-05/P-06 have no controller levers: use P-VAT.\n\n");
             for (var f : FIXTURES) {
                 boolean vat = f.machine().equals("Vat");

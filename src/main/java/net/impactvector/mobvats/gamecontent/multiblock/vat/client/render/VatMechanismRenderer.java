@@ -10,9 +10,11 @@ import net.impactvector.mobvats.gamecontent.multiblock.vat.VatPresentation;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.part.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -136,19 +138,39 @@ public final class VatMechanismRenderer {
                             net.minecraft.client.renderer.RenderType.solid());
             pose.popPose();
             if (!held.isEmpty()) {
-                // A generated sword's grip is near (3,3) in its 16-pixel image, measured
-                // from the bottom left. Pin that point to the arm tip, not transparent image
-                // padding at mid-height. Even the full rear edge stays inside the shell at idle.
-                if (held.is(ItemTags.SWORDS)) pose.translate(0, scale.y() * 5.0 / 16, length + scale.x() * 5.0 / 16);
-                else pose.translate(0, 0, length + Math.abs(scale.x()) / 2);
-                // Native image right (+X) faces the specimen, preserving its natural diagonal.
-                // MobVats' syringe has its needle on the image left (-X), so reverse its mount.
-                pose.mulPose(Axis.YP.rotationDegrees(held.is(Content.SYRINGE.get()) ? 90 : -90));
-                pose.scale(scale.x(), scale.y(), scale.z());
-                // NONE avoids applying display/hand rotations again after the mechanical mount.
-                // Vanilla dispatch still resolves actual components, model overrides and glint.
-                renderer.render(held, ItemDisplayContext.NONE, false, pose, buffers, light, overlay, model);
+                renderMountedItem(held, model, scale, length, pose, buffers, light, overlay);
             }
+            pose.popPose();
+        }
+    }
+
+    /** Shared native item mount for the world mechanism and the controller miniature. */
+    public static void renderMountedItem(
+            ItemStack held,
+            BakedModel model,
+            Vector3f scale,
+            double length,
+            PoseStack pose,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
+        pose.pushPose();
+        try {
+            // A generated sword's grip is near (3,3) in its 16-pixel image, measured
+            // from the bottom left. Pin that point to the arm tip, not transparent image
+            // padding at mid-height. Even the full rear edge stays inside the shell at idle.
+            if (held.is(ItemTags.SWORDS)) pose.translate(0, scale.y() * 5.0 / 16, length + scale.x() * 5.0 / 16);
+            else pose.translate(0, 0, length + Math.abs(scale.x()) / 2);
+            // Native image right (+X) faces the specimen, preserving its natural diagonal.
+            // MobVats' syringe has its needle on the image left (-X), so reverse its mount.
+            pose.mulPose(Axis.YP.rotationDegrees(held.is(Content.SYRINGE.get()) ? 90 : -90));
+            pose.scale(scale.x(), scale.y(), scale.z());
+            // NONE avoids applying display/hand rotations again after the mechanical mount.
+            // Vanilla dispatch still resolves actual components, model overrides and glint.
+            Minecraft.getInstance()
+                    .getItemRenderer()
+                    .render(held, ItemDisplayContext.NONE, false, pose, buffers, light, overlay, model);
+        } finally {
             pose.popPose();
         }
     }

@@ -31,16 +31,21 @@ public final class WorldRedstoneControlGameTests {
                     .getMultiblockController()
                     .orElseThrow();
             h.assertTrue(controller.isAssembled() && controller.processingEnabled(), "Unpowered Vat not operational");
-            WorldRedstoneControls.install(
+            var lever = WorldRedstoneControls.install(
                     h.getLevel(), new StringBuilder(), "operator", h.absolutePos(c), Direction.WEST);
+            h.assertTrue(h.getBlockState(c.west()).isAir(), "Controller GUI face is obstructed");
+            h.assertTrue(lever.getY() == h.absolutePos(c).getY(), "Lever must sit beside the controller");
+            h.assertTrue(
+                    h.getLevel().getBlockState(lever.east()).is(Content.block(VatPartType.Casing)),
+                    "Lever is not mounted on the Vat wall");
             h.assertTrue(
                     controller.isMachineActive() && !controller.processingEnabled(),
                     "Lever must preserve operator preference");
             h.assertTrue(
                     h.getBlockState(hopper).getValue(HopperBlock.ENABLED), "Feed hopper locked by controller lever");
-            toggle(h, c.west(2));
+            toggle(h, lever);
             h.assertTrue(controller.processingEnabled(), "Lever OFF did not resume Vat");
-            toggle(h, c.west(2));
+            toggle(h, lever);
             h.assertTrue(!controller.processingEnabled(), "Lever ON did not pause Vat");
             h.succeed();
         });
@@ -58,17 +63,22 @@ public final class WorldRedstoneControlGameTests {
                     .getMultiblockController()
                     .orElseThrow();
             h.assertTrue(controller.isAssembled() && controller.processingEnabled(), "Unpowered Mixer not operational");
-            WorldRedstoneControls.install(h.getLevel(), new StringBuilder(), "mixer", h.absolutePos(c), Direction.WEST);
+            var lever = WorldRedstoneControls.install(
+                    h.getLevel(), new StringBuilder(), "mixer", h.absolutePos(c), Direction.WEST);
+            h.assertTrue(h.getBlockState(c.west()).isAir(), "Controller GUI face is obstructed");
+            h.assertTrue(lever.getY() == h.absolutePos(c).getY(), "Lever must sit beside the controller");
+            h.assertTrue(
+                    h.getLevel().getBlockState(lever.east()).is(MixerContent.block(MixerPartType.Casing)),
+                    "Lever is not mounted on the Mixer wall");
             h.assertTrue(controller.isMachineActive() && !controller.processingEnabled(), "Mixer not paused");
             h.assertTrue(!h.getLevel().hasNeighborSignal(h.absolutePos(port)), "Port received controller power");
-            toggle(h, c.west(2));
+            toggle(h, lever);
             h.assertTrue(controller.processingEnabled(), "Lever OFF did not resume Mixer");
             h.succeed();
         });
     }
 
-    private static void toggle(GameTestHelper h, BlockPos lever) {
-        var pos = h.absolutePos(lever);
+    private static void toggle(GameTestHelper h, BlockPos pos) {
         ((LeverBlock) Blocks.LEVER).pull(h.getLevel().getBlockState(pos), h.getLevel(), pos, null);
     }
 }
