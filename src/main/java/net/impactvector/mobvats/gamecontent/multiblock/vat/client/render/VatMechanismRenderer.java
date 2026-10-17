@@ -41,10 +41,7 @@ public final class VatMechanismRenderer {
                 .map(link -> {
                     var direction = Vec3.atLowerCornerOf(link.inward().getNormal());
                     var travel = link.target().subtract(link.base());
-                    var rotation = new Quaternionf()
-                            .rotationTo(
-                                    new Vector3f(0, 0, 1),
-                                    (travel.lengthSqr() > 1e-8 ? travel.normalize() : direction).toVector3f());
+                    var rotation = aimRotation(travel.lengthSqr() > 1e-8 ? travel : direction);
                     var base = CableRenderer.bake(
                             CableCurve.between(link.base(), link.base().add(direction.scale(.14)), 0, 2), .15);
                     return new Arm(link, rotation, base);
@@ -86,9 +83,7 @@ public final class VatMechanismRenderer {
             if (detail.animates() && tool.previousAim() != null && age >= 0 && age < 4) {
                 var direction = tool.previousAim().subtract(link.base()).normalize();
                 if (direction.lengthSqr() > 1e-8)
-                    rotation = new Quaternionf()
-                            .rotationTo(new Vector3f(0, 0, 1), direction.toVector3f())
-                            .slerp(rotation, (float) (age / 4));
+                    rotation = aimRotation(direction).slerp(rotation, (float) (age / 4));
             }
             pose.mulPose(rotation);
             segment(MIDDLE, .08, Math.max(.04, length * .65), pose, buffers, light);
@@ -142,6 +137,14 @@ public final class VatMechanismRenderer {
             }
             pose.popPose();
         }
+    }
+
+    /** Aim local +Z with world-up roll, including the opposite (-Z) facing. */
+    public static Quaternionf aimRotation(Vec3 direction) {
+        double horizontal = Math.hypot(direction.x, direction.z);
+        float yaw = horizontal > 1e-8 ? (float) Math.atan2(direction.x, direction.z) : 0;
+        float pitch = (float) -Math.atan2(direction.y, horizontal);
+        return new Quaternionf().rotationY(yaw).rotateX(pitch);
     }
 
     /** Shared native item mount for the world mechanism and the controller miniature. */

@@ -86,9 +86,8 @@ final class VatSpecimenPreviewRenderer {
                             == Minecraft.getInstance().getModelManager().getMissingModel())
                         throw new IllegalStateException("Actor model unavailable");
                     var pose = pose(g, x + layout.actorX(), y + layout.centerY() + 6, layout.actorScale());
-                    pose.mulPose(Axis.XP.rotationDegrees(20));
-                    // Show the working face at a 45-degree angle toward the viewer and the mob.
-                    pose.mulPose(Axis.YP.rotationDegrees(135));
+                    // Keep the assembly level; its +Z business end faces the mob and viewer.
+                    pose.mulPose(Axis.YP.rotationDegrees(-45));
                     pose.translate(-.5, -.5, -.5);
                     renderer.renderSingleBlock(state, pose, g.bufferSource(), 15728880, OverlayTexture.NO_OVERLAY);
                     if (type == VatPartType.ToolPort) renderTool(g, pose, actor);

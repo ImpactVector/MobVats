@@ -7,8 +7,13 @@ import java.nio.file.Path;
 import java.util.*;
 import net.impactvector.mobvats.gamecontent.multiblock.conduit.*;
 import net.impactvector.mobvats.gamecontent.multiblock.conduit.client.ConduitPreviewModel;
+import net.impactvector.mobvats.gamecontent.multiblock.vat.VatPresentation;
+import net.impactvector.mobvats.gamecontent.multiblock.vat.client.render.VatMechanismRenderer;
 import net.minecraft.core.*;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 /** CPU geometry contracts and preview examples baked by the authoritative formed geometry code. */
 public final class ConduitArtGeometryTest {
@@ -20,6 +25,7 @@ public final class ConduitArtGeometryTest {
         net.neoforged.fml.loading.LoadingModList.of(List.of(), List.of(), List.of(), List.of(), Map.of());
         net.minecraft.SharedConstants.tryDetectVersion();
         net.minecraft.server.Bootstrap.bootStrap();
+        ToolArmPoseTest.verify();
         net.impactvector.mobvats.gamecontent.multiblock.conduit.client.ConduitShellOwnershipTest.verify();
         net.impactvector.mobvats.gamecontent.multiblock.common.client.FixtureModelTest.verify();
         var descriptor =
@@ -327,5 +333,59 @@ public final class ConduitArtGeometryTest {
         Files.writeString(output, new GsonBuilder().setPrettyPrinting().create().toJson(examples) + "\n");
         System.out.println(
                 "PASS: six-axis frusta, 6-to-3 pixel taper, unchanged inputs, authoritative formed examples and snapshot restoration.");
+    }
+    /** CPU checks for the actual baked arm frame and its animated aim transitions. */
+    private static final class ToolArmPoseTest {
+        static void verify() {
+            for (int degrees = 0; degrees < 360; degrees += 15) {
+                double yaw = Math.toRadians(degrees);
+                for (double slope : new double[] {-.5, 0, .5}) {
+                    var travel = new Vec3(Math.sin(yaw), slope, Math.cos(yaw));
+                    var link = new VatPresentation.Link(BlockPos.ZERO, Vec3.ZERO, travel, Direction.SOUTH, true);
+                    var arm = VatMechanismRenderer.bake(new VatPresentation(List.of(link), List.of()))
+                            .arms()
+                            .getFirst();
+                    assertFrame(arm.rotation(), travel);
+                    var swordTip = arm.rotation().transform(new Vector3f(0, 1, 1));
+                    require(swordTip.y > 0, "Sword blade points down at yaw " + degrees + ", slope " + slope);
+                    var previous = VatMechanismRenderer.aimRotation(new Vec3(-travel.x, slope, -travel.z));
+                    for (float progress : new float[] {0, .25f, .5f, .75f, 1}) {
+                        var animated = new Quaternionf(previous).slerp(arm.rotation(), progress);
+                        require(
+                                animated.transform(new Vector3f(0, 1, 0)).y > 0,
+                                "Aim transition inverted the vise/tool");
+                    }
+                }
+            }
+            for (var direction : Direction.values()) {
+                var target = Vec3.atLowerCornerOf(direction.getNormal());
+                assertFrame(VatMechanismRenderer.aimRotation(target), target);
+                var link = new VatPresentation.Link(BlockPos.ZERO, Vec3.ZERO, Vec3.ZERO, direction, false);
+                assertFrame(
+                        VatMechanismRenderer.bake(new VatPresentation(List.of(link), List.of()))
+                                .arms()
+                                .getFirst()
+                                .rotation(),
+                        target);
+            }
+            assertFrame(VatMechanismRenderer.aimRotation(Vec3.ZERO), new Vec3(0, 0, 1));
+            System.out.println(
+                    "PASS: baked tool arms preserve upright tools through every wall facing, slope and aim transition.");
+        }
+
+        private static void assertFrame(Quaternionf rotation, Vec3 travel) {
+            var forward = rotation.transform(new Vector3f(0, 0, 1));
+            require(forward.distance(travel.normalize().toVector3f()) < 1e-5, "Arm no longer aims at its target");
+            var right = rotation.transform(new Vector3f(1, 0, 0));
+            require(Math.abs(right.y) < 1e-5, "Arm acquired roll around its aim direction");
+            var up = rotation.transform(new Vector3f(0, 1, 0));
+            require(up.y >= -1e-5, "Tool mount is upside down");
+        }
+
+        private static void require(boolean condition, String message) {
+            if (!condition) throw new AssertionError(message);
+        }
+
+        private ToolArmPoseTest() {}
     }
 }
