@@ -21,6 +21,95 @@ import net.neoforged.neoforge.gametest.*;
 @GameTestHolder("mobvats")
 @PrefixGameTestTemplate(false)
 public final class VatSpecimenMenuGameTests {
+    @GameTest(template = "empty", timeoutTicks = 10)
+    public static void dioramaPrimaryActorStableAcrossAssignmentOrder(GameTestHelper h) {
+        var tool = new VatSpecimenSnapshot.Actor("tool port", 20, "milk", "minecraft:bucket", "Bucket", "Assigned", 0);
+        var secondTool = new VatSpecimenSnapshot.Actor("tool port", 30, "shear", "", "", "Assigned", 0);
+        var blender = new VatSpecimenSnapshot.Actor("blender", 1, "harvest", "", "", "Assigned", 0);
+        var harness = new VatSpecimenSnapshot.Actor("harness", 0, "suspension", "", "", "Assigned", 0);
+        var loading = new VatSpecimenSnapshot.Actor("tool port", 0, "tool loading", "", "", "Assigned", 0);
+        var actors = new ArrayList<>(List.of(blender, secondTool, tool, harness, loading));
+        for (int i = 0; i < actors.size(); i++) {
+            Collections.rotate(actors, 1);
+            h.assertTrue(
+                    actorRow(actors).primaryProductionActor().orElseThrow().equals(tool),
+                    "Assignment order changed primary production actor");
+        }
+        h.assertTrue(
+                actorRow(List.of(blender, harness))
+                        .primaryProductionActor()
+                        .orElseThrow()
+                        .equals(blender),
+                "Blender-only assignment missing");
+        h.assertTrue(
+                actorRow(List.of(harness, loading)).primaryProductionActor().isEmpty()
+                        && actorRow(List.of()).primaryProductionActor().isEmpty(),
+                "Invented production actor");
+        h.succeed();
+    }
+
+    private static VatSpecimenSnapshot actorRow(List<VatSpecimenSnapshot.Actor> actors) {
+        return new VatSpecimenSnapshot(
+                UUID.randomUUID(),
+                0,
+                "minecraft:cow",
+                "Cow",
+                true,
+                "Operational",
+                1,
+                1,
+                1,
+                1,
+                "None",
+                "Waiting",
+                List.of(),
+                actors,
+                "{}");
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 10)
+    public static void dioramaBoundedFramingAndSeparateActorRegion(GameTestHelper h) {
+        // Chicken, cow, sheep, tall/large and wide/low generic bounds; no species-specific fit rules.
+        float[][] dimensions = {{.4f, .7f}, {.9f, 1.4f}, {.9f, 1.3f}, {4, 8}, {8, .5f}, {.1f, .1f}};
+        for (int width : new int[] {90, 180, 280}) {
+            for (var size : dimensions) {
+                for (boolean actor : new boolean[] {false, true}) {
+                    var adult = VatDioramaLayout.fit(width, 88, size[0], size[1], size[0], size[1], actor);
+                    var baby = VatDioramaLayout.fit(width, 88, size[0] / 2, size[1] / 2, size[0], size[1], actor);
+                    h.assertTrue(adult.specimenScale() > 0 && adult.specimenScale() <= 64, "Unbounded scale");
+                    h.assertTrue(
+                            adult.specimenX() - adult.specimenWidth() / 2 >= 0
+                                    && adult.specimenX() + adult.specimenWidth() / 2 <= width
+                                    && adult.centerY() - adult.specimenHeight() / 2 >= 2
+                                    && adult.centerY() + adult.specimenHeight() / 2 <= 86,
+                            "Specimen escaped viewport");
+                    h.assertTrue(
+                            baby.specimenScale() == adult.specimenScale()
+                                    && baby.specimenHeight() < adult.specimenHeight(),
+                            "Juvenile enlarged to adult size");
+                    if (actor) {
+                        h.assertTrue(
+                                adult.specimenX() + adult.specimenWidth() / 2
+                                        < adult.actorX() - adult.actorScale() * .9f,
+                                "Actor overlaps specimen region");
+                        h.assertTrue(
+                                adult.actorX() + adult.actorScale() * .9f <= width
+                                        && adult.centerY() + 6 + adult.actorScale() * .9f <= 88,
+                                "Actor escaped viewport");
+                    }
+                }
+            }
+        }
+        boolean invalid = false;
+        try {
+            VatDioramaLayout.fit(180, 88, Float.NaN, 1, 1, 1, true);
+        } catch (IllegalArgumentException expected) {
+            invalid = true;
+        }
+        h.assertTrue(invalid, "Invalid dimensions accepted");
+        h.succeed();
+    }
+
     @GameTest(template = "empty", timeoutTicks = 60)
     public static void blockedTimerHasNoCountdownAndPreservesPhase(GameTestHelper h) {
         rig(h);

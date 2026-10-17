@@ -40,9 +40,9 @@ public final class VatSpecimenPreview {
             mob.setNoGravity(true);
             mob.setSilent(true);
             mob.setCustomNameVisible(false);
-            mob.yBodyRot = mob.yBodyRotO = mob.yHeadRot = mob.yHeadRotO = 155;
-            mob.setYRot(155);
-            mob.yRotO = 155;
+            mob.yBodyRot = mob.yBodyRotO = mob.yHeadRot = mob.yHeadRotO = VatDioramaLayout.BODY_YAW;
+            mob.setYRot(VatDioramaLayout.BODY_YAW);
+            mob.yRotO = VatDioramaLayout.BODY_YAW;
             mob.setXRot(0);
             mob.xRotO = 0;
             entity = mob;

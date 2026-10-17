@@ -47,6 +47,17 @@ public record VatSpecimenSnapshot(
             String status,
             long cooldownTicks) {}
 
+    /** Tool Port first, then Blender; routing coordinates break ties but never place the miniature. */
+    public Optional<Actor> primaryProductionActor() {
+        return actors.stream()
+                .filter(a -> a.type().equals("tool port") || a.type().equals("blender"))
+                .filter(a -> !a.operation().equals("tool loading"))
+                .min(Comparator.comparingInt((Actor a) -> a.type().equals("tool port") ? 0 : 1)
+                        .thenComparingLong(Actor::position)
+                        .thenComparing(Actor::operation)
+                        .thenComparing(Actor::item));
+    }
+
     public static List<VatSpecimenSnapshot> capture(MultiblockVat vat) {
         return vat.specimenSnapshots();
     }

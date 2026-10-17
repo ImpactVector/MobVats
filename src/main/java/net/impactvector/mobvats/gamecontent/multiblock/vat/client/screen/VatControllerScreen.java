@@ -22,6 +22,7 @@ public final class VatControllerScreen extends AbstractContainerScreen<VatContro
     private boolean diagnostics;
     private static final int PREVIEW_HEIGHT = 88;
     private final VatSpecimenPreview preview = new VatSpecimenPreview();
+    private final VatSpecimenPreviewRenderer diorama = new VatSpecimenPreviewRenderer();
     private int page, listScroll, detailScroll, diagnosticScroll, detailHeight, diagnosticHeight, listWidth;
     private Button activation, mode, diagnosticPage;
     private VatSpecimenSnapshot cachedSpecimen;
@@ -309,10 +310,8 @@ public final class VatControllerScreen extends AbstractContainerScreen<VatContro
         boolean available = false;
         try {
             var entity = preview.update(menu.selected(), minecraft.level);
-            if (entity != null) {
-                VatSpecimenPreviewRenderer.render(g, entity, x, y, width, PREVIEW_HEIGHT);
-                available = true;
-            }
+            diorama.render(g, entity, menu.selected(), preview, x, y, width, PREVIEW_HEIGHT);
+            available = entity != null;
         } catch (Exception error) {
             preview.failed(error);
         } finally {
