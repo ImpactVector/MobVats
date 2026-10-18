@@ -141,7 +141,7 @@ public final class FluidBufferRenderer implements BlockEntityRenderer<FluidBuffe
             int overlay) {
         var state = states.computeIfAbsent(entity, k -> new State());
         state.update(entity);
-        draw(state.shape.metal(), sprite(METAL), 0xffffffff, pose, buffers, light, false);
+        draw(state.shape.metal(), sprite(METAL), 0xffffffff, pose, buffers, light, Sheets.solidBlockSheet());
         var fluid = entity.visualFluid();
         if (!fluid.isEmpty() && !state.liquid.quads().isEmpty()) {
             var appearance = IClientFluidTypeExtensions.of(fluid.getFluid());
@@ -151,10 +151,10 @@ public final class FluidBufferRenderer implements BlockEntityRenderer<FluidBuffe
                 int tint = MixerLiquidPresentation.compoundTint(fluid, appearance.getTintColor(fluid));
                 int liquidLight = MixerLiquidPresentation.liquidLight(
                         light, light, fluid.getFluidType().getLightLevel(fluid));
-                draw(state.liquid, sprite, tint, pose, buffers, liquidLight, true);
+                draw(state.liquid, sprite, tint, pose, buffers, liquidLight, translucentType());
             }
         }
-        draw(state.shape.glass(), sprite(GLASS), 0xffffffff, pose, buffers, light, true);
+        draw(state.shape.glass(), sprite(GLASS), 0xffffffff, pose, buffers, light, FluidBufferRenderTypes.GLASS);
     }
 
     private static void draw(
@@ -164,9 +164,9 @@ public final class FluidBufferRenderer implements BlockEntityRenderer<FluidBuffe
             PoseStack pose,
             MultiBufferSource buffers,
             int light,
-            boolean translucent) {
-        // Fixed atlas buffers defer transparency until after all opaque block entities.
-        var buffer = buffers.getBuffer(translucent ? translucentType() : Sheets.solidBlockSheet());
+            RenderType type) {
+        // Both transparent layers have fixed buffers; glass flushes after liquid without writing depth.
+        var buffer = buffers.getBuffer(type);
         var matrix = pose.last();
         for (var quad : mesh.quads())
             for (var p : List.of(quad.a(), quad.b(), quad.c(), quad.d())) {

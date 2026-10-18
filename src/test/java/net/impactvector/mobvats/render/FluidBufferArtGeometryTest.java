@@ -380,6 +380,7 @@ public final class FluidBufferArtGeometryTest {
                         .scale(1e-6);
                 require(exposed(wet, panel.bounds().getCenter(), normal), "Liquid retained an internal cap or wall");
             }
+            if (fraction != .001) verifyLiquidCoverage(wet, liquid);
         }
         // The 2x2 junction opposite a removed corner must remain full rather than reverting to thin bridges.
         if (members.containsAll(List.of(
@@ -393,6 +394,56 @@ public final class FluidBufferArtGeometryTest {
     }
 
     private record SurfacePixel(BlockPos voxel, Direction face) {}
+
+    private static void verifyLiquidCoverage(List<AABB> wet, List<FluidBufferArt.Panel> panels) {
+        var cuts = new ArrayList<List<Double>>();
+        for (var axis : Direction.Axis.values()) {
+            var values = new TreeSet<Double>();
+            for (var b : wet) {
+                values.add(b.min(axis));
+                values.add(b.max(axis));
+            }
+            cuts.add(List.copyOf(values));
+        }
+        var occupied = new HashSet<BlockPos>();
+        for (int x = 0; x + 1 < cuts.get(0).size(); x++)
+            for (int y = 0; y + 1 < cuts.get(1).size(); y++)
+                for (int z = 0; z + 1 < cuts.get(2).size(); z++) {
+                    var center = new net.minecraft.world.phys.Vec3(
+                            (cuts.get(0).get(x) + cuts.get(0).get(x + 1)) / 2,
+                            (cuts.get(1).get(y) + cuts.get(1).get(y + 1)) / 2,
+                            (cuts.get(2).get(z) + cuts.get(2).get(z + 1)) / 2);
+                    if (wet.stream().anyMatch(b -> b.contains(center))) occupied.add(new BlockPos(x, y, z));
+                }
+        for (var cell : occupied)
+            for (var face : Direction.values()) {
+                if (occupied.contains(cell.relative(face))) continue;
+                double[] p = new double[3];
+                for (var axis : Direction.Axis.values()) {
+                    int index = cell.get(axis), a = axis.ordinal();
+                    p[a] = axis == face.getAxis()
+                            ? cuts.get(a)
+                                    .get(index + (face.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : 0))
+                            : (cuts.get(a).get(index) + cuts.get(a).get(index + 1)) / 2;
+                }
+                int count = 0;
+                for (var panel : panels) {
+                    if (panel.face() != face) continue;
+                    var b = panel.bounds();
+                    if (Math.abs(b.min(face.getAxis()) - p[face.getAxis().ordinal()]) > 1e-9) continue;
+                    boolean covers = true;
+                    for (var axis : Direction.Axis.values())
+                        if (axis != face.getAxis()
+                                && (p[axis.ordinal()] <= b.min(axis) || p[axis.ordinal()] >= b.max(axis)))
+                            covers = false;
+                    if (covers) count++;
+                }
+                require(
+                        count == 1,
+                        "Shared liquid surface has a missing/overlapping strip: " + face + " " + Arrays.toString(p)
+                                + " count=" + count);
+            }
+    }
 
     private static boolean exposed(
             List<AABB> volumes, net.minecraft.world.phys.Vec3 center, net.minecraft.world.phys.Vec3 normal) {
