@@ -157,6 +157,14 @@ public final class MixerPartBlock extends MultiblockPartBlock<MultiblockMixer, M
             if (player instanceof ServerPlayer server) server.openMenu(port, pos);
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
+        if (level.getBlockEntity(pos) instanceof MixerControllerEntity controller) {
+            if (player instanceof ServerPlayer server) {
+                if (player.isCrouching())
+                    controller.getMultiblockController().ifPresent(c -> c.depositPlayerXp(server));
+                else server.openMenu(controller, pos);
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
         if (level.isClientSide) return InteractionResult.SUCCESS;
         if (level.getBlockEntity(pos) instanceof AbstractMixerEntity part) {
             var controller = part.getMultiblockController();

@@ -17,6 +17,9 @@ public final class MixerClient {
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(
+                net.impactvector.mobvats.gamecontent.Content.MIXER_CONTROLLER_MENU.get(),
+                net.impactvector.mobvats.gamecontent.multiblock.mixer.client.screen.MixerControllerScreen::new);
+        event.register(
                 net.impactvector.mobvats.gamecontent.Content.METER_MENU.get(),
                 net.impactvector.mobvats.gamecontent.multiblock.mixer.client.screen.MixerMeterScreen::new);
     }

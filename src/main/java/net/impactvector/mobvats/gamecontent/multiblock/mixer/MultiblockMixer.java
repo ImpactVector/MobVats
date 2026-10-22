@@ -112,6 +112,25 @@ public final class MultiblockMixer
         return startupTicks;
     }
 
+    public int runningCadence() {
+        return runningCadence;
+    }
+
+    public boolean driveInhibited() {
+        return driveParts().stream().anyMatch(d -> ownsDrive(d) && d.redstoneInhibited());
+    }
+
+    public List<ResourceEndpoint> presentationItemConsumers() {
+        var result = new ArrayList<ResourceEndpoint>();
+        result.addAll(controllerParts.parts());
+        driveParts().stream()
+                .filter(this::ownsDrive)
+                .filter(ResourceEndpoint.class::isInstance)
+                .map(ResourceEndpoint.class::cast)
+                .forEach(result::add);
+        return List.copyOf(result);
+    }
+
     public int spinUpTicks() {
         return slotCount() * 200;
     }

@@ -5,13 +5,27 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class MixerControllerEntity extends AbstractMixerEntity
-        implements net.impactvector.mobvats.gamecontent.multiblock.conduit.ResourceEndpoint {
+        implements net.minecraft.world.MenuProvider,
+                net.impactvector.mobvats.gamecontent.multiblock.conduit.ResourceEndpoint {
     public MixerControllerEntity(BlockPos pos, BlockState state) {
         super(MixerPartType.Controller, pos, state);
         setCommandDispatcher(it.zerono.mods.zerocore.lib.block.TileCommandDispatcher.<MixerControllerEntity>builder()
                 .addServerHandler("activate", p -> p.setActive(true))
                 .addServerHandler("deactivate", p -> p.setActive(false))
                 .build(this));
+    }
+
+    @Override
+    public net.minecraft.network.chat.Component getDisplayName() {
+        return net.minecraft.network.chat.Component.translatable("block.mobvats.mixer_controller");
+    }
+
+    @Override
+    public net.minecraft.world.inventory.AbstractContainerMenu createMenu(
+            int id,
+            net.minecraft.world.entity.player.Inventory inventory,
+            net.minecraft.world.entity.player.Player player) {
+        return new net.impactvector.mobvats.gamecontent.multiblock.mixer.menu.MixerControllerMenu(id, inventory, this);
     }
 
     private void setActive(boolean active) {

@@ -63,6 +63,15 @@ public final class Content {
     public static final DeferredHolder<
                     net.minecraft.world.inventory.MenuType<?>,
                     net.minecraft.world.inventory.MenuType<
+                            net.impactvector.mobvats.gamecontent.multiblock.mixer.menu.MixerControllerMenu>>
+            MIXER_CONTROLLER_MENU = MENUS.register(
+                    "mixer_controller",
+                    () -> net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create(
+                            net.impactvector.mobvats.gamecontent.multiblock.mixer.menu.MixerControllerMenu::new));
+
+    public static final DeferredHolder<
+                    net.minecraft.world.inventory.MenuType<?>,
+                    net.minecraft.world.inventory.MenuType<
                             net.impactvector.mobvats.gamecontent.multiblock.common.MachinePortMenu>>
             PORT_MENU = MENUS.register(
                     "vat_port",
@@ -194,6 +203,7 @@ public final class Content {
         TABS.register(bus);
         MENUS.register(bus);
         net.impactvector.mobvats.gamecontent.multiblock.mixer.menu.MixerMeterNetworking.register(bus);
+        net.impactvector.mobvats.gamecontent.multiblock.mixer.menu.MixerControllerNetworking.register(bus);
         RECIPES.register(bus);
     }
 

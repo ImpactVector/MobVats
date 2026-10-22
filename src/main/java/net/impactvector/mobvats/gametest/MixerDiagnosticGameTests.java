@@ -36,6 +36,25 @@ public final class MixerDiagnosticGameTests {
                         new GameProfile(UUID.randomUUID(), "mixer-diagnostics"),
                         ClientInformation.createDefault()) {
                     @Override
+                    public java.util.OptionalInt openMenu(
+                            net.minecraft.world.MenuProvider provider,
+                            java.util.function.Consumer<net.minecraft.network.RegistryFriendlyByteBuf> extraData) {
+                        h.assertTrue(
+                                provider
+                                        instanceof
+                                        net.impactvector.mobvats.gamecontent.multiblock.mixer.part
+                                                .MixerControllerEntity,
+                                "Wrong menu provider");
+                        containerMenu = provider.createMenu(1, getInventory(), this);
+                        h.assertTrue(
+                                containerMenu
+                                        instanceof
+                                        net.impactvector.mobvats.gamecontent.multiblock.mixer.menu.MixerControllerMenu,
+                                "Wrong menu type");
+                        return java.util.OptionalInt.of(1);
+                    }
+
+                    @Override
                     public void displayClientMessage(Component text, boolean actionBar) {
                         h.assertTrue(!actionBar, "Mixer report changed message channel");
                         message[0] = text.getString();
@@ -49,11 +68,26 @@ public final class MixerDiagnosticGameTests {
                 .getBlockState(pos)
                 .useWithoutItem(
                         h.getLevel(), player, new BlockHitResult(Vec3.atCenterOf(pos), Direction.WEST, pos, false));
+        if (relative.equals(CONTROLLER)) {
+            h.assertTrue(message[0] == null, "Controller opened diagnostic chat");
+            h.assertTrue(
+                    crouching
+                            ? player.containerMenu == player.inventoryMenu
+                            : player.containerMenu
+                                    instanceof
+                                    net.impactvector.mobvats.gamecontent.multiblock.mixer.menu.MixerControllerMenu,
+                    "Controller interaction opened wrong menu or opened one during XP deposit");
+            message[0] = net.impactvector.mobvats.gamecontent.multiblock.mixer.MixerControllerSnapshot.capture(
+                            mixer(h), (net.impactvector.mobvats.gamecontent.multiblock.mixer.part.MixerControllerEntity)
+                                    h.getBlockEntity(CONTROLLER))
+                    .diagnostics();
+        }
         h.assertTrue(message[0] != null, "Mixer click did not report diagnostics");
         if (crouching)
             h.assertTrue(
                     player.totalExperience == (mixer(h).isAssembled() && relative.equals(CONTROLLER) ? 2 : 15),
                     "Diagnostic click changed XP deposit behavior");
+        if (!crouching) h.assertTrue(player.totalExperience == 15, "Normal menu open deposited XP");
         return message[0];
     }
 

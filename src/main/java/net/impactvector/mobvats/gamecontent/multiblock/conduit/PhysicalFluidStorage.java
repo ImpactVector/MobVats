@@ -443,6 +443,37 @@ public final class PhysicalFluidStorage {
         return List.copyOf(result);
     }
 
+    public record StoredFluid(BlockPos location, boolean bulk, boolean local, FluidStack stack, int capacity) {}
+
+    /** Same membership as recipe execution, preserving each physical tank and composition. */
+    public List<StoredFluid> storedFluids(BlockPos endpoint) {
+        var result = new ArrayList<StoredFluid>();
+        var seen = Collections.newSetFromMap(new IdentityHashMap<FluidTank, Boolean>());
+        var reachable = bulkConnected(endpoint);
+        for (var cluster : clusters) {
+            var tank = cluster.tank();
+            if (reachable.contains(tank) && !tank.isEmpty() && seen.add(tank))
+                result.add(new StoredFluid(
+                        cluster.members().getFirst().getBlockPos().immutable(),
+                        true,
+                        false,
+                        tank.getFluid().copy(),
+                        tank.getCapacity()));
+        }
+        services.forEach((pos, stage) -> {
+            if (connected(endpoint, pos))
+                for (var tank : stage.tanks())
+                    if (!tank.isEmpty() && seen.add(tank))
+                        result.add(new StoredFluid(
+                                pos.immutable(),
+                                false,
+                                pos.equals(endpoint),
+                                tank.getFluid().copy(),
+                                tank.getCapacity()));
+        });
+        return List.copyOf(result);
+    }
+
     public boolean connectedEndpoints(BlockPos endpoint, BlockPos member, ConduitResource resource) {
         return adjacent(endpoint, member)
                 || topology.connectivity(endpoint, resource).membership().contains(member);

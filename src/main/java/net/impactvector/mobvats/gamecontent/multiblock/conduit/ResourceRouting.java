@@ -49,6 +49,39 @@ public final class ResourceRouting {
 
     private record Supply(ResourceEndpoint endpoint, ConduitTopology.Role role) {}
 
+    public record StoredItem(BlockPos location, int slot, ItemStack stack, boolean available) {}
+
+    /** Read-only routing projection. Physical handler/slot identity prevents endpoint aliases counting twice. */
+    public List<StoredItem> storedItems(ResourceEndpoint consumer) {
+        return storedItems(List.of(consumer));
+    }
+
+    public List<StoredItem> storedItems(Collection<? extends ResourceEndpoint> consumers) {
+        var result = new LinkedHashMap<Slot, StoredItem>();
+        for (var consumer : consumers) {
+            if (!consumer.routingAvailable()) continue;
+            for (var candidate : supply(consumer, ConduitResource.ITEM)) {
+                var source = candidate.endpoint();
+                for (var handler : source.itemInventories(candidate.role()))
+                    for (int slot = 0; slot < handler.getSlots(); slot++) {
+                        var stack = handler.getStackInSlot(slot).copy();
+                        if (!stack.isEmpty()) {
+                            var key = new Slot(handler, slot);
+                            var entry = new StoredItem(
+                                    source.getBlockPos().immutable(),
+                                    slot,
+                                    stack,
+                                    consumer.roles(ConduitResource.ITEM).contains(CONSUMER)
+                                            && source.accepts(stack)
+                                            && consumer.accepts(stack));
+                            if (!result.containsKey(key) || entry.available()) result.put(key, entry);
+                        }
+                    }
+            }
+        }
+        return List.copyOf(result.values());
+    }
+
     private List<Supply> supply(ResourceEndpoint owner, ConduitResource resource) {
         var result = new ArrayList<Supply>();
         for (var role : List.of(STORE, PRODUCER))

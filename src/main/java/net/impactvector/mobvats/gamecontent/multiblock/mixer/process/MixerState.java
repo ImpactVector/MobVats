@@ -54,6 +54,119 @@ public final class MixerState {
     private long legacyXpMigration;
     private String recipe = "", blocked = "Waiting for recipe inputs";
     private int progress;
+    private Completion lastCompletion;
+
+    /** One successful commit; stacks are detached on both ingress and access. */
+    public record Completion(String recipe, List<ItemStack> items, List<FluidStack> fluids) {
+        public Completion {
+            items = items.stream().map(ItemStack::copy).toList();
+            fluids = fluids.stream().map(FluidStack::copy).toList();
+        }
+
+        public List<ItemStack> items() {
+            return items.stream().map(ItemStack::copy).toList();
+        }
+
+        public List<FluidStack> fluids() {
+            return fluids.stream().map(FluidStack::copy).toList();
+        }
+    }
+
+    public Completion lastCompletion() {
+        return lastCompletion;
+    }
+
+    public List<FluidStack> internalFluids() {
+        return escrow.stream()
+                .filter(t -> !t.isEmpty())
+                .map(t -> t.getFluid().copy())
+                .toList();
+    }
+
+    /** Protect transient planner/status fields while observing the existing planner. */
+    public <T> T observe(java.util.function.Supplier<T> query) {
+        String oldBlocked = blocked, oldProblem = meterProblem;
+        var oldMeters = meterRequirements;
+        boolean oldCandidate = candidateBlocked, oldContinuing = continuingBatch;
+        try {
+            return query.get();
+        } finally {
+            blocked = oldBlocked;
+            meterProblem = oldProblem;
+            meterRequirements = oldMeters;
+            candidateBlocked = oldCandidate;
+            continuingBatch = oldContinuing;
+        }
+    }
+
+    public record BatchView(
+            String recipe,
+            boolean active,
+            int progress,
+            int duration,
+            boolean executable,
+            boolean productsResolved,
+            String condition,
+            List<ItemStack> items,
+            List<FluidStack> fluids) {}
+
+    public BatchView batchView() {
+        return observe(() -> {
+            var definition = MixerRecipeRegistry.recipe(recipe);
+            boolean active = definition != null;
+            var plan = active ? continuingPlan(definition) : selectPlan();
+            String condition = plan == null ? blocked : "";
+            var expected = plan;
+            // Output congestion must not hide an otherwise resolvable compound product.
+            if (active && expected == null) {
+                continuingBatch = true;
+                try {
+                    expected = plan(definition, false);
+                } finally {
+                    continuingBatch = false;
+                }
+            }
+            if (!active && plan != null) definition = plan.definition();
+            if (definition == null)
+                return new BatchView(
+                        "",
+                        false,
+                        0,
+                        0,
+                        false,
+                        false,
+                        condition.isBlank() ? "No eligible recipe" : condition,
+                        List.of(),
+                        List.of());
+            var fluids = expected == null
+                    ? definition.fluidOutputs().stream()
+                            .map(o -> {
+                                var stack = new FluidStack(o.fluid().get(), o.amount());
+                                if (o.composition() != null)
+                                    stack.set(
+                                            net.impactvector.mobvats.gamecontent.fluid.compound.CompoundFluids
+                                                    .COMPOSITION
+                                                    .get(),
+                                            o.composition());
+                                return stack;
+                            })
+                            .toList()
+                    : expected.outputs().stream().map(FluidStack::copy).toList();
+            return new BatchView(
+                    definition.id(),
+                    active,
+                    active ? progress : 0,
+                    definition.batchTicks(),
+                    plan != null,
+                    expected != null,
+                    condition,
+                    definition.itemOutputs().stream()
+                            .map(MixerRecipeDefinition.ItemOutput::stack)
+                            .toList(),
+                    fluids);
+        });
+    }
+
     private MixerRecipeDefinition activeDefinition;
     private String savedSignature = "";
     private final MachineMetrics metrics = new MachineMetrics();
@@ -462,6 +575,10 @@ public final class MixerState {
     }
 
     private Plan plan(MixerRecipeDefinition d) {
+        return plan(d, true);
+    }
+
+    private Plan plan(MixerRecipeDefinition d, boolean requireOutputSpace) {
         refreshMeters();
         if (!continuingBatch && !meterProblem.isEmpty()) {
             blocked = meterProblem;
@@ -470,13 +587,13 @@ public final class MixerState {
         Plan best = null;
         for (var strategy : d.strategies())
             if (strategy.enabled()) {
-                var candidate = plan(d, strategy);
+                var candidate = plan(d, strategy, requireOutputSpace);
                 if (candidate != null && (best == null || comparePlans(candidate, best) < 0)) best = candidate;
             }
         return best;
     }
 
-    private Plan plan(MixerRecipeDefinition d, MixerRecipeDefinition.Strategy strategy) {
+    private Plan plan(MixerRecipeDefinition d, MixerRecipeDefinition.Strategy strategy, boolean requireOutputSpace) {
         var physical = new ArrayList<>(tanks());
         var snapshot = physical.stream().map(t -> t.getFluid().copy()).toList();
         var fluidUse = allocateFluids(d, strategy, snapshot);
@@ -547,6 +664,9 @@ public final class MixerState {
             s.shrink(count);
             reservation.item(items, i, s);
         }
+        // Presentation can resolve the exact same allocated products without requiring free output space.
+        if (!requireOutputSpace)
+            return new Plan(d, strategy, reservation, List.of(), List.copyOf(outputs), itemCount, consumption, null);
         // Item production has bounded private escrow, separate from input inventory.
         for (var output : d.itemOutputs()) {
             var stack = output.stack();
@@ -725,6 +845,12 @@ public final class MixerState {
 
     private void recordCommit(Plan p) {
         var d = p.definition();
+        lastCompletion = new Completion(
+                d.id(),
+                d.itemOutputs().stream()
+                        .map(MixerRecipeDefinition.ItemOutput::stack)
+                        .toList(),
+                p.outputs());
         var strategy = p.strategy();
         for (var input : strategy.fluids()) {
             metrics.record("fluidConsumed", input.amount());
@@ -891,6 +1017,17 @@ public final class MixerState {
         tag.putInt("progress", progress);
         tag.putString("blocked", blocked);
         tag.put("metrics", metrics.save());
+        if (lastCompletion != null) {
+            var completion = new CompoundTag();
+            completion.putString("recipe", lastCompletion.recipe());
+            var completedItems = new ListTag();
+            lastCompletion.items().forEach(s -> completedItems.add(s.save(registries)));
+            var completedFluids = new ListTag();
+            lastCompletion.fluids().forEach(s -> completedFluids.add(s.save(registries)));
+            completion.put("items", completedItems);
+            completion.put("fluids", completedFluids);
+            tag.put("lastCompletion", completion);
+        }
         return tag;
     }
 
@@ -903,6 +1040,17 @@ public final class MixerState {
     }
 
     public void load(CompoundTag tag, HolderLookup.Provider registries) {
+        lastCompletion = null;
+        if (tag.contains("lastCompletion")) {
+            var completion = tag.getCompound("lastCompletion");
+            var completedItems = new ArrayList<ItemStack>();
+            for (var entry : completion.getList("items", Tag.TAG_COMPOUND))
+                ItemStack.parse(registries, entry).ifPresent(completedItems::add);
+            var completedFluids = new ArrayList<FluidStack>();
+            for (var entry : completion.getList("fluids", Tag.TAG_COMPOUND))
+                FluidStack.parse(registries, entry).ifPresent(completedFluids::add);
+            lastCompletion = new Completion(completion.getString("recipe"), completedItems, completedFluids);
+        }
         escrow.clear();
         if (tag.contains("escrow")) {
             var list = tag.getList("escrow", Tag.TAG_COMPOUND);
@@ -967,6 +1115,8 @@ public final class MixerState {
     }
 
     public void assimilate(MixerState source) {
+        // Retain the receiving controller's record; adopt the donor's only when absent.
+        if (lastCompletion == null) lastCompletion = source.lastCompletion;
         legacyXpMigration = Math.addExact(legacyXpMigration, source.legacyXpMigration);
         restoredFluids.addAll(source.restoredFluids);
         for (var t : source.escrow)
@@ -1014,6 +1164,7 @@ public final class MixerState {
     }
 
     public void clear() {
+        lastCompletion = null;
         escrow.clear();
         restoredFluids.clear();
         legacyXpMigration = 0;
