@@ -19,14 +19,26 @@ Example recipe ratio (illustrative): 1,000 mB water + 100 mB XP produces 1,000 m
 
 For the *currently bundled* enrichment recipe of 250 mB XP per 1,000 mB culture, restoring 100 mB fouled medium instead requires **25 mB XP**. Recipe ratios should remain data-driven and tunable.
 
-## Mixer restoration
+## Separate Mixer operations: filtration then enrichment
 
-Filtration transforms a matching quantity of dirty culture to its original clean culture:
-1. Remove the Waste entry that replaced XP in its normalized formula.
-2. Consume fresh XP fluid proportional to the batch's *actual culture mB* and the original recipe's XP per 1,000 mB.
-3. Restore the XP formula component in equal amount and preserve other components and fluid volume.
+Culture **always remains Culture** throughout fouling, filtering, and re-enrichment. Filtering must never turn it into ordinary water merely because its Waste and XP components have been removed. The fluid identity is separate from its normalized compound formula.
 
-A generic contamination-only filter must **not** silently restore XP for free. Existing filter materials (charcoal for general culture, sand for lava-specific culture) may remain additional filtration inputs; their exact costs are balance knobs. Ensure restoration can distinguish replacement Waste from pre-existing unrelated waste/additives where relevant, and preserve original composition identity for reliable filter matching.
+Example normalized formulas per 1,000 mB of Culture (using an illustrative 100 mB XP enrichment ratio):
+
+| State | Fluid identity | Normalized formula |
+| --- | --- | --- |
+| Fresh | Culture | Water 1,000 + XP 100 |
+| Fouled | Culture | Water 1,000 + Waste 100 |
+| Filtered | Culture | Water 1,000 |
+| Re-enriched | Culture | Water 1,000 + XP 100 |
+
+**Stage 1 — generic filtration:** Charcoal removes Waste from a compatible mixture, leaving other formula ingredients and fluid identity unchanged. The filter should operate against Waste concentration/quantity in the normalized composition, with removal capacity proportional to actual processed volume (equivalent mB per 1,000 mB), rather than being a special recipe that restores enriched culture wholesale. The exact charcoal capacity and batch economics remain to be tuned. Existing lava-specific filtering can remain a separate material rule.
+
+**Stage 2 — enrichment:** A distinct Mixer operation adds actual XP fluid to filtered Culture, restoring the XP formula component at the intended ratio. For 100 mB of filtered Culture derived from a 100-XP-per-1,000 recipe, consume 10 mB XP; with the currently bundled 250-XP-per-1,000 recipe, consume 25 mB. Do not simultaneously remove Waste in the enrichment stage.
+
+These are separate recipe stages, **not a requirement to own two Mixers**. One programmable Mixer may process both at different times; two dedicated Mixers and intermediate fluid storage enable a continuous automated filtration → enrichment pipeline. Neither stage creates or destroys physical Culture volume; don't discard other composition additives.
+
+Generic filtration must not silently restore XP for free. Preserve the distinction between contaminated culture, filtered XP-free culture, and enriched culture for matching and routing. The exact handling of incidental Waste already present in a mixture, fractional restoration remainders, and filter material capacities must be specified and tested before implementation.
 
 Avoid creating many distinct partially enriched formulas. The chosen clean/dirty formula pair and separate physical quantities should remain stable, even for small fouling and partial drains/filtration. Ensure fractional XP requirements across arbitrary partial batch sizes are accurate and conserved (using appropriate integer-mB/remainder handling, not exploitable rounding).
 
