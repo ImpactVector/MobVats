@@ -14,6 +14,31 @@ import net.neoforged.neoforge.client.model.DynamicFluidContainerModel;
 
 @EventBusSubscriber(modid = MobVats.MOD_ID, value = Dist.CLIENT)
 public final class ProductFluidClient {
+    /** Fixed authored rotten-flesh pixels: all consumers share the same opaque palette. */
+    public static final net.minecraft.resources.ResourceLocation STRANGE_MEAT_TEXTURE =
+            net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(
+                    "mobvats", "block/procedural/master/strange_meat");
+
+    @SubscribeEvent
+    public static void fluidExtensions(
+            net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) {
+        event.registerFluidType(
+                new net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions() {
+                    public net.minecraft.resources.ResourceLocation getStillTexture() {
+                        return STRANGE_MEAT_TEXTURE;
+                    }
+
+                    public net.minecraft.resources.ResourceLocation getFlowingTexture() {
+                        return STRANGE_MEAT_TEXTURE;
+                    }
+
+                    public int getTintColor() {
+                        return 0xffffffff;
+                    }
+                },
+                ProductFluids.STRANGE_MEAT_TYPE.get());
+    }
+
     @SubscribeEvent
     public static void bucketColors(RegisterColorHandlersEvent.Item event) {
         event.register(

@@ -26,6 +26,11 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public final class ProductFluidGameTests {
     @GameTest(template = "empty", batch = "fluid_buckets", timeoutTicks = 10)
+    public static void strangeMeatBucket(GameTestHelper h) {
+        checkBucket(h, "strange_meat", ProductFluids.STRANGE_MEAT.get(), ProductFluids.STRANGE_MEAT_BUCKET.get());
+    }
+
+    @GameTest(template = "empty", batch = "fluid_buckets", timeoutTicks = 10)
     public static void meatBucket(GameTestHelper h) {
         checkBucket(h, "meat", ProductFluids.MEAT.get(), ProductFluids.MEAT_BUCKET.get());
     }

@@ -292,7 +292,9 @@ public final class PassiveMobDefinitionRegistry {
                     d.harvest().sword().equals("") || d.harvest().sword().equals("mobvats:vanilla_entity_death_loot"),
                     "Unsupported sword strategy");
             require(
-                    d.harvest().blender().equals("") || d.harvest().blender().equals("mobvats:meat"),
+                    d.harvest().blender().equals("")
+                            || d.harvest().blender().equals("mobvats:meat")
+                            || d.harvest().blender().equals("mobvats:strange_meat"),
                     "Unsupported blender strategy");
             positive(d.harvest().blender_amount(), "blender_amount");
             require(d.harvest().blender_xp() >= 0, "blender_xp must be nonnegative");

@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "mobvats:mixer_casing"
+      "item": "minecraft:copper_ingot"
     },
     {
       "item": "minecraft:comparator"

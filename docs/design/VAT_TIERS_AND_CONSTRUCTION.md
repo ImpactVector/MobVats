@@ -37,9 +37,13 @@ Validation checks only the actual exterior shell for tier agreement and reports 
 
 Tier comes from current block state on formation/revalidation/reload; no saved tier migration is needed. Existing structural/cladding change notifications trigger revalidation. Disposable development worlds may be regenerated rather than migrated.
 
-## Future survival recipe transition
+## Survival construction (Slice 2)
 
-Slice 1 leaves every current T1 recipe intact, including its temporary Iron ingredients. T2 and T3 structural items are Creative-only. A later slice will change T1 ingredients to Copper and introduce T2 structural crafting and tier-specific Glass/Controller costs. No T3 recipe or Blood Iron intermediate/manufacturing chain is implemented.
+T1 Copper and T2 Iron are Survival-craftable. One Copper/Iron ingot plus ordinary Glass makes four matching casings. One matching casing plus Glass makes four matching Vat Glass; one matching casing plus Redstone makes one matching Controller. No hostile drops, XP, lightning or Strange Meat are needed for T2 construction. T3 Blood Iron casing, Glass and Controller remain registered in Creative with no Survival recipes or manufacturing chain.
+
+Universal machinery uses Copper for fluid transport/storage, ports, pumps, valves, disposal, feed delivery and Sumps; Iron for item transport, ports, tools and motion; Iron plus Leather for Harnesses; and Iron, a Stonecutter and a Diamond for the Blender. These are crafting costs, not mechanical tiers. Conduits still craft in batches of four, and Mixer Shafts in batches of three. Existing pump/void mode switches and conduit trunk/tap conversions remain reversible. Matching structural cladding is still charged separately for exterior mechanisms, including Harnesses and Sumps. No functional tier variants, transfer/actor speed changes or inventory changes are introduced. See [recipe audit](../SURVIVAL_RECIPES.md).
+
+`mobvats:strange_meat` is a distinct registered fluid with its own source, flowing state, FluidType and bucket. It is available in Creative for fluid-handling checks. It cannot enter ordinary Meat extrusion even if optional composition is absent or mentions Meat. Hostile production still requires a future T2+ and lightning-activated Head feature; this slice adds no activation or hostile processing. Explicit Blender output configuration can select Strange Meat, but passive defaults remain ordinary Meat. Solid Strange Meat products and extrusion outputs are undecided. See [products](../PRODUCTS.md).
 
 ## Future hostile Head progression
 

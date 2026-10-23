@@ -124,17 +124,19 @@ for name in ('syringe', 'essence'):
 write(root / 'pack.mcmeta', {'pack': {'pack_format': 34, 'description': 'MobVats resources'}})
 recipes = {
     'syringe': ['minecraft:iron_ingot', 'minecraft:glass_bottle', 'minecraft:bone'],
-    'vat_casing': ['minecraft:iron_ingot', 'minecraft:glass'],
+    'vat_casing': ['minecraft:copper_ingot', 'minecraft:glass'],
     'vat_glass': ['mobvats:vat_casing', 'minecraft:glass'],
     'vat_controller': ['mobvats:vat_casing', 'minecraft:redstone'],
-    'vat_harness': ['mobvats:vat_casing', 'minecraft:chain'],
-    'vat_drain': ['mobvats:vat_casing', 'minecraft:hopper'],
+    'vat_harness': ['minecraft:iron_ingot', 'minecraft:leather'],
+    'vat_drain': ['mobvats:vat_casing', 'minecraft:bucket'],
     'vat_flesh': ['minecraft:rotten_flesh', 'minecraft:slime_ball'],
     'vat_head': ['mobvats:vat_flesh', 'minecraft:iron_ingot'],
 }
+for part in ('casing', 'glass', 'controller'):
+    recipes['vat_' + part + '_t2'] = [i.replace('minecraft:copper_ingot', 'minecraft:iron_ingot').replace('mobvats:vat_casing', 'mobvats:vat_casing_t2') for i in recipes['vat_' + part]]
 for name, ingredients in recipes.items():
     write(data / f'recipe/{name}.json', {'type': 'minecraft:crafting_shapeless', 'ingredients': [{'item': i} for i in ingredients],
-          'result': {'id': 'mobvats:' + name, 'count': 4 if name in ('vat_casing', 'vat_glass') else 1}})
+          'result': {'id': 'mobvats:' + name, 'count': 4 if name in ('vat_casing', 'vat_glass', 'vat_casing_t2', 'vat_glass_t2') else 1}})
 
 # Minimal NBT structure using only standard library; no external authoring dependency.
 def string(value):
@@ -154,8 +156,12 @@ payload = tag(10, '', structure)
 if not path.exists() or gzip.decompress(path.read_bytes()) != payload:
     path.write_bytes(gzip.compress(payload, mtime=0))
 
-# Provisional one-block port recipes; direction is runtime state, never a craft variant.
-for kind, ingredient in (('item', 'minecraft:hopper'), ('fluid', 'minecraft:bucket'), ('tool', 'minecraft:piston')):
+# Universal mechanisms; matching structural cladding is installed separately.
+for kind, ingredients in {
+    'item': ['minecraft:iron_ingot', 'minecraft:hopper'],
+    'fluid': ['mobvats:vat_casing', 'minecraft:bucket'],
+    'tool': ['minecraft:iron_ingot', 'minecraft:iron_ingot', 'minecraft:piston'],
+}.items():
     write(data / f'recipe/{kind}_port.json', {'type': 'minecraft:crafting_shapeless',
-        'ingredients': [{'item': 'mobvats:vat_casing'}, {'item': 'minecraft:iron_ingot'}, {'item': ingredient}],
+        'ingredients': [{'item': item} for item in ingredients],
         'result': {'id': f'mobvats:{kind}_port', 'count': 1}})

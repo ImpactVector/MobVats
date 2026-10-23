@@ -44,6 +44,25 @@ public final class ProductFluids {
                 .block(MEAT_BLOCK);
     }
 
+    public static final DeferredHolder<FluidType, FluidType> STRANGE_MEAT_TYPE = TYPES.register(
+            "strange_meat",
+            () -> new ComponentPreservingFluidType(FluidType.Properties.create()
+                    .descriptionId("fluid.mobvats.strange_meat")
+                    .density(1100)
+                    .viscosity(2000)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> STRANGE_MEAT =
+            FLUIDS.register("strange_meat", () -> new BaseFlowingFluid.Source(strangeMeatProperties()));
+    private static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_STRANGE_MEAT =
+            FLUIDS.register("flowing_strange_meat", () -> new BaseFlowingFluid.Flowing(strangeMeatProperties()));
+    public static final DeferredItem<BucketItem> STRANGE_MEAT_BUCKET = bucket("strange_meat", STRANGE_MEAT);
+    private static final DeferredBlock<LiquidBlock> STRANGE_MEAT_BLOCK = liquidBlock("strange_meat", STRANGE_MEAT);
+
+    private static BaseFlowingFluid.Properties strangeMeatProperties() {
+        return new BaseFlowingFluid.Properties(STRANGE_MEAT_TYPE, STRANGE_MEAT, FLOWING_STRANGE_MEAT)
+                .bucket(STRANGE_MEAT_BUCKET)
+                .block(STRANGE_MEAT_BLOCK);
+    }
+
     public static final DeferredHolder<FluidType, FluidType> WASTE_TYPE = TYPES.register(
             "waste",
             () -> new ComponentPreservingFluidType(FluidType.Properties.create()
@@ -164,7 +183,8 @@ public final class ProductFluids {
                 CULTURE_SLURRY_BUCKET.get(),
                 FEEDING_SLURRY_BUCKET.get(),
                 EXPERIENCE_BUCKET.get(),
-                COMPONENT_BUCKET.get());
+                COMPONENT_BUCKET.get(),
+                STRANGE_MEAT_BUCKET.get());
     }
 
     public static List<BaseFlowingFluid.Source> sources() {
@@ -174,7 +194,8 @@ public final class ProductFluids {
                 CULTURE_SLURRY.get(),
                 FEEDING_SLURRY.get(),
                 EXPERIENCE.get(),
-                COMPONENT_FLUID.get());
+                COMPONENT_FLUID.get(),
+                STRANGE_MEAT.get());
     }
 
     public static void register(IEventBus bus) {

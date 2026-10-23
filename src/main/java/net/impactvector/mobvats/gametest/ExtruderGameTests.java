@@ -128,6 +128,40 @@ public final class ExtruderGameTests {
     }
 
     @GameTest(template = "empty", timeoutTicks = 10)
+    public static void strangeMeatNeverExtrudesEvenWithMeatComposition(GameTestHelper h) {
+        for (var selected : ExtruderBlock.Form.values()) {
+            for (boolean metadata : new boolean[] {false, true}) {
+                var strange = new FluidStack(ProductFluids.STRANGE_MEAT.get(), 2000);
+                if (metadata)
+                    strange.set(
+                            CompoundFluids.COMPOSITION.get(),
+                            new CompoundComposition(List.of(new CompoundComposition.Entry(
+                                    CompoundComposition.Kind.FLUID, "mobvats:meat", 1000))));
+                var f = fixture(h, strange);
+                form(h, selected);
+                f.entity.processCycle();
+                output(h, f, Items.AIR, 0);
+                h.assertTrue(
+                        f.source.executions == 0 && f.source.getFluidInTank(0).getAmount() == 2000,
+                        "Strange Meat entered edible extrusion " + selected);
+                // A rejected first tank must not prevent normal Meat in a subsequent tank.
+                f = fixture(h, strange, meat(1000));
+                form(h, selected);
+                f.entity.processCycle();
+                output(
+                        h,
+                        f,
+                        selected == ExtruderBlock.Form.BLOCK
+                                ? ProductContent.MEAT_BLOCK.get().asItem()
+                                : ProductContent.RAW_MEAT.get(),
+                        1);
+                h.assertTrue(f.source.getFluidInTank(0).getAmount() == 2000, "Consumed hostile biomass");
+            }
+        }
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 10)
     public static void redstoneDirectPauseResume(GameTestHelper h) {
         var f = fixture(h, meat(1000));
         f.entity.processCycle();

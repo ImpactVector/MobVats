@@ -298,11 +298,23 @@ tasks.register('verifyRenderResources') {
                     ['assets/mobvats/blockstates/'+id+'.json','assets/mobvats/models/item/'+id+'.json','data/mobvats/loot_table/blocks/'+id+'.json'].each { path ->
                         if(archive.getEntry(path)==null) throw new GradleException('Missing tier construction resource '+path)
                     }
-                    if(archive.getEntry('data/mobvats/recipe/'+id+'.json')!=null) throw new GradleException('Creative-only tier gained a survival recipe: '+id)
+                    boolean hasRecipe = archive.getEntry('data/mobvats/recipe/'+id+'.json') != null
+                    if(hasRecipe != (tier == 't2')) throw new GradleException('Tier survival recipe policy violated: '+id)
                 }
                 def glass=parser.parse(archive.getInputStream(archive.getEntry('assets/mobvats/models/block/formed_glass_material_'+tier+'.json')))
                 if(glass.render_type!='minecraft:translucent') throw new GradleException('Tier glass lost transparency: '+tier)
             }
+            def strangeBucket = parser.parse(archive.getInputStream(archive.getEntry('assets/mobvats/models/item/strange_meat_bucket.json')))
+            if (strangeBucket.loader != 'neoforge:fluid_container' || strangeBucket.fluid != 'mobvats:strange_meat')
+                throw new GradleException('Strange Meat bucket lost its distinct fluid model')
+            def strangeTexture = archive.getEntry('assets/mobvats/textures/block/procedural/master/strange_meat.png')
+            if (strangeTexture == null) throw new GradleException('Missing generated Strange Meat texture')
+            def strangeImage = javax.imageio.ImageIO.read(archive.getInputStream(strangeTexture))
+            if (strangeImage.width != 16 || strangeImage.height != 16)
+                throw new GradleException('Strange Meat texture must be 16x16')
+            (0..<16).each { x -> (0..<16).each { y ->
+                if ((strangeImage.getRGB(x,y) >>> 24) != 255) throw new GradleException('Strange Meat must remain opaque')
+            } }
             // The BER owns the reservoir in every assembly state. World models may only add cladding.
             def bufferStates = parser.parse(archive.getInputStream(archive.getEntry('assets/mobvats/blockstates/fluid_buffer.json')))
             bufferStates.variants.each { state, variant ->

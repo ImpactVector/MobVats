@@ -799,6 +799,43 @@ public final class CowProcessGameTests {
         });
     }
 
+    @GameTest(template = "empty", timeoutTicks = 65)
+    public static void explicitBlenderOutputUsesConfiguredFluidIdentity(GameTestHelper h) {
+        rig(h, true);
+        h.setBlock(BLENDER, Content.state(VatPartType.Blender));
+        var bufferPos = ORIGIN.offset(3, 3, 1);
+        var buffer =
+                (net.impactvector.mobvats.gamecontent.multiblock.conduit.FluidBufferEntity) h.getBlockEntity(bufferPos);
+        buffer.filter("mobvats:strange_meat");
+        h.runAtTickTime(30, () -> {
+            var c = vat(h);
+            h.assertTrue(c.isAssembled(), "Configured Blender fixture did not form");
+            var json = PassiveMobDefinitionRegistry.JSON
+                    .toJsonTree(PassiveDefaults.data().get("minecraft:cow"))
+                    .getAsJsonObject();
+            json.getAsJsonObject("harvest").addProperty("blender", "mobvats:strange_meat");
+            var definition = PassiveMobDefinitionRegistry.JSON.fromJson(json, PassiveMobDefinition.class);
+            var profile = PassiveProcessCompiler.compile(definition);
+            var state = new SpecimenProcessState();
+            var context =
+                    new ProcessContext(c.processEngine(), c.getAssemblies().getFirst(), state, profile);
+            item(h, FEED).staging().setStackInSlot(0, new ItemStack(Items.WHEAT, 2));
+            var operation = profile.definitions().stream()
+                    .filter(d -> d.id().equals("50_replace"))
+                    .findFirst()
+                    .orElseThrow();
+            var result = operation.execute(context, new ProcessState());
+            h.assertTrue(
+                    result.reason() == ProcessResult.Reason.COMMITTED
+                            && buffer.tank.getFluid().is(ProductFluids.STRANGE_MEAT.get())
+                            && buffer.tank.getFluidAmount()
+                                    == (int) Math.floor(1000 * c.yieldMultiplier(h.absolutePos(HEAD)))
+                            && c.meatAmount() == 0,
+                    "Configured Blender fell back to ordinary Meat: " + result);
+            h.succeed();
+        });
+    }
+
     @GameTest(template = "empty", timeoutTicks = 95)
     public static void blenderCapacityAndItemBufferIndependence(GameTestHelper h) {
         rig(h, false);

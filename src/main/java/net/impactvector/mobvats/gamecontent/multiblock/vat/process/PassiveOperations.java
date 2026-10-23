@@ -107,7 +107,10 @@ final class PassiveOperations {
             if (blender) {
                 var output = yield.fluid(
                         "blender",
-                        new FluidStack(ProductFluids.MEAT.get(), d.harvest().blender_amount()));
+                        new FluidStack(
+                                BuiltInRegistries.FLUID.get(
+                                        ResourceLocation.parse(d.harvest().blender())),
+                                d.harvest().blender_amount()));
                 if (!output.isEmpty()) {
                     var tank = vat.storage().selectOutput(route.actor(), output);
                     var step = tank == null ? null : ProcessOutput.fluid(tank, output);

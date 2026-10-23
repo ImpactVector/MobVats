@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "mobvats:vat_casing"
+      "item": "minecraft:iron_ingot"
     },
     {
       "item": "minecraft:iron_ingot"

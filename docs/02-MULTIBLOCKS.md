@@ -246,7 +246,7 @@ Only passive conduits and buffers contribute to passive bridge counts. Functiona
 
 Bare conduit collision is empty; clad conduit collision is full-block. Existing routing, TAP clearance, occupied geometry, buffer displacement and compatible-buffer joining remain unchanged. Mechanical shells use non-occluding models to support glass and open construction presentation. No new waterlogging capability was added.
 
-Only T1 structural materials exist. T2/T3 gameplay and mixed-tier formation tests are outside the current registered content. Future materials extend the installed-material enum, actual structural items/policies and procedural palettes; they do not add mechanical block/item registrations or tiers to mechanical functions.
+Copper T1 and Iron T2 structural materials are Survival-craftable. Blood Iron T3 materials are registered in Creative with no Survival recipes. All tiers enforce matching shell/cladding materials and have headless formation/mismatch coverage. Functional machinery remains universal; crafting conventions use Copper for fluids, Iron for items/motion, Iron plus Leather for Harnesses, and a Diamond for Blenders. See the [recipe audit](SURVIVAL_RECIPES.md). Hostile activation and Blood Iron manufacturing remain future work. Future materials extend the installed-material enum, actual structural items/policies and procedural palettes; they do not add mechanical block/item registrations or tiers to mechanical functions.
 
 ### 2.4.5 Rendering
 

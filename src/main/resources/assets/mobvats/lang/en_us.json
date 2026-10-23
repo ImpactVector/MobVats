@@ -123,5 +123,8 @@
   "block.mobvats.vat_casing_t3": "Blood Iron Vat Casing",
   "block.mobvats.vat_glass_t3": "Blood Iron Vat Glass",
   "block.mobvats.vat_controller_t3": "Blood Iron Vat Controller",
-  "multiblock.mobvats.tier_mismatch": "Shell tier mismatch: expected %s (%s), found %s (%s)"
+  "multiblock.mobvats.tier_mismatch": "Shell tier mismatch: expected %s (%s), found %s (%s)",
+  "fluid.mobvats.strange_meat": "Strange Meat",
+  "block.mobvats.strange_meat": "Strange Meat",
+  "item.mobvats.strange_meat_bucket": "Strange Meat Bucket"
 }
