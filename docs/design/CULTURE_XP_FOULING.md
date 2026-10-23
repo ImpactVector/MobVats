@@ -1,6 +1,6 @@
 # Culture XP depletion and restoration — design decisions
 
-Status: agreed behavior, not necessarily implemented. Last updated: 2026-10-23.
+Status: implemented recovery slice; see [production benchmark](CULTURE_PRODUCTION_BENCHMARK.md) for validation and provisional economics. Last updated: 2026-10-23.
 
 ## Goal
 
@@ -32,15 +32,15 @@ Example normalized formulas per 1,000 mB of Culture (using an illustrative 100 m
 | Filtered | Culture | Water 1,000 |
 | Re-enriched | Culture | Water 1,000 + XP 100 |
 
-**Stage 1 — generic filtration:** Charcoal removes Waste from a compatible mixture, leaving other formula ingredients and fluid identity unchanged. The filter should operate against Waste concentration/quantity in the normalized composition, with removal capacity proportional to actual processed volume (equivalent mB per 1,000 mB), rather than being a special recipe that restores enriched culture wholesale. The exact charcoal capacity and batch economics remain to be tuned. Existing lava-specific filtering can remain a separate material rule.
+**Stage 1 — ordinary recipe filtration:** The bundled `mobvats:filter_general` recipe consumes one charcoal and 1,000 mB of water-based dirty Culture. Its existing removal transform removes the Waste entry, preserves other formula entries and metadata, and returns exactly 1,000 mB of Culture without XP restoration. The recipe requires Culture identity and at least Water 1,000 in its formula, and excludes lava. This supersedes the proposed universal quantitative/PPMB charcoal filter: there is no removal capacity, partial component removal, or arbitrary-fluid charcoal recipe. The separate lava/sand recipe retains its existing behavior.
 
-**Stage 2 — enrichment:** A distinct Mixer operation adds actual XP fluid to filtered Culture, restoring the XP formula component at the intended ratio. For 100 mB of filtered Culture derived from a 100-XP-per-1,000 recipe, consume 10 mB XP; with the currently bundled 250-XP-per-1,000 recipe, consume 25 mB. Do not simultaneously remove Waste in the enrichment stage.
+**Stage 2 — enrichment:** The ordinary `mobvats:enrich_culture` recipe consumes 1,000 mB of XP-free water-based Culture and 250 mB of actual `mobvats:experience`, returning 1,000 mB of Culture with XP 250 added to the existing formula. It preserves other ingredients, including any Waste: filtration is a distinct operation. Already XP-bearing formulas do not match. Both operations take 200 base Mixer ticks per batch. Smaller batches are optional authored recipes, not a fractional-XP accounting subsystem.
 
 These are separate recipe stages, **not a requirement to own two Mixers**. One programmable Mixer may process both at different times; two dedicated Mixers and intermediate fluid storage enable a continuous automated filtration → enrichment pipeline. Neither stage creates or destroys physical Culture volume; don't discard other composition additives.
 
-Generic filtration must not silently restore XP for free. Preserve the distinction between contaminated culture, filtered XP-free culture, and enriched culture for matching and routing. The exact handling of incidental Waste already present in a mixture, fractional restoration remainders, and filter material capacities must be specified and tested before implementation.
+Filtering never restores XP for free. Preserve the distinction between contaminated culture, filtered XP-free culture, and enriched culture for matching and routing. Fouling adds the replaced XP to any pre-existing Waste; it preserves all unrelated entries. The recipe removes the whole Waste entry, including incidental Waste. It does not distinguish Waste provenance. Filtered Culture does not satisfy the enriched culture profile and currently falls back to frequency 0.5.
 
-Avoid creating many distinct partially enriched formulas. The chosen clean/dirty formula pair and separate physical quantities should remain stable, even for small fouling and partial drains/filtration. Ensure fractional XP requirements across arbitrary partial batch sizes are accurate and conserved (using appropriate integer-mB/remainder handling, not exploitable rounding).
+The selected clean/dirty formula pair and separate physical quantities remain stable through small fouling events and partial transfers. Processing uses whole configured batches with exact integer input/output quantities. A 100 mB transfer can wait in a buffer until enough accumulates for a batch; arbitrary 1 mB recovery is not implemented. Recipe authors must specify exact ratios and the intended formula basis for other batch sizes.
 
 ## No hidden upkeep
 
@@ -48,14 +48,16 @@ Fouling occurs on successfully committed recognized biological work, not continu
 
 ## Current implementation versus target
 
-As documented in the existing 2026-10-05 Slice 12.2 behavior, current `CultureFouling.dirty` **adds** Waste and `filter_general`/`filter_lava` **remove** Waste without replacing XP. This is superseded as the intended *future* enrichment behavior, but should not be described as already implemented. The bundled recipe currently uses 1,000 mB water + 250 mB XP -> 1,000 mB culture.
+`CultureFouling.dirty` now replaces the entire XP entry with equal Waste. Media without XP retain the previous configured Waste increment. Storage still saves both prototypes and physical fractions. On load, an exact legacy pair (the clean prototype plus an added Waste increment, still carrying XP) migrates to the new dirty formula without changing either volume. The saved clean prototype identifies unrelated pre-existing Waste, which is preserved. Unrecognized/custom pairs retain their exact stored identities. An imported dirty stack without its original clean prototype cannot establish that it formerly contained XP; inverse legacy pairing never invents XP. Normal recovery returns enriched Culture to the original selected pair.
 
-## Tests to add
+The Mixer previously could derive the additive formula using an ordinary output, but could not retain exact source metadata and apply required/excluded composition matching without also removing an entry. The only engine extension permits `transform.remove: []`; existing source checks and recorded-input composition derivation then perform enrichment. Ratios remain JSON data. Existing authored Mixer configuration is never overwritten: installations with an old `_defaults.json` must explicitly adopt the updated recipes or provide overrides.
+
+## Automated coverage
 
 - Complete XP-to-Waste normalized formula replacement, with all other components unchanged.
 - Independent clean/dirty mB conservation during repeated fouling, fill/drain and world reload.
-- 100 mB dirty / 100 XP-per-1000 ratio => 10 mB XP to restore.
-- 100 mB dirty / 250 XP-per-1000 ratio => 25 mB XP to restore.
-- Partial batches and remainders never create or destroy XP through rounding.
+- Configurable 100 and bundled 250 mB XP inputs produce the corresponding formula entries.
+- Partial transfers preserve exact fluid identity; repeated whole batches conserve Culture and pay actual XP.
 - Missing XP stops restoration; filtering alone does not restore enrichment.
 - Existing non-XP cultures and lava-specific filtration continue behaving sensibly.
+- Atomic input/output reservations, full destinations, stale plans, exact meters, and single-/two-Mixer sequences.

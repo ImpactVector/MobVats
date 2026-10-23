@@ -56,8 +56,15 @@ public final class Slice122GameTests {
                 CompoundFluids.COMPOSITION.get(),
                 new CompoundComposition(List.of(
                         new CompoundComposition.Entry(CompoundComposition.Kind.FLUID, "#c:water", 1000),
-                        new CompoundComposition.Entry(CompoundComposition.Kind.FLUID, "mobvats:experience", 250),
                         new CompoundComposition.Entry(CompoundComposition.Kind.ITEM, "minecraft:wheat", 8))));
+        return s;
+    }
+
+    private static FluidStack enriched(int amount) {
+        var s = culture(amount);
+        var entries = new ArrayList<>(s.get(CompoundFluids.COMPOSITION.get()).entries());
+        entries.add(new CompoundComposition.Entry(CompoundComposition.Kind.FLUID, "mobvats:experience", 250));
+        s.set(CompoundFluids.COMPOSITION.get(), new CompoundComposition(entries));
         return s;
     }
 
@@ -69,10 +76,32 @@ public final class Slice122GameTests {
         h.assertTrue(Math.abs(actual - expected) < 1e-8, "Expected " + expected + ", got " + actual);
     }
 
-    private static MixerRecipeRegistry.Loaded bundled() {
+    /** Legacy authored recipe compatibility fixture, distinct from the current bundled recovery recipes. */
+    private static MixerRecipeRegistry.Loaded legacyDefinitions() {
         try (var in = Slice122GameTests.class.getResourceAsStream("/data/mobvats/mixer_defaults.json")) {
-            return MixerRecipeRegistry.parse(JsonParser.parseString(
-                    new String(Objects.requireNonNull(in).readAllBytes(), java.nio.charset.StandardCharsets.UTF_8)));
+            var root = JsonParser.parseString(new String(
+                            Objects.requireNonNull(in).readAllBytes(), java.nio.charset.StandardCharsets.UTF_8))
+                    .getAsJsonObject();
+            root.getAsJsonObject("recipes").remove("mobvats:enrich_culture");
+            var general = root.getAsJsonObject("recipes").getAsJsonObject("mobvats:filter_general");
+            general.getAsJsonArray("strategies")
+                    .get(0)
+                    .getAsJsonObject()
+                    .getAsJsonArray("fluids")
+                    .get(0)
+                    .getAsJsonObject()
+                    .add(
+                            "selector",
+                            JsonParser.parseString(
+                                    "[{\"fluid\":\"mobvats:culture_slurry\"},{\"fluid\":\"mobvats:component_fluid\"}]"));
+            var transform = general.getAsJsonObject("outputs")
+                    .getAsJsonArray("fluids")
+                    .get(0)
+                    .getAsJsonObject()
+                    .getAsJsonObject("transform");
+            transform.remove("required");
+            transform.addProperty("restore_ordinary", true);
+            return MixerRecipeRegistry.parse(root);
         } catch (java.io.IOException e) {
             throw new IllegalStateException(e);
         }
@@ -89,7 +118,7 @@ public final class Slice122GameTests {
     }
 
     private static FluidStack filter(GameTestHelper h, FluidStack clean, String filterId) {
-        var loaded = bundled();
+        var loaded = legacyDefinitions();
         var recipe = loaded.recipes().get(filterId);
         var dirty = CultureFouling.dirty(clean, 100).copyWithAmount(1000);
         return recipe.result(List.of(List.of(dirty)));
@@ -141,9 +170,9 @@ public final class Slice122GameTests {
     @GameTest(template = "empty")
     public static void fullyDirtyRetainsPrototype(GameTestHelper h) {
         var m = medium(h);
-        m.fill(culture(1000), EXECUTE);
+        m.fill(enriched(1000), EXECUTE);
         m.foul(1000);
-        same(h, m.cleanPrototype(), culture(1));
+        same(h, m.cleanPrototype(), enriched(1));
         h.assertTrue(m.cleanAmount() == 0 && m.dirtyAmount() == 1000, "Full dirty state lost");
         close(h, m.frequency(COW), 2.75);
         h.succeed();
@@ -332,7 +361,7 @@ public final class Slice122GameTests {
     @GameTest(template = "empty")
     public static void enrichedVolumeWeightedFrequency(GameTestHelper h) {
         var m = medium(h);
-        m.fill(culture(1000), EXECUTE);
+        m.fill(enriched(1000), EXECUTE);
         close(h, m.frequency(COW), 5);
         m.foul(500);
         close(h, m.frequency(COW), 3.875);
@@ -397,7 +426,7 @@ public final class Slice122GameTests {
         same(h, filter(h, clean, "mobvats:filter_lava"), clean);
         var dirty = CultureFouling.dirty(clean, 100);
         h.assertTrue(
-                !bundled().recipes().get("mobvats:filter_general").matchesInput(0, dirty),
+                !legacyDefinitions().recipes().get("mobvats:filter_general").matchesInput(0, dirty),
                 "Charcoal recipe matched lava culture");
         h.succeed();
     }
@@ -421,7 +450,7 @@ public final class Slice122GameTests {
 
     @GameTest(template = "empty")
     public static void filterItemsConsumedWithoutEnteringFormula(GameTestHelper h) {
-        var loaded = bundled();
+        var loaded = legacyDefinitions();
         scoped(loaded, () -> {
             for (var id : List.of("mobvats:filter_general", "mobvats:filter_lava")) {
                 var recipe = loaded.recipes().get(id);
@@ -484,7 +513,7 @@ public final class Slice122GameTests {
 
     @GameTest(template = "empty")
     public static void cleanOrSpilledCultureDoesNotConsumeFilters(GameTestHelper h) {
-        var loaded = bundled();
+        var loaded = legacyDefinitions();
         scoped(loaded, () -> {
             for (var input : List.of(culture(1000), new FluidStack(ProductFluids.CULTURE_SLURRY.get(), 1000))) {
                 var state = new MixerState(() -> {});
@@ -537,7 +566,7 @@ public final class Slice122GameTests {
     @GameTest(template = "empty")
     public static void oldMediumMigratesEntirelyCleanWithoutLoss(GameTestHelper h) {
         var old = new FluidTank(10);
-        var stack = culture(4567);
+        var stack = enriched(4567);
         stack.set(DataComponents.CUSTOM_NAME, Component.literal("Legacy culture"));
         old.setFluid(stack);
         var tag = old.writeToNBT(h.getLevel().registryAccess(), new CompoundTag());
@@ -687,7 +716,7 @@ public final class Slice122GameTests {
         h.runAtTickTime(35, () -> {
             var vat = vat(h);
             double happiness = vat.yieldMultiplier(h.absolutePos(HEAD));
-            vat.medium().fill(culture(vat.medium().getCapacity() / 2), EXECUTE);
+            vat.medium().fill(enriched(vat.medium().getCapacity() / 2), EXECUTE);
             vat.medium().foul(vat.medium().getFluidAmount() / 2);
             double exposure = vat.specimenClearance(h.absolutePos(HEAD)).shell().stream()
                     .mapToDouble(vat.medium()::exposure)
@@ -805,7 +834,7 @@ public final class Slice122GameTests {
         rig(h, COW, false);
         h.runAtTickTime(35, () -> {
             var vat = vat(h);
-            vat.medium().fill(culture(1000), EXECUTE);
+            vat.medium().fill(enriched(1000), EXECUTE);
             var p = new PassiveMobDefinition.ResourceProcess(
                     "test:bio",
                     1,
@@ -1012,7 +1041,7 @@ public final class Slice122GameTests {
 
     @GameTest(template = "empty")
     public static void filterBatchNeverBlendsDifferentSourceFormulas(GameTestHelper h) {
-        var loaded = bundled();
+        var loaded = legacyDefinitions();
         scoped(loaded, () -> {
             var first = CultureFouling.dirty(water(1), 100).copyWithAmount(500);
             var second = CultureFouling.dirty(culture(1), 100).copyWithAmount(1000);
@@ -1035,7 +1064,7 @@ public final class Slice122GameTests {
 
     @GameTest(template = "empty")
     public static void partialDifferentFormulasCannotCombineForFilterBatch(GameTestHelper h) {
-        var loaded = bundled();
+        var loaded = legacyDefinitions();
         scoped(loaded, () -> {
             var state = new MixerState(() -> {});
             state.fluids(true).fill(CultureFouling.dirty(water(1), 100).copyWithAmount(500), EXECUTE);
@@ -1052,7 +1081,7 @@ public final class Slice122GameTests {
 
     @GameTest(template = "empty")
     public static void filteredOrdinaryOutputEligibilitySurvivesReload(GameTestHelper h) {
-        var loaded = bundled();
+        var loaded = legacyDefinitions();
         scoped(loaded, () -> {
             var state = new MixerState(() -> {});
             h.assertTrue(!state.outputFluid(water(1)), "Raw input was initially treated as a filter output");
@@ -1166,7 +1195,7 @@ public final class Slice122GameTests {
 
     @GameTest(template = "empty")
     public static void vatDrainFilterFillCycleConservesCulture(GameTestHelper h) {
-        var loaded = bundled();
+        var loaded = legacyDefinitions();
         scoped(loaded, () -> {
             var vat = medium(h);
             var clean = culture(4000);
@@ -1191,7 +1220,7 @@ public final class Slice122GameTests {
 
     @GameTest(template = "empty")
     public static void filterTimingDoesNotConsumeBeforeConfiguredCompletion(GameTestHelper h) {
-        var loaded = bundled();
+        var loaded = legacyDefinitions();
         scoped(loaded, () -> {
             var state = new MixerState(() -> {});
             state.fluids(true).fill(CultureFouling.dirty(culture(1), 100).copyWithAmount(1000), EXECUTE);
@@ -1214,7 +1243,7 @@ public final class Slice122GameTests {
 
     @GameTest(template = "empty")
     public static void blockedFilterPreservesDirtyVolumeAndFilter(GameTestHelper h) {
-        var loaded = bundled();
+        var loaded = legacyDefinitions();
         scoped(loaded, () -> {
             var state = new MixerState(() -> {});
             var dirty = CultureFouling.dirty(culture(1), 100).copyWithAmount(1000);
@@ -1239,7 +1268,7 @@ public final class Slice122GameTests {
 
     @GameTest(template = "empty")
     public static void splitPhysicalBuffersFilterWithoutDuplicatingFormula(GameTestHelper h) {
-        var loaded = bundled();
+        var loaded = legacyDefinitions();
         var p = new BlockPos(3, 2, 3);
         var members = new ArrayList<FluidBufferEntity>();
         for (var pos : List.of(p.west(), p.east())) {

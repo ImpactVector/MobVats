@@ -24,6 +24,8 @@ Vat medium belongs to the controller, separately from Fluid Buffers and endpoint
 
 Clean and dirty amounts share one selected fluid identity/profile and common capacity. Recognized committed biological work fouls clean volume (default 50 mB), preserving total volume. Failed/blocked work and ordinary mechanical transfers do not foul it. Drain exports dirty first, then clean, including partial tails. Only the selected clean/dirty pair refills nonempty medium; incompatible reconnection contents are preserved separately, not blended. Fill refuses excess capacity; Drain can recover stored excess. Mixer filtration recipes transform dirty culture through definition-owned composition checks.
 
+For enriched Culture, fouling replaces the entire XP formula entry with equal Waste in the dirty fraction only, adding to pre-existing Waste and preserving other ingredients. Non-XP media retain the configured Waste increment. Filtration and enrichment are separate ordinary Mixer recipes: one charcoal filters 1,000 mB of water-based dirty Culture without restoring XP; 250 mB of actual XP then enriches 1,000 mB of XP-free Culture. Both return 1,000 mB of Culture. Filtered Culture remains a compound fluid and does not match the enriched performance profile. See [recovery decisions](design/CULTURE_XP_FOULING.md) and [production measurements](design/CULTURE_PRODUCTION_BENCHMARK.md).
+
 Culture JSON under `config/mobvats/culture/` assigns ordered medium rules through specific mobs, groups and a default profile. Required composition, selectors and exact components determine matching. Existing defaults remain authored data; [examples/CULTURE_PROFILES.example.json](examples/CULTURE_PROFILES.example.json) illustrates the schema.
 
 ## 4.4 Tool interaction definitions
@@ -249,6 +251,8 @@ existing meaning. A source spanning several buffers must have one exact fluid
 and component identity. Other outputs in the same operation are unaffected by
 the transform. Restored ordinary fluid identities become exportable only after
 successful production and remain persisted.
+
+An empty `transform.remove` list retains the source while incorporating the other recorded inputs. The bundled enrichment recipe uses this with XP input 250, required Water 1,000 and excluded XP 1. It does not remove Waste. The charcoal recipe uses a nonempty Waste removal list and `restore_ordinary: false`, so filtered Culture stays Culture. There is no quantitative/PPMB filtering framework. Legacy authored general transforms remain valid; the bundled charcoal recipe is restricted to water-based Culture. Empty-removal transforms record `compoundTransformedMb`, while removal transforms retain `cultureFilteredMb` metrics.
 
 An executable active batch keeps its recipe and progress until completion;
 its best executable strategy is reevaluated each cadence. Progress belongs to

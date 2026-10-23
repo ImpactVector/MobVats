@@ -870,7 +870,9 @@ public final class MixerState {
         for (int i = 0; i < d.fluidOutputs().size(); i++)
             if (d.fluidOutputs().get(i).transform() != null) {
                 metrics.record(
-                        "cultureFilteredMb",
+                        d.fluidOutputs().get(i).transform().remove().isEmpty()
+                                ? "compoundTransformedMb"
+                                : "cultureFilteredMb",
                         strategy.fluids()
                                 .get(d.fluidOutputs().get(i).transform().sourceInput())
                                 .amount());

@@ -12,6 +12,12 @@ import net.neoforged.neoforge.fluids.FluidStack;
 public final class CultureFouling {
     public static final String WASTE =
             CompoundComposition.canonicalSelector(CompoundComposition.Kind.FLUID, "mobvats:waste");
+    public static final String XP =
+            CompoundComposition.canonicalSelector(CompoundComposition.Kind.FLUID, "mobvats:experience");
+
+    public static boolean experience(CompoundComposition.Entry e) {
+        return e.kind() == CompoundComposition.Kind.FLUID && e.selector().equals(XP);
+    }
 
     public static boolean waste(CompoundComposition.Entry e) {
         return e.kind() == CompoundComposition.Kind.FLUID && e.selector().equals(WASTE);
@@ -35,7 +41,14 @@ public final class CultureFouling {
                 result = new FluidStack(ProductFluids.CULTURE_SLURRY.get(), 1);
                 result.applyComponents(clean.getComponentsPatch());
             }
-            entries.add(new CompoundComposition.Entry(CompoundComposition.Kind.FLUID, WASTE, wasteAmount));
+            int xp = entries.stream()
+                    .filter(CultureFouling::experience)
+                    .mapToInt(CompoundComposition.Entry::amount)
+                    .sum();
+            entries.removeIf(CultureFouling::experience);
+            // Existing contamination remains; only XP is replaced. Non-XP media retain legacy fouling.
+            entries.add(
+                    new CompoundComposition.Entry(CompoundComposition.Kind.FLUID, WASTE, xp > 0 ? xp : wasteAmount));
             result.set(CompoundFluids.COMPOSITION.get(), new CompoundComposition(entries));
             return result;
         } catch (IllegalArgumentException | ArithmeticException e) {
@@ -89,6 +102,33 @@ public final class CultureFouling {
     public static boolean hasWaste(FluidStack stack) {
         var formula = stack.get(CompoundFluids.COMPOSITION.get());
         return formula != null && formula.entries().stream().anyMatch(CultureFouling::waste);
+    }
+
+    /** Recognize the old saved pair (clean + a Waste increment, still carrying XP).
+     * The clean prototype identifies pre-existing contamination, so it is preserved without guessing.
+     * Unrecognized/custom pairs retain their exact stored identities.
+     */
+    public static FluidStack migrateDirtyPrototype(FluidStack clean, FluidStack storedDirty) {
+        var source = clean.get(CompoundFluids.COMPOSITION.get());
+        var stored = storedDirty.get(CompoundFluids.COMPOSITION.get());
+        if (source == null
+                || stored == null
+                || source.entries().stream().noneMatch(CultureFouling::experience)
+                || stored.entries().stream().noneMatch(CultureFouling::experience)) return storedDirty;
+        int increment = stored.entries().stream()
+                        .filter(CultureFouling::waste)
+                        .mapToInt(CompoundComposition.Entry::amount)
+                        .sum()
+                - source.entries().stream()
+                        .filter(CultureFouling::waste)
+                        .mapToInt(CompoundComposition.Entry::amount)
+                        .sum();
+        if (increment <= 0) return storedDirty;
+        var entries = new ArrayList<>(source.entries());
+        entries.add(new CompoundComposition.Entry(CompoundComposition.Kind.FLUID, WASTE, increment));
+        var legacy = clean.copyWithAmount(1);
+        legacy.set(CompoundFluids.COMPOSITION.get(), new CompoundComposition(entries));
+        return FluidStack.isSameFluidSameComponents(legacy, storedDirty) ? dirty(clean, increment) : storedDirty;
     }
 
     private CultureFouling() {}

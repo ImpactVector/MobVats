@@ -41,3 +41,7 @@ Prior conversational estimates used illustrative layouts and assumptions that ha
 A validation should enumerate legal geometry/actor positions, compute each cow's comfort-shell credit and culture exposure through the real code, run sustained growth/harvest cycles, tally effective drops and actual XP upkeep, and report gross/net throughput divided by exterior volume. Keep the model reproducible and testable before changing constants.
 
 See `CULTURE_XP_FOULING.md` for the target XP upkeep mechanic and `VAT_TIERS_AND_CONSTRUCTION.md` for structural constraints.
+
+## Implemented benchmark
+
+The culture-recovery slice adds [reproducible fixture measurements and operating economics](CULTURE_PRODUCTION_BENCHMARK.md). Those results supersede conversational estimates for the measured fixtures only. They distinguish legal Head count from productive cow count, native feed/harvest validation from the sustained simulation, and growth-only ceilings from mechanical throughput. The requested dense dimensions are retained as a diagnostic; an additional dense fixture tests the closest recovery-capable geometry when normal actor access and a Drain Valve require more space. Balance goals above remain goals; the slice does not tune constants to force them to pass.

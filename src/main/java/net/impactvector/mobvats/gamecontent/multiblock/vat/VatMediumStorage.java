@@ -331,9 +331,11 @@ public final class VatMediumStorage extends FluidTank {
     }
 
     private static State readState(CompoundTag tag, HolderLookup.Provider registries) {
+        var clean = FluidStack.parseOptional(registries, tag.getCompound("cleanPrototype"));
+        var dirty = FluidStack.parseOptional(registries, tag.getCompound("dirtyPrototype"));
         return new State(
-                FluidStack.parseOptional(registries, tag.getCompound("cleanPrototype")),
-                FluidStack.parseOptional(registries, tag.getCompound("dirtyPrototype")),
+                clean,
+                CultureFouling.migrateDirtyPrototype(clean, dirty),
                 tag.getInt("cleanAmount"),
                 tag.getInt("dirtyAmount"));
     }

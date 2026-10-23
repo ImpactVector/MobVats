@@ -176,8 +176,7 @@ public record MixerRecipeDefinition(
             boolean restoreOrdinary) {
         public Transform {
             remove = List.copyOf(remove);
-            if (sourceInput < 0 || remove.isEmpty())
-                throw new IllegalArgumentException("Transform requires a source and removal selectors");
+            if (sourceInput < 0) throw new IllegalArgumentException("Transform requires a source input");
         }
 
         private boolean contains(CompoundComposition formula, CompoundComposition needs) {
