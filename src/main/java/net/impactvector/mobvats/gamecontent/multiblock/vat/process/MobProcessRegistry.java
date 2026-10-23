@@ -8,6 +8,38 @@ public final class MobProcessRegistry {
     public static final class Profile {
         private final List<ProcessDefinition> definitions, tick, cadence;
         private final Map<ResourceLocation, ProductBufferDefinition> buffers;
+        private String foulingConfiguration = "";
+
+        public String foulingConfiguration() {
+            return foulingConfiguration;
+        }
+
+        Profile foulingConfiguration(PassiveMobDefinition definition) {
+            // Canonical JSON is independent of map iteration order across JVMs/reloads.
+            foulingConfiguration = com.google.common.hash.Hashing.sha256()
+                    .hashString(
+                            canonical(PassiveMobDefinitionRegistry.JSON.toJsonTree(definition))
+                                    .toString(),
+                            java.nio.charset.StandardCharsets.UTF_8)
+                    .toString();
+            return this;
+        }
+
+        private static com.google.gson.JsonElement canonical(com.google.gson.JsonElement value) {
+            if (value.isJsonObject()) {
+                var sorted = new com.google.gson.JsonObject();
+                new TreeSet<>(value.getAsJsonObject().keySet())
+                        .forEach(key -> sorted.add(
+                                key, canonical(value.getAsJsonObject().get(key))));
+                return sorted;
+            }
+            if (value.isJsonArray()) {
+                var array = new com.google.gson.JsonArray();
+                value.getAsJsonArray().forEach(element -> array.add(canonical(element)));
+                return array;
+            }
+            return value;
+        }
 
         public Map<ResourceLocation, ProductBufferDefinition> buffers() {
             return buffers;

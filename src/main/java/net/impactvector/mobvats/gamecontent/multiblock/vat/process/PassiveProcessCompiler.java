@@ -138,7 +138,7 @@ public final class PassiveProcessCompiler {
                     .withExclusiveUse(interaction.actor_use()));
         }
         for (var process : d.processes()) compileResource(definitions, d, process);
-        return new MobProcessRegistry.Profile(definitions, d.bufferDefinitions());
+        return new MobProcessRegistry.Profile(definitions, d.bufferDefinitions()).foulingConfiguration(d);
     }
 
     private static void compileResource(

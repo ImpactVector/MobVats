@@ -44,7 +44,24 @@ public final class CultureProfiles {
             String defaultProfile,
             int wasteFormulaMb,
             int defaultFoulingMb,
-            Map<String, Integer> actions) {
+            Map<String, Integer> actions,
+            double maxFoulingMultiplier) {
+        public Data {
+            if (!Double.isFinite(maxFoulingMultiplier) || maxFoulingMultiplier < 1)
+                throw new IllegalArgumentException("max_multiplier must be finite and >= 1");
+        }
+
+        public Data(
+                Map<String, List<Rule>> profiles,
+                Map<ResourceLocation, String> mobs,
+                List<Group> groups,
+                String defaultProfile,
+                int wasteFormulaMb,
+                int defaultFoulingMb,
+                Map<String, Integer> actions) {
+            this(profiles, mobs, groups, defaultProfile, wasteFormulaMb, defaultFoulingMb, actions, 5.0);
+        }
+
         public Data(
                 Map<String, List<Rule>> profiles,
                 Map<ResourceLocation, String> mobs,
@@ -88,6 +105,10 @@ public final class CultureProfiles {
 
     public static int wasteFormulaMb() {
         return current.wasteFormulaMb();
+    }
+
+    public static double maxFoulingMultiplier() {
+        return current.maxFoulingMultiplier();
     }
     /** Identical authored selectors match directly; exact resources can satisfy a tag/ingredient rule.
      * Unknown tag formulas are never expanded speculatively into a more specific ingredient. */
@@ -152,9 +173,11 @@ public final class CultureProfiles {
         for (var ref : refs)
             if (!profiles.containsKey(ref)) throw new IllegalArgumentException("Unknown culture profile: " + ref);
         int waste = 100, fouling = 50;
+        double maximum = 5.0;
         var actions = new TreeMap<String, Integer>();
         if (root.has("fouling")) {
             var o = root.getAsJsonObject("fouling");
+            if (o.has("max_multiplier")) maximum = o.get("max_multiplier").getAsDouble();
             if (o.has("waste_formula_mb")) waste = integer(o, "waste_formula_mb", 1);
             if (o.has("default_mb")) fouling = integer(o, "default_mb", 0);
             if (o.has("actions"))
@@ -170,7 +193,8 @@ public final class CultureProfiles {
                 fallback,
                 waste,
                 fouling,
-                Map.copyOf(actions));
+                Map.copyOf(actions),
+                maximum);
     }
 
     private static int integer(JsonObject o, String key, int minimum) {

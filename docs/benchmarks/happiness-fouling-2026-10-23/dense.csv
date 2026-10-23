@@ -1,0 +1,3 @@
+layout,medium,volume,medium_capacity_mb,legal_cows,productive_cows,yield,frequency,biological_kph,kills_ph,effective_kph,effective_per_100,xp_ph,xp_cost_ph,net_xp_ph,wheat_ph,fouled_mb_ph,charcoal_ph
+dense,water,144,28000,14,4,0.500000,0.544118,6.529412,6.400000,3.200000,2.222222,6.400000,0.000000,6.400000,6.400000,0.000000,0.000000
+dense,fresh,144,28000,14,4,0.500000,1.294118,15.529412,15.600000,7.800000,5.416667,15.600000,0.000000,15.600000,15.600000,0.000000,0.000000

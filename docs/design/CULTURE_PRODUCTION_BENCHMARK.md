@@ -1,5 +1,7 @@
 # Culture recovery production benchmark
 
+These measurements precede happiness-scaled fouling. See [the updated formula and benchmark regression](HAPPINESS_SCALED_FOULING.md) for current behavior, maintenance costs and XP-self-funded results. Fixture geometry and original operating-mode methodology below remain the reference.
+
 Measured on NeoForge 1.21.1 / 21.1.252, 2026-10-23. No balance constants were changed.
 
 ## Reproduction and measurement boundary

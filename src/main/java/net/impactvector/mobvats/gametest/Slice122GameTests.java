@@ -710,6 +710,203 @@ public final class Slice122GameTests {
         return vat;
     }
 
+    private static int scaledFouling(MultiblockVat vat, int base) {
+        double happiness =
+                vat.yieldMultiplier(vat.getAssemblies().getFirst().head().getBlockPos());
+        return (int) Math.floor(base * (1 + 4 * Math.clamp((2 - happiness) / 1.5, 0, 1)) + 1e-10);
+    }
+
+    @GameTest(template = "empty")
+    public static void happinessFoulingEndpointsAndLinearValues(GameTestHelper h) {
+        double[] expected = {5, 13.0 / 3, 11.0 / 3, 3, 7.0 / 3, 5.0 / 3, 1};
+        for (int i = 0; i < expected.length; i++)
+            close(h, FoulingRemainders.multiplier(0.5 + i * 0.25, 5), expected[i]);
+        close(h, FoulingRemainders.multiplier(-10, 5), 5);
+        close(h, FoulingRemainders.multiplier(10, 5), 1);
+        close(h, FoulingRemainders.multiplier(0.5, 7), 7);
+        close(h, FoulingRemainders.multiplier(1, 1), 1);
+        var large = new FoulingRemainders().plan("large", "cow", Integer.MAX_VALUE, 0.5, 5);
+        h.assertTrue(
+                large.amount() == Integer.MAX_VALUE
+                        && new ProcessTransaction().add(large.step()).commit(),
+                "Large valid base overflowed instead of saturating available volume");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void foulingMaximumConfigurationDefaultsAndValidation(GameTestHelper h) throws Exception {
+        JsonObject root;
+        try (var in = Slice122GameTests.class.getResourceAsStream("/data/mobvats/culture_defaults.json")) {
+            root = JsonParser.parseString(new String(
+                            Objects.requireNonNull(in).readAllBytes(), java.nio.charset.StandardCharsets.UTF_8))
+                    .getAsJsonObject();
+        }
+        root.getAsJsonObject("fouling").remove("max_multiplier");
+        close(h, CultureProfiles.parse(root).maxFoulingMultiplier(), 5);
+        root.getAsJsonObject("fouling").addProperty("max_multiplier", 7);
+        close(h, CultureProfiles.parse(root).maxFoulingMultiplier(), 7);
+        for (double invalid : new double[] {0.99, Double.NaN, Double.POSITIVE_INFINITY}) {
+            root.getAsJsonObject("fouling").addProperty("max_multiplier", invalid);
+            boolean rejected = false;
+            try {
+                CultureProfiles.parse(root);
+            } catch (IllegalArgumentException expected) {
+                rejected = true;
+            }
+            h.assertTrue(rejected, "Invalid maximum accepted: " + invalid);
+        }
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void fractionalFoulingSurvivesSpecimenSaveLoad(GameTestHelper h) {
+        var specimen = new SpecimenProcessState();
+        long total = 0;
+        for (int i = 0; i < 300; i++) {
+            var plan = specimen.fouling().plan("milk", "cow/process", 50, 1.75, 5);
+            h.assertTrue(new ProcessTransaction().add(plan.step()).commit(), "Carry commit failed");
+            total += plan.amount();
+            specimen = SpecimenProcessState.load(
+                    specimen.save(h.getLevel().registryAccess()), h.getLevel().registryAccess());
+        }
+        h.assertTrue(total == 25000, "Fractional mB drift after reload: " + total);
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 70)
+    public static void engineReloadRetainsCarryOnlyForOriginalSpecimenOwner(GameTestHelper h) {
+        rig(h, COW, false);
+        h.runAtTickTime(35, () -> {
+            var c = context(vat(h), definition(COW));
+            var engine = c.engine();
+            for (int i = 0; i < 2; i++)
+                new ProcessTransaction()
+                        .add(c.state()
+                                .fouling()
+                                .plan("milk", "cow", 50, 1.75, 5)
+                                .step())
+                        .commit();
+            var saved = new CompoundTag();
+            engine.save(saved, h.getLevel().registryAccess());
+            engine.load(saved, h.getLevel().registryAccess());
+            engine.assembled();
+            h.assertTrue(
+                    engine.state(c.head())
+                                    .fouling()
+                                    .plan("milk", "cow", 50, 1.75, 5)
+                                    .amount()
+                            == 84,
+                    "Engine reload lost the original specimen's carry");
+            saved.getList("specimenProcesses", Tag.TAG_COMPOUND)
+                    .getCompound(0)
+                    .putUUID("specimenId", UUID.randomUUID());
+            engine.load(saved, h.getLevel().registryAccess());
+            engine.assembled();
+            h.assertTrue(engine.state(c.head()).fouling().save().isEmpty(), "Replacement specimen inherited carry");
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = "empty")
+    public static void foulingCarryRollsBackAndRejectsStalePlans(GameTestHelper h) {
+        var carry = new FoulingRemainders();
+        var plan = carry.plan("milk", "cow", 50, 1.75, 5);
+        var before = carry.save();
+        h.assertTrue(
+                !new ProcessTransaction()
+                        .add(plan.step())
+                        .add(new ProcessTransaction.Step(new Object(), () -> true, () -> false, () -> {}))
+                        .commit(),
+                "Failure committed");
+        h.assertTrue(carry.save().equals(before), "Rollback consumed carry");
+        var stale = carry.plan("milk", "cow", 50, 1.75, 5);
+        h.assertTrue(new ProcessTransaction().add(plan.step()).commit(), "Retry failed");
+        h.assertTrue(!new ProcessTransaction().add(stale.step()).commit(), "Stale carry plan committed");
+        var saved = carry.save();
+        h.assertTrue(
+                !new ProcessTransaction()
+                        .add(carry.plan("milk", "cow", 50, 1.75, 5).step())
+                        .add(new ProcessTransaction.Step(new Object(), () -> false, () -> true, () -> {}))
+                        .commit(),
+                "Invalid transaction committed");
+        h.assertTrue(saved.equals(carry.save()), "Failed preflight consumed carry");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void foulingCarrySeparatesSpecimensProcessesAndConfigurations(GameTestHelper h) {
+        var carry = new FoulingRemainders();
+        for (int i = 0; i < 2; i++)
+            new ProcessTransaction()
+                    .add(carry.plan("milk", "cow", 50, 1.75, 5).step())
+                    .commit();
+        h.assertTrue(carry.plan("milk", "cow", 50, 1.75, 5).amount() == 84, "Missing accumulated fraction");
+        h.assertTrue(
+                new FoulingRemainders().plan("milk", "cow", 50, 1.75, 5).amount() == 83,
+                "New specimen inherited fraction");
+        h.assertTrue(carry.plan("growth", "cow", 50, 1.75, 5).amount() == 83, "Other process inherited fraction");
+        h.assertTrue(
+                carry.plan("milk", "changed process", 50, 1.75, 5).amount() == 83,
+                "New configuration inherited fraction");
+        h.assertTrue(carry.plan("milk", "cow", 1, 1.75, 5).amount() == 1, "New base inherited fraction");
+        h.assertTrue(carry.plan("milk", "cow", 50, 1.75, 1).amount() == 50, "New maximum inherited fraction");
+        var zero = carry.plan("milk", "cow", 0, 0.5, 5);
+        h.assertTrue(
+                zero.amount() == 0 && new ProcessTransaction().add(zero.step()).commit(),
+                "Zero fouling was scaled above zero");
+        h.assertTrue(carry.plan("milk", "cow", 50, 1.75, 5).amount() == 83, "Opt-out retained old fraction");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 70)
+    public static void scaledFoulingConservesWaterAndEnrichedChemistry(GameTestHelper h) {
+        rig(h, COW, false);
+        h.runAtTickTime(35, () -> {
+            var vat = vat(h);
+            for (var fluid : List.of(water(1000), CultureRecoveryGameTests.culture(1000, 250, 17))) {
+                var c = context(vat, definition(COW));
+                vat.medium().setFluid(fluid);
+                var before = c.state().fouling().save();
+                h.assertTrue(
+                        !Fouling.commit(
+                                new ProcessTransaction()
+                                        .add(new ProcessTransaction.Step(
+                                                new Object(), () -> true, () -> false, () -> {})),
+                                c,
+                                "test:scaled",
+                                1),
+                        "Failed work committed");
+                h.assertTrue(
+                        before.equals(c.state().fouling().save())
+                                && vat.medium().dirtyAmount() == 0,
+                        "Failed work changed carry/fluid");
+                for (int i = 0; i < 3; i++)
+                    h.assertTrue(Fouling.commit(new ProcessTransaction(), c, "test:scaled", 50), "Scaled work failed");
+                int expected =
+                        (int) Math.floor(150 * (1 + 4 * Math.clamp((2 - vat.yieldMultiplier(c.head())) / 1.5, 0, 1))
+                                + 1e-10);
+                h.assertTrue(
+                        vat.medium().dirtyAmount() == expected
+                                && vat.medium().getFluidAmount() == 1000
+                                && vat.medium().cleanAmount() == 1000 - expected,
+                        "Scaled fouling lost/duplicated volume");
+                same(h, vat.medium().cleanPrototype(), fluid.copyWithAmount(1));
+                same(
+                        h,
+                        vat.medium().dirtyPrototype(),
+                        fluid.is(Fluids.WATER)
+                                ? CultureFouling.dirty(water(1), 100)
+                                : CultureRecoveryGameTests.culture(1, 0, 267));
+                int dirty = vat.medium().dirtyAmount();
+                h.assertTrue(
+                        Fouling.commit(new ProcessTransaction(), c, "test:zero", 0)
+                                && vat.medium().dirtyAmount() == dirty,
+                        "Zero override fouled");
+            }
+            h.succeed();
+        });
+    }
+
     @GameTest(template = "empty", timeoutTicks = 70)
     public static void partialExposureInterpolatesMixedFrequency(GameTestHelper h) {
         rig(h, COW, false);
@@ -745,17 +942,17 @@ public final class Slice122GameTests {
             op.execute(c, growth);
             h.assertTrue(
                     c.state().stage() == LifeStage.ADULT
-                            && vat.medium().dirtyAmount() == 50
+                            && vat.medium().dirtyAmount() == scaledFouling(vat, 50)
                             && vat.metrics().total("foulingEvents") == 1,
                     "Growth did not foul once");
             for (int i = 0; i < 5; i++) op.execute(c, growth);
-            h.assertTrue(vat.medium().dirtyAmount() == 50, "Ready growth fouled repeatedly");
+            h.assertTrue(vat.medium().dirtyAmount() == scaledFouling(vat, 50), "Ready growth fouled repeatedly");
             h.succeed();
         });
     }
 
     @GameTest(template = "empty", timeoutTicks = 70)
-    public static void successfulPassiveOutputFoulsOrdinaryAtOneTimes(GameTestHelper h) {
+    public static void successfulPassiveOutputFoulsOrdinaryByHappiness(GameTestHelper h) {
         rig(h, COW, false);
         h.runAtTickTime(35, () -> {
             var vat = vat(h);
@@ -766,8 +963,8 @@ public final class Slice122GameTests {
             state.phase = ProcessState.Phase.READY;
             h.assertTrue(
                     op.execute(c, state).reason() == ProcessResult.Reason.COMMITTED
-                            && vat.medium().dirtyAmount() == 50
-                            && vat.metrics().total("cultureFouledMb") == 50,
+                            && vat.medium().dirtyAmount() == scaledFouling(vat, 50)
+                            && vat.metrics().total("cultureFouledMb") == scaledFouling(vat, 50),
                     "Ordinary passive output did not foul");
             h.succeed();
         });
@@ -853,7 +1050,7 @@ public final class Slice122GameTests {
             state.phase = ProcessState.Phase.READY;
             h.assertTrue(
                     runtime.finish(c, state).reason() == ProcessResult.Reason.COMMITTED
-                            && vat.medium().dirtyAmount() == 50,
+                            && vat.medium().dirtyAmount() == scaledFouling(vat, 50),
                     "Generic biological finish did not foul");
             h.succeed();
         });
@@ -901,7 +1098,7 @@ public final class Slice122GameTests {
                         Map.of("test:override", 25)));
                 h.assertTrue(
                         Fouling.commit(new ProcessTransaction(), c, "test:override")
-                                && vat.medium().dirtyAmount() == 25,
+                                && vat.medium().dirtyAmount() == scaledFouling(vat, 25),
                         "Per-action override ignored");
             } finally {
                 CultureProfiles.publish(before);
@@ -953,10 +1150,10 @@ public final class Slice122GameTests {
             h.assertTrue(
                     SecondaryToolOperations.shear(c, state).reason() == ProcessResult.Reason.COMMITTED
                             && !head.specimenState().getBoolean("Sheared")
-                            && vat.medium().dirtyAmount() == 50,
+                            && vat.medium().dirtyAmount() == scaledFouling(vat, 50),
                     "Regrowth failed fouling commit");
             SecondaryToolOperations.shear(c, state);
-            h.assertTrue(vat.medium().dirtyAmount() == 50, "Regrowth fouled repeatedly");
+            h.assertTrue(vat.medium().dirtyAmount() == scaledFouling(vat, 50), "Regrowth fouled repeatedly");
             h.succeed();
         });
     }
@@ -1135,7 +1332,7 @@ public final class Slice122GameTests {
                                             .finish(c, c.state().process(p.id()))
                                             .reason()
                                     == ProcessResult.Reason.COMMITTED
-                            && vat.medium().dirtyAmount() == 100,
+                            && vat.medium().dirtyAmount() == scaledFouling(vat, 100),
                     "Definition fouling_mb ignored");
             h.succeed();
         });

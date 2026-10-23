@@ -546,9 +546,11 @@ public final class PhysicalRouteGameTests {
         });
         h.runAtTickTime(140, () -> {
             var c = vat(h);
+            // A native 1-XP cow reward can yield zero whole XP at low happiness.
+            // The committed harvest counter verifies resumption independently of reward RNG.
             h.assertTrue(
                     c.getTopology().operational(h.absolutePos(HEAD))
-                            && c.getExperienceMb() > 0
+                            && c.metrics().total(MachineMetrics.HARVESTS) > 0
                             && c.milkAmount() > 0
                             && ((VatToolPortEntity) h.getBlockEntity(TOOL))
                                             .heldItem()

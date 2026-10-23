@@ -111,6 +111,7 @@
     }
   ],
   "fouling": {
+    "max_multiplier": 5.0,
     "waste_formula_mb": 100,
     "actions": {
       "mobvats:waste": {

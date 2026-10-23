@@ -179,6 +179,7 @@ public final class CultureProductionBenchmarkGameTests {
                                     && !r.itemInputs().isEmpty()))
                     .count();
             h.assertTrue(productive > 0 && (depth == 4 || productive == heads.size()), "Missing productive cows");
+            verifySpecimenFouling(h, vat);
             h.assertTrue(
                     vat.metrics().total(MachineMetrics.HARVESTS) >= productive
                             && vat.metrics().total(MachineMetrics.WHEAT) >= productive,
@@ -190,10 +191,13 @@ public final class CultureProductionBenchmarkGameTests {
                 var lines = new ArrayList<String>();
                 lines.add(
                         "layout,medium,volume,medium_capacity_mb,legal_cows,productive_cows,yield,frequency,biological_kph,kills_ph,effective_kph,effective_per_100,xp_ph,xp_cost_ph,net_xp_ph,wheat_ph,fouled_mb_ph,charcoal_ph");
-                for (var mode : depth == 4 ? List.of("water", "fresh") : List.of("water", "fresh", "sustained")) {
+                for (var mode : depth == 4
+                        ? List.of("water", "fresh")
+                        : List.of("water", "fresh", "sustained", "self-funded")) {
                     var first = simulate(h, vat, mode, 9 * height * depth, loaded);
                     var repeat = simulate(h, vat, mode, 9 * height * depth, loaded);
                     h.assertTrue(first.equals(repeat), "Nonreproducible benchmark " + name + "/" + mode);
+                    com.mojang.logging.LogUtils.getLogger().info("Culture benchmark {}/{}: {}", name, mode, first);
                     lines.add(name + "," + mode + "," + first);
                 }
                 var output = Path.of("build", "reports", "culture-benchmark", name + ".csv");
@@ -211,6 +215,20 @@ public final class CultureProductionBenchmarkGameTests {
     private static void itemPort(GameTestHelper h, BlockPos pos, boolean output) {
         h.setBlock(pos, Content.state(VatPartType.ItemPort));
         ((VatItemPortEntity) h.getBlockEntity(pos)).setIoDirection(output ? IoDirection.Output : IoDirection.Input);
+    }
+
+    private static void verifySpecimenFouling(GameTestHelper h, MultiblockVat vat) {
+        var profile = PassiveProcessCompiler.compile(Objects.requireNonNull(PassiveMobDefinitionRegistry.resolve(COW)));
+        for (var assembly : vat.getAssemblies()) {
+            vat.medium().setFluid(new FluidStack(Fluids.WATER, vat.medium().getCapacity()));
+            var context = new ProcessContext(vat.processEngine(), assembly, new SpecimenProcessState(), profile);
+            double happiness = vat.yieldMultiplier(assembly.head().getBlockPos());
+            int expected = (int) Math.floor(50 * (1 + 4 * Math.clamp((2 - happiness) / 1.5, 0, 1)) + 1e-10);
+            h.assertTrue(
+                    Fouling.commit(new ProcessTransaction(), context, "test:individual", 50)
+                            && vat.medium().dirtyAmount() == expected,
+                    "Fouling did not use individual happiness at " + context.head());
+        }
     }
 
     private static String simulate(
@@ -243,6 +261,11 @@ public final class CultureProductionBenchmarkGameTests {
         var frequencies = new double[n];
         var happiness = new double[n];
         var definition = Objects.requireNonNull(PassiveMobDefinitionRegistry.resolve(COW));
+        var contexts = new ProcessContext[n];
+        var profile = PassiveProcessCompiler.compile(definition);
+        for (int i = 0; i < n; i++)
+            contexts[i] =
+                    new ProcessContext(vat.processEngine(), assemblies.get(i), new SpecimenProcessState(), profile);
         var milkDefinition = definition.secondary_outputs().stream()
                 .filter(s -> s.process().equals(PassiveProcessCompiler.MILK))
                 .findFirst()
@@ -266,10 +289,25 @@ public final class CultureProductionBenchmarkGameTests {
         var mixer = new MixerState(() -> {});
         int batchDone = -1, filterDone = -1;
         long kills = 0, xp = 0, fouled = 0, charcoal = 0, xpMb = 0;
+        boolean selfFunded = mode.equals("self-funded");
+        int warmup = selfFunded ? 200 * HOUR : WARMUP;
+        int measurement = selfFunded ? 100 * HOUR : MEASURE;
+        long xpBankMb = 0;
+        int enrichmentCost = enrich.fluids().get(1).amount();
         double effective = 0, rateTotal = 0, biological = 0;
         boolean refresh = true;
-        for (int tick = 0; tick < WARMUP + MEASURE; tick++) {
-            boolean measure = tick >= WARMUP;
+        for (int tick = 0; tick < warmup + measurement; tick++) {
+            if (selfFunded && tick % (50 * HOUR) == 0)
+                com.mojang.logging.LogUtils.getLogger()
+                        .info(
+                                "Self-funded benchmark: {} cows / {} exterior, hour {}, clean {} mB, dirty {} mB, bank {} mB XP",
+                                n,
+                                volume,
+                                tick / HOUR,
+                                medium.cleanAmount(),
+                                medium.dirtyAmount(),
+                                xpBankMb);
+            boolean measure = tick >= warmup;
             if (filterDone == tick) {
                 if (!mixer.commit(filter)) throw new IllegalStateException("Benchmark filtration failed");
                 if (measure) charcoal++;
@@ -289,6 +327,15 @@ public final class CultureProductionBenchmarkGameTests {
                 if (measure) {
                     xpMb += enrich.fluids().get(1).amount();
                 }
+                // The isolated test model appends escrow tanks rather than reusing physical buffers.
+                // Retire only empty escrow after a complete batch, avoiding an unbounded allocator
+                // matrix in the long run. No fluid, reagent or in-flight work may be discarded.
+                for (boolean input : new boolean[] {true, false})
+                    for (int tank = 0; tank < mixer.fluids(input).getTanks(); tank++)
+                        h.assertTrue(
+                                mixer.fluids(input).getFluidInTank(tank).isEmpty(), "Recovery left fluid inventory");
+                h.assertTrue(mixer.itemInput().getStackInSlot(0).isEmpty(), "Recovery left charcoal inventory");
+                mixer = new MixerState(() -> {});
                 batchDone = -1;
                 refresh = true;
             }
@@ -308,7 +355,10 @@ public final class CultureProductionBenchmarkGameTests {
                     if (growth[i].elapsed >= definition.juvenile_growth_ticks()) {
                         adult[i] = true;
                         if (!mode.equals("fresh")) {
-                            int amount = medium.foul(CultureProfiles.foulingMb(PassiveProcessCompiler.GROWTH));
+                            int before = medium.dirtyAmount();
+                            if (!Fouling.commit(new ProcessTransaction(), contexts[i], PassiveProcessCompiler.GROWTH))
+                                throw new IllegalStateException("Growth fouling failed");
+                            int amount = medium.dirtyAmount() - before;
                             if (measure) fouled += amount;
                             refresh = true;
                         }
@@ -320,7 +370,13 @@ public final class CultureProductionBenchmarkGameTests {
                 if (milk[i].elapsed >= milkDefinition.interval_ticks()) {
                     milk[i].elapsed = 0;
                     if (!mode.equals("fresh") && milkDefinition.accelerated()) {
-                        int amount = medium.foul(CultureProfiles.foulingMb(PassiveProcessCompiler.MILK));
+                        int before = medium.dirtyAmount();
+                        if (!Fouling.commit(
+                                new ProcessTransaction(),
+                                contexts[i],
+                                PassiveProcessCompiler.MILK,
+                                milkDefinition.fouling_mb())) throw new IllegalStateException("Milk fouling failed");
+                        int amount = medium.dirtyAmount() - before;
                         if (measure) fouled += amount;
                         refresh = true;
                     }
@@ -333,6 +389,7 @@ public final class CultureProductionBenchmarkGameTests {
                 int reward = yield.amount("kill/xp", nativeXp);
                 if (!new ProcessTransaction().add(yield.step()).commit())
                     throw new IllegalStateException("Yield commit failed");
+                xpBankMb += (long) reward * ExperienceFluid.ratio();
                 if (measure) {
                     kills++;
                     effective += happiness[i];
@@ -343,7 +400,11 @@ public final class CultureProductionBenchmarkGameTests {
                 growth[i].elapsed = 0;
             }
             // One programmable Mixer, exact whole batches, with a buffer holding the intermediate.
-            if (mode.equals("sustained") && batchDone < 0 && medium.dirtyAmount() >= 1000) {
+            if ((mode.equals("sustained") || selfFunded)
+                    && batchDone < 0
+                    && medium.dirtyAmount() >= 1000
+                    && (!selfFunded || xpBankMb >= enrichmentCost)) {
+                if (selfFunded) xpBankMb -= enrichmentCost; // Reserve only this Vat's committed harvest XP.
                 mixer.fluids(true).fill(medium.drain(1000, EXECUTE), EXECUTE);
                 mixer.itemInput().insertItem(0, new ItemStack(Items.CHARCOAL), false);
                 filterDone = tick + filter.batchTicks();
@@ -351,7 +412,8 @@ public final class CultureProductionBenchmarkGameTests {
                 refresh = true;
             }
         }
-        double hours = (double) MEASURE / HOUR;
+        h.assertTrue(xpBankMb >= 0, "External XP subsidy in self-funded benchmark");
+        double hours = (double) measurement / HOUR;
         double cost = xpMb / (double) ExperienceFluid.ratio() / hours;
         return String.format(
                 Locale.ROOT,
@@ -365,7 +427,7 @@ public final class CultureProductionBenchmarkGameTests {
                         .mapToDouble(i -> happiness[i])
                         .average()
                         .orElseThrow(),
-                rateTotal / MEASURE / productiveCount,
+                rateTotal / measurement / productiveCount,
                 biological / hours,
                 kills / hours,
                 effective / hours,

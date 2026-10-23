@@ -23,13 +23,20 @@ public final class Fouling {
     public static boolean commit(
             ProcessTransaction transaction, ProcessContext context, String action, Integer override) {
         var medium = context.controller().medium();
-        int amount = CultureProfiles.resolve(context.identity(), medium.cleanPrototype()) == null
-                        || medium.dirtyPrototype().isEmpty()
-                ? 0
-                : Math.min(
-                        medium.cleanAmount(),
-                        override == null ? CultureProfiles.foulingMb(action) : Math.max(0, override));
-        if (!transaction.add(step(medium, amount)).commit()) return false;
+        if (CultureProfiles.resolve(context.identity(), medium.cleanPrototype()) == null
+                || medium.dirtyPrototype().isEmpty()
+                || medium.cleanAmount() == 0) return transaction.commit();
+        int base = override == null ? CultureProfiles.foulingMb(action) : Math.max(0, override);
+        var plan = context.state()
+                .fouling()
+                .plan(
+                        action,
+                        context.identity() + "/" + context.profile().foulingConfiguration(),
+                        base,
+                        context.controller().yieldMultiplier(context.head()),
+                        CultureProfiles.maxFoulingMultiplier());
+        int amount = Math.min(medium.cleanAmount(), plan.amount());
+        if (!transaction.add(plan.step()).add(step(medium, amount)).commit()) return false;
         if (amount > 0) {
             context.metrics().record("cultureFouledMb", amount);
             context.metrics().record("foulingEvents", 1);
