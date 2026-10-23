@@ -21,7 +21,8 @@ public class VatControllerEntity extends AbstractVatEntity implements net.minecr
 
     @Override
     public net.minecraft.network.chat.Component getDisplayName() {
-        return net.minecraft.network.chat.Component.translatable("block.mobvats.vat_controller");
+        return net.minecraft.network.chat.Component.translatable(
+                getBlockState().getBlock().getDescriptionId());
     }
 
     @Override

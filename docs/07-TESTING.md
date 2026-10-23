@@ -23,6 +23,14 @@ GameTests run in `.cache/gametest`, separated from operator `run/config`, and mu
 
 With `-PworldAcceptance=true`, generation uses actual server processing and writes acceptance reports/completion markers only after assertions and save verification. Default generation prepares a world for manual inspection without production acceptance. Worlds under `run/saves/<worldName>` are disposable outputs; the task resets the named world and refuses a running/locked save. Do not use it on a valuable gameplay save. Documentation-only moves do not require GameTests or regenerated worlds.
 
+## Tier construction acceptance
+
+Run the canonical Java 21 launcher in `format`, then `validate` mode (see [repository instructions](../AGENTS.md)). The latter runs formatting checks, the build/resource/CPU checks and autonomous headless GameTests.
+
+`VatTierGameTests` builds actual Copper/Iron/Blood Iron shells: maximum dimensions; independent axis overflow; rectangular footprints with X/Z exchanged and quarter-turn rotation; minimum chicken/cow; Controller/casing/glass/Tool Port/Harness/Sump/conduit/buffer mismatches; corner/edge/face diagnostic coordinates; repair and installed-cladding replacement with inventory retention; T2/T3 chunk pause/restore with saved process state; and no hostile unlock. All tiers reuse the same Tool Port, Blender and service registrations. Existing all-material `AppliedCladdingGameTests` extend installation, replacement, recovery, Pick Block and serialization checks to the new materials. Existing culture/growth/happiness/harvesting and lifecycle tests remain regression coverage. Resource checks inspect generated blockstates, tier models/materials, transparent glass and deterministic hashes without launching a client. Client visual acceptance remains manual and was not performed by the agent.
+
+The headless world at `.cache/gametest` and generated operator worlds are disposable. Regenerate outdated fixtures; no runtime registry migration is provided. T2/T3 survival recipes, Strange Meat, Blood Iron manufacturing and lightning activation are outside this acceptance slice.
+
 ## 7.3 Generated geometry references
 
 The [Mixer clearance tables](generated/MIXER_CLEARANCE_GENERATED.md) and [reference SVG](generated/MIXER_REFERENCE.svg) come from `MixerClearanceCharts` via `MixerVesselGeometryGameTests.generatedClearanceReport`. The GameTest writes `.cache/gametest/mixer-clearance.md` and `mixer-reference.svg`; copy those outputs into their tracked generated-document destinations after an authorized geometry change. Their content is preserved unchanged during documentation reorganization. The existing [raster reference](generated/MIXER_REFERENCE.png) is also preserved beside them; the SVG/Java geometry remains canonical because a separate raster-generation command is not documented.

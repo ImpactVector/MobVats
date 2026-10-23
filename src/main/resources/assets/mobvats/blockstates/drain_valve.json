@@ -29,6 +29,30 @@
     },
     "cladding_material=mixer_t1_glass,port_output=true": {
       "model": "mobvats:block/procedural/t1/vat_glass_drain_valve"
+    },
+    "cladding_material=vat_t2_casing,port_output=false": {
+      "model": "mobvats:block/procedural/t2/vat_casing_drain_valve"
+    },
+    "cladding_material=vat_t3_casing,port_output=false": {
+      "model": "mobvats:block/procedural/t3/vat_casing_drain_valve"
+    },
+    "cladding_material=vat_t2_casing,port_output=true": {
+      "model": "mobvats:block/procedural/t2/vat_casing_drain_valve"
+    },
+    "cladding_material=vat_t3_casing,port_output=true": {
+      "model": "mobvats:block/procedural/t3/vat_casing_drain_valve"
+    },
+    "cladding_material=vat_t2_glass,port_output=false": {
+      "model": "mobvats:block/procedural/t2/vat_glass_drain_valve"
+    },
+    "cladding_material=vat_t3_glass,port_output=false": {
+      "model": "mobvats:block/procedural/t3/vat_glass_drain_valve"
+    },
+    "cladding_material=vat_t2_glass,port_output=true": {
+      "model": "mobvats:block/procedural/t2/vat_glass_drain_valve"
+    },
+    "cladding_material=vat_t3_glass,port_output=true": {
+      "model": "mobvats:block/procedural/t3/vat_glass_drain_valve"
     }
   }
 }

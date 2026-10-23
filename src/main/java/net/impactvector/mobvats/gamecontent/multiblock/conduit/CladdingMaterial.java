@@ -14,6 +14,10 @@ public enum CladdingMaterial implements StringRepresentable {
     NONE(ConduitCladding.BARE, ConduitShell.SHARED),
     VAT_T1_CASING(ConduitCladding.CASING, ConduitShell.VAT),
     VAT_T1_GLASS(ConduitCladding.GLASS, ConduitShell.VAT),
+    VAT_T2_CASING(ConduitCladding.CASING, ConduitShell.VAT),
+    VAT_T2_GLASS(ConduitCladding.GLASS, ConduitShell.VAT),
+    VAT_T3_CASING(ConduitCladding.CASING, ConduitShell.VAT),
+    VAT_T3_GLASS(ConduitCladding.GLASS, ConduitShell.VAT),
     MIXER_T1_CASING(ConduitCladding.CASING, ConduitShell.MIXER),
     MIXER_T1_GLASS(ConduitCladding.GLASS, ConduitShell.MIXER);
     public static final EnumProperty<CladdingMaterial> PROPERTY =
@@ -43,6 +47,18 @@ public enum CladdingMaterial implements StringRepresentable {
             case NONE -> net.minecraft.world.item.Items.AIR;
             case VAT_T1_CASING -> Content.block(VatPartType.Casing).asItem();
             case VAT_T1_GLASS -> Content.block(VatPartType.Glass).asItem();
+            case VAT_T2_CASING ->
+                Content.block(net.impactvector.mobvats.gamecontent.multiblock.vat.VatTier.T2, VatPartType.Casing)
+                        .asItem();
+            case VAT_T2_GLASS ->
+                Content.block(net.impactvector.mobvats.gamecontent.multiblock.vat.VatTier.T2, VatPartType.Glass)
+                        .asItem();
+            case VAT_T3_CASING ->
+                Content.block(net.impactvector.mobvats.gamecontent.multiblock.vat.VatTier.T3, VatPartType.Casing)
+                        .asItem();
+            case VAT_T3_GLASS ->
+                Content.block(net.impactvector.mobvats.gamecontent.multiblock.vat.VatTier.T3, VatPartType.Glass)
+                        .asItem();
             case MIXER_T1_CASING -> MixerContent.block(MixerPartType.Casing).asItem();
             case MIXER_T1_GLASS -> MixerContent.block(MixerPartType.Glass).asItem();
         };

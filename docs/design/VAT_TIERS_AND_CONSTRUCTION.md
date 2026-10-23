@@ -1,6 +1,6 @@
 # Vat tiers and construction — design decisions
 
-Status: agreed design; implementation may lag this document.
+Status: Slice 1 structural tiers implemented; survival progression and hostile activation remain future work.
 Last updated: 2026-10-23.
 
 ## Principle
@@ -27,17 +27,29 @@ Tool Ports, Blenders, item/fluid ports, pumps/valves, conduits, buffers, Heads, 
 
 Preserve the current installed-material/cladding architecture and its material drop/replacement behavior. Extend material registration, appearance and shell validation rather than introducing per-tier copies of every actor.
 
-## T1 recipe transition
+## Implemented construction (Slice 1)
 
-The current T1 Vat Casing recipe uses iron; change the tier-one structural ingredient to copper. Add T2 Iron and T3 Blood Iron casing and associated glass recipes. Controller recipes should incorporate the appropriate casing. Specific quantities/recipe arrangements remain subject to recipe inspection and tuning.
+Creative exposes Copper casing/glass/Controller under the established IDs `vat_casing`, `vat_glass`, `vat_controller`; Iron uses the corresponding `_t2` suffix and Blood Iron uses `_t3`. All Controllers share the existing entity, menu, management APIs and process engine. Tier is derived from the Controller block; it adds no process multiplier or hostile eligibility.
 
-## Hostile Head progression
+Installed materials `vat_t2_casing`, `vat_t2_glass`, `vat_t3_casing`, `vat_t3_glass` extend the existing `cladding_material` property. Sneak-installation/replacement consumes and recovers the corresponding structural item. Functional item registrations remain universal. Harness/Sump shell mounts also require installed matching material; their existing IDs, interior support geometry and association rules remain intact.
+
+Validation checks only the actual exterior shell for tier agreement and reports the first offending coordinate with expected/actual tiers and materials. Controller dimensions are independent per axis; X/Z limits are equal, preserving horizontal rotation. The base geometric floor is 3×3×3 (one interior cell); actual specimen ownership and Harness/Sump rules determine whether it forms. A cow still needs its two-cell vertical substrate. One-block comfort-shell and happiness rules are unchanged.
+
+Tier comes from current block state on formation/revalidation/reload; no saved tier migration is needed. Existing structural/cladding change notifications trigger revalidation. Disposable development worlds may be regenerated rather than migrated.
+
+## Future survival recipe transition
+
+Slice 1 leaves every current T1 recipe intact, including its temporary Iron ingredients. T2 and T3 structural items are Creative-only. A later slice will change T1 ingredients to Copper and introduce T2 structural crafting and tier-specific Glass/Controller costs. No T3 recipe or Blood Iron intermediate/manufacturing chain is implemented.
+
+## Future hostile Head progression
+
+Current default hostile catalog entries disable capture and have no production processes. Manually encoded representation-only Heads retain their existing formation behavior in every tier. Constructing T2/T3 does not enable capture, add hostile processes or activate a Head.
 
 A hostile specimen requires **both** a T2-or-higher Vat and an encoded hostile Head activated once by lightning. Lightning activation is a persistent Boolean on the Head associated with the current encoded specimen. Re-encoding/replacing the specimen resets activation; relocating the Head while preserving its encoded specimen retains activation. No FE, fuel, charge budget or repeated lightning upkeep is intended.
 
 A vanilla lightning rod at/adjacent to the Head is a possible activation interface, but exact placement and whether an unactivated hostile Head prevents formation versus merely preventing processing are not yet settled.
 
-## Blood Iron
+## Future Blood Iron manufacturing
 
 Blood Iron is intended to be made using the Mixer from T2 Iron Casing and material derived from hostile specimens (provisionally Strange Meat), potentially with XP or another reagent. Favor direct production of Blood Iron Casing over inventing an unnecessary intermediate. Craft T3 glass from T3 casing. **No final Blood Iron recipe or precise Strange Meat form has been agreed yet.**
 

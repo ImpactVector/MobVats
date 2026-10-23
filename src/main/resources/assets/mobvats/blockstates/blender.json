@@ -29,6 +29,30 @@
     },
     "cladding_material=mixer_t1_glass,port_output=true": {
       "model": "mobvats:block/blender"
+    },
+    "cladding_material=vat_t2_casing,port_output=false": {
+      "model": "mobvats:block/blender"
+    },
+    "cladding_material=vat_t3_casing,port_output=false": {
+      "model": "mobvats:block/blender"
+    },
+    "cladding_material=vat_t2_casing,port_output=true": {
+      "model": "mobvats:block/blender"
+    },
+    "cladding_material=vat_t3_casing,port_output=true": {
+      "model": "mobvats:block/blender"
+    },
+    "cladding_material=vat_t2_glass,port_output=false": {
+      "model": "mobvats:block/blender"
+    },
+    "cladding_material=vat_t3_glass,port_output=false": {
+      "model": "mobvats:block/blender"
+    },
+    "cladding_material=vat_t2_glass,port_output=true": {
+      "model": "mobvats:block/blender"
+    },
+    "cladding_material=vat_t3_glass,port_output=true": {
+      "model": "mobvats:block/blender"
     }
   }
 }

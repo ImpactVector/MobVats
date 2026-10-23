@@ -117,12 +117,8 @@ public final class VatClientSmokeTest {
                         level.setBlockAndUpdate(
                                 BASE.offset(1, 1, 0),
                                 Content.block(VatPartType.Controller).defaultBlockState());
-                        level.setBlockAndUpdate(
-                                BASE.offset(1, 3, 1),
-                                Content.block(VatPartType.Harness).defaultBlockState());
-                        level.setBlockAndUpdate(
-                                BASE.offset(1, 0, 1),
-                                Content.block(VatPartType.Sump).defaultBlockState());
+                        level.setBlockAndUpdate(BASE.offset(1, 3, 1), Content.state(VatPartType.Harness));
+                        level.setBlockAndUpdate(BASE.offset(1, 0, 1), Content.state(VatPartType.Sump));
                         level.setBlockAndUpdate(
                                 HEAD, Content.block(VatPartType.Head).defaultBlockState());
                         level.setBlockAndUpdate(

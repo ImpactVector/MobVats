@@ -8,7 +8,7 @@ from inspect_saved_vats import chunks
 MECHANICAL = {'item_conduit', 'fluid_conduit', 'fluid_buffer', 'item_port', 'fluid_port',
               'tool_port', 'feed_port', 'blender', 'pull_pump', 'push_pump', 'fill_valve',
               'drain_valve', 'item_void', 'fluid_void'}
-MATERIALS = {'none', 'vat_t1_casing', 'vat_t1_glass', 'mixer_t1_casing', 'mixer_t1_glass'}
+MATERIALS = {'none', 'vat_t1_casing', 'vat_t1_glass', 'vat_t2_casing', 'vat_t2_glass', 'vat_t3_casing', 'vat_t3_glass', 'mixer_t1_casing', 'mixer_t1_glass'}
 OBSOLETE = {'mobvats:' + family + cladding + '_' + function
             for family in ('', 'mixer_') for cladding in ('casing', 'glass')
             for function in ('item_conduit', 'fluid_conduit', 'fluid_buffer')}

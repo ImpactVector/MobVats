@@ -577,6 +577,29 @@ public class MultiblockVat
     @Override
     protected boolean isMachineWhole(IMultiblockValidator validator) {
         assemblies = List.of();
+        var tier = structuralTier();
+        var bounds = getBoundingBox();
+        if (bounds.getLengthX() <= 16 && bounds.getLengthY() <= 16 && bounds.getLengthZ() <= 16)
+            for (var pos : bounds) {
+                if (pos.getX() != bounds.getMin().getX()
+                        && pos.getX() != bounds.getMax().getX()
+                        && pos.getY() != bounds.getMin().getY()
+                        && pos.getY() != bounds.getMax().getY()
+                        && pos.getZ() != bounds.getMin().getZ()
+                        && pos.getZ() != bounds.getMax().getZ()) continue;
+                if (!getWorld().hasChunkAt(pos)) continue;
+                var actual = VatTier.of(getWorld().getBlockState(pos));
+                if (actual != null && actual != tier) {
+                    validator.setLastError(
+                            pos,
+                            "multiblock.mobvats.tier_mismatch",
+                            tier.name(),
+                            tier.material,
+                            actual.name(),
+                            actual.material);
+                    return false;
+                }
+            }
         if (!super.isMachineWhole(validator)) return false;
         var parts = getConnectedParts().stream().map(p -> (AbstractVatEntity) p).toList();
         if (count(parts, VatPartType.Controller) != 1 || count(parts, VatPartType.Head) < 1) {
@@ -758,6 +781,23 @@ public class MultiblockVat
     @Override
     protected void updateClient() {}
 
+    public VatTier structuralTier() {
+        // Operational collections retire on disassembly/pause; structural membership survives.
+        return getConnectedParts().stream()
+                .filter(VatControllerEntity.class::isInstance)
+                .map(VatControllerEntity.class::cast)
+                .sorted(Comparator.comparing(VatControllerEntity::getBlockPos, VatTopologyCompiler.POSITION))
+                .map(p -> VatTier.of(p.getBlockState()))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(VatTier.T1);
+    }
+
+    @Override
+    protected int getMinimumNumberOfPartsForAssembledMachine() {
+        return 1;
+    }
+
     @Override
     protected int getMinimumXSize() {
         return 3;
@@ -765,7 +805,7 @@ public class MultiblockVat
 
     @Override
     protected int getMinimumYSize() {
-        return 4;
+        return 3;
     }
 
     @Override
@@ -775,17 +815,17 @@ public class MultiblockVat
 
     @Override
     protected int getMaximumXSize() {
-        return 16;
+        return structuralTier().maxX;
     }
 
     @Override
     protected int getMaximumYSize() {
-        return 16;
+        return structuralTier().maxY;
     }
 
     @Override
     protected int getMaximumZSize() {
-        return 16;
+        return structuralTier().maxZ;
     }
 
     private boolean conduitAllowed(Level level, int x, int y, int z) {

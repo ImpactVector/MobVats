@@ -29,6 +29,30 @@
     },
     "cladding_material=mixer_t1_glass,mode=tap": {
       "model": "mobvats:block/mixer_glass_fluid_conduit_tap"
+    },
+    "cladding_material=vat_t2_casing,mode=trunk": {
+      "model": "mobvats:block/procedural/t2/casing_fluid_conduit_trunk"
+    },
+    "cladding_material=vat_t3_casing,mode=trunk": {
+      "model": "mobvats:block/procedural/t3/casing_fluid_conduit_trunk"
+    },
+    "cladding_material=vat_t2_casing,mode=tap": {
+      "model": "mobvats:block/procedural/t2/casing_fluid_conduit_tap"
+    },
+    "cladding_material=vat_t3_casing,mode=tap": {
+      "model": "mobvats:block/procedural/t3/casing_fluid_conduit_tap"
+    },
+    "cladding_material=vat_t2_glass,mode=trunk": {
+      "model": "mobvats:block/procedural/t2/glass_fluid_conduit_trunk"
+    },
+    "cladding_material=vat_t3_glass,mode=trunk": {
+      "model": "mobvats:block/procedural/t3/glass_fluid_conduit_trunk"
+    },
+    "cladding_material=vat_t2_glass,mode=tap": {
+      "model": "mobvats:block/procedural/t2/glass_fluid_conduit_tap"
+    },
+    "cladding_material=vat_t3_glass,mode=tap": {
+      "model": "mobvats:block/procedural/t3/glass_fluid_conduit_tap"
     }
   }
 }

@@ -1105,6 +1105,22 @@ public final class VatGameTests {
                                     InteractionHand.MAIN_HAND,
                                     new BlockHitResult(Vec3.atCenterOf(absolute), Direction.UP, absolute, false)));
                     h.assertBlockPresent(Content.block(type), pos);
+                    if (type == VatPartType.Harness || type == VatPartType.Sump) {
+                        player.setItemInHand(
+                                InteractionHand.MAIN_HAND, new ItemStack(Content.block(VatPartType.Casing)));
+                        var support = h.absolutePos(pos);
+                        player.getMainHandItem()
+                                .useOn(new UseOnContext(
+                                        player,
+                                        InteractionHand.MAIN_HAND,
+                                        new BlockHitResult(Vec3.atCenterOf(support), Direction.UP, support, false)));
+                        h.assertTrue(
+                                net.impactvector.mobvats.gamecontent.multiblock.conduit.CladdingMaterial.installed(
+                                                h.getBlockState(pos))
+                                        == net.impactvector.mobvats.gamecontent.multiblock.conduit.CladdingMaterial
+                                                .VAT_T1_CASING,
+                                "Player did not clad shell support");
+                    }
                 }
         player.setShiftKeyDown(false);
         var essence = new ItemStack(Content.ESSENCE.get());

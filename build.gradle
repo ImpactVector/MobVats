@@ -282,6 +282,27 @@ tasks.register('verifyRenderResources') {
                 if (variant?.model != 'mobvats:block/vat_head' || (variant.y ?: 0) != angle)
                     throw new GradleException("Head model facing/rotation mismatch: ${facing}")
             }
+            // Every registered tier and installed material state must resolve in the packaged resources.
+            archive.entries().toList().findAll { it.name.startsWith('assets/mobvats/blockstates/') && it.name.endsWith('.json') }.each { entry ->
+                def state = parser.parse(archive.getInputStream(entry))
+                state.variants?.values()?.flatten()?.each { variant ->
+                    if(variant.model?.startsWith('mobvats:')) {
+                        def path = 'assets/mobvats/models/' + variant.model.substring(8) + '.json'
+                        if(archive.getEntry(path)==null) throw new GradleException("Missing blockstate model ${path} in ${entry.name}")
+                    }
+                }
+            }
+            ['t2','t3'].each { tier ->
+                ['casing','glass','controller'].each { part ->
+                    String id="vat_${part}_${tier}"
+                    ['assets/mobvats/blockstates/'+id+'.json','assets/mobvats/models/item/'+id+'.json','data/mobvats/loot_table/blocks/'+id+'.json'].each { path ->
+                        if(archive.getEntry(path)==null) throw new GradleException('Missing tier construction resource '+path)
+                    }
+                    if(archive.getEntry('data/mobvats/recipe/'+id+'.json')!=null) throw new GradleException('Creative-only tier gained a survival recipe: '+id)
+                }
+                def glass=parser.parse(archive.getInputStream(archive.getEntry('assets/mobvats/models/block/formed_glass_material_'+tier+'.json')))
+                if(glass.render_type!='minecraft:translucent') throw new GradleException('Tier glass lost transparency: '+tier)
+            }
             // The BER owns the reservoir in every assembly state. World models may only add cladding.
             def bufferStates = parser.parse(archive.getInputStream(archive.getEntry('assets/mobvats/blockstates/fluid_buffer.json')))
             bufferStates.variants.each { state, variant ->

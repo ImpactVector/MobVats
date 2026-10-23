@@ -5,6 +5,7 @@ import java.util.IdentityHashMap;
 import net.impactvector.mobvats.MobVats;
 import net.impactvector.mobvats.gamecontent.Content;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.VatPartType;
+import net.impactvector.mobvats.gamecontent.multiblock.vat.VatTier;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.client.model.VatCasingModel;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.client.model.VatGlassModel;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.client.model.VatWallPanelModel;
@@ -29,6 +30,18 @@ public final class VatClient {
             ResourceLocation.fromNamespaceAndPath(MobVats.MOD_ID, "block/casing_material"));
     private static final ModelResourceLocation MIXER_GLASS_MATERIAL = ModelResourceLocation.standalone(
             ResourceLocation.fromNamespaceAndPath(MobVats.MOD_ID, "block/mixer_formed_glass_material"));
+
+    private static ModelResourceLocation tierMaterial(String base, VatTier tier) {
+        return ModelResourceLocation.standalone(ResourceLocation.fromNamespaceAndPath(
+                MobVats.MOD_ID,
+                base + (tier == VatTier.T1 ? "" : "_" + tier.name().toLowerCase(java.util.Locale.ROOT))));
+    }
+
+    private static VatTier modelTier(ModelResourceLocation location) {
+        var m = java.util.regex.Pattern.compile("vat_(t[123])_").matcher(location.variant());
+        return m.find() ? VatTier.valueOf(m.group(1).toUpperCase(java.util.Locale.ROOT)) : VatTier.T1;
+    }
+
     private static final BlockVariantsModelBuilder[] MODELS = {
         new ConstructionModelBuilder(VatPartType.Head, "facing=north"),
         new ConstructionModelBuilder(VatPartType.Head, "facing=east"),
@@ -57,6 +70,11 @@ public final class VatClient {
         for (var builder : MODELS) builder.onRegisterModels(event);
         event.register(GLASS_MATERIAL);
         event.register(CASING_MATERIAL);
+        for (var tier : VatTier.values())
+            if (tier != VatTier.T1) {
+                event.register(tierMaterial("block/casing_material", tier));
+                event.register(tierMaterial("block/formed_glass_material", tier));
+            }
         event.register(MIXER_GLASS_MATERIAL);
         event.register(VatMechanismRenderer.VISE_MODEL);
         for (var id : java.util.List.of("pull_pump", "push_pump")) event.register(pumpSleeve(id));
@@ -98,6 +116,20 @@ public final class VatClient {
                                         && !location.variant().equals("inventory")
                                 ? casings.computeIfAbsent(original, model -> new VatCasingModel(model, casingMaterials))
                                 : original);
+        for (var tier : VatTier.values())
+            if (tier != VatTier.T1) {
+                var casing = event.getModels().get(tierMaterial("block/casing_material", tier));
+                var glass = event.getModels().get(tierMaterial("block/formed_glass_material", tier));
+                var cache = new IdentityHashMap<BakedModel, BakedModel>();
+                event.getModels().replaceAll((location, original) -> {
+                    if (location.variant().equals("inventory")) return original;
+                    if (location.id().getPath().equals(tier.id(VatPartType.Casing)))
+                        return cache.computeIfAbsent(original, m -> new VatCasingModel(m, casing));
+                    if (location.id().getPath().equals(tier.id(VatPartType.Glass)))
+                        return cache.computeIfAbsent(original, m -> new VatGlassModel(m, glass));
+                    return original;
+                });
+            }
         // Separate Mixer glass material, sharing the established bounds-selected shell geometry.
         var mixerCasing = event.getModels().entrySet().stream()
                 .filter(e ->
@@ -132,8 +164,13 @@ public final class VatClient {
                                                                             .toUpperCase(java.util.Locale.ROOT))
                                                                     .cladding()
                                                             : cladding,
-                                                    material,
-                                                    casingMaterials,
+                                                    event.getModels()
+                                                            .get(tierMaterial(
+                                                                    "block/formed_glass_material",
+                                                                    modelTier(location))),
+                                                    event.getModels()
+                                                            .get(tierMaterial(
+                                                                    "block/casing_material", modelTier(location))),
                                                     mixerGlass,
                                                     mixerCasing))
                                     : original);
@@ -159,8 +196,13 @@ public final class VatClient {
                                                                             .toUpperCase(java.util.Locale.ROOT))
                                                                     .cladding()
                                                             : cladding,
-                                                    material,
-                                                    casingMaterials,
+                                                    event.getModels()
+                                                            .get(tierMaterial(
+                                                                    "block/formed_glass_material",
+                                                                    modelTier(location))),
+                                                    event.getModels()
+                                                            .get(tierMaterial(
+                                                                    "block/casing_material", modelTier(location))),
                                                     mixerGlass,
                                                     mixerCasing))
                                     : original);
@@ -185,8 +227,13 @@ public final class VatClient {
                                                                             .toUpperCase(java.util.Locale.ROOT))
                                                                     .cladding()
                                                             : cladding,
-                                                    material,
-                                                    casingMaterials,
+                                                    event.getModels()
+                                                            .get(tierMaterial(
+                                                                    "block/formed_glass_material",
+                                                                    modelTier(location))),
+                                                    event.getModels()
+                                                            .get(tierMaterial(
+                                                                    "block/casing_material", modelTier(location))),
                                                     mixerGlass,
                                                     mixerCasing))
                                     : original);
@@ -221,7 +268,11 @@ public final class VatClient {
             }
         // Inventory and chunk models share the same generated fixture geometry.
         // Apply after the generic wall wrappers so these parts retain their mechanisms.
-        for (var fixture : net.impactvector.mobvats.gamecontent.multiblock.common.client.FixtureModel.IDS) {
+        var fixtures =
+                new java.util.HashSet<>(net.impactvector.mobvats.gamecontent.multiblock.common.client.FixtureModel.IDS);
+        fixtures.add("vat_controller_t2");
+        fixtures.add("vat_controller_t3");
+        for (var fixture : fixtures) {
             var id = ResourceLocation.fromNamespaceAndPath(MobVats.MOD_ID, fixture);
             event.getModels().replaceAll((location, original) -> {
                 if (!location.id().equals(id)) return original;
@@ -232,13 +283,16 @@ public final class VatClient {
                                         .split(",")[0]
                                         .toUpperCase(java.util.Locale.ROOT))
                         : net.impactvector.mobvats.gamecontent.multiblock.conduit.CladdingMaterial.NONE;
+                var tier = fixture.endsWith("_t2")
+                        ? VatTier.T2
+                        : fixture.endsWith("_t3") ? VatTier.T3 : modelTier(location);
                 boolean mixer =
                         installed.shell() == net.impactvector.mobvats.gamecontent.multiblock.conduit.ConduitShell.MIXER
                                 || fixture.startsWith("mixer_");
                 var model = new net.impactvector.mobvats.gamecontent.multiblock.common.client.FixtureModel(
                         original,
-                        mixer ? mixerCasing : casingMaterials,
-                        fixture,
+                        mixer ? mixerCasing : event.getModels().get(tierMaterial("block/casing_material", tier)),
+                        fixture.replaceFirst("_t[23]$", ""),
                         fixture.endsWith("_pump")
                                 ? java.util.Objects.requireNonNull(
                                         event.getModels().get(pumpSleeve(fixture)))
@@ -254,7 +308,11 @@ public final class VatClient {
                                                 "fluid_void",
                                                 "item_void")
                                         .contains(fixture)
-                        ? model.withCladding(installed, mixer ? mixerGlass : material)
+                        ? model.withCladding(
+                                installed,
+                                mixer
+                                        ? mixerGlass
+                                        : event.getModels().get(tierMaterial("block/formed_glass_material", tier)))
                         : model;
             });
         }
@@ -334,7 +392,8 @@ public final class VatClient {
     @SubscribeEvent
     public static void setup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            ItemBlockRenderTypes.setRenderLayer(Content.block(VatPartType.Glass), RenderType.cutout());
+            for (var tier : VatTier.values())
+                ItemBlockRenderTypes.setRenderLayer(Content.block(tier, VatPartType.Glass), RenderType.cutout());
             for (var block : net.impactvector.mobvats.gamecontent.multiblock.conduit.ConduitContent.blocks())
                 ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutout());
             for (var block : net.impactvector.mobvats.gamecontent.multiblock.conduit.FluidBufferContent.blocks())

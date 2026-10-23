@@ -14,6 +14,18 @@
     },
     "cladding_material=mixer_t1_glass": {
       "model": "mobvats:block/procedural/t1/mixer_glass_fluid_buffer_frame"
+    },
+    "cladding_material=vat_t2_casing": {
+      "model": "mobvats:block/procedural/t2/casing_fluid_buffer_frame"
+    },
+    "cladding_material=vat_t3_casing": {
+      "model": "mobvats:block/procedural/t3/casing_fluid_buffer_frame"
+    },
+    "cladding_material=vat_t2_glass": {
+      "model": "mobvats:block/procedural/t2/glass_fluid_buffer_frame"
+    },
+    "cladding_material=vat_t3_glass": {
+      "model": "mobvats:block/procedural/t3/glass_fluid_buffer_frame"
     }
   }
 }

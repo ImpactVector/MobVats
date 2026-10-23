@@ -2,7 +2,9 @@
 
 ## 2.1 Vat structure and specimens
 
-The Vat exterior is at least 3 × 4 × 3 blocks (X/Y/Z), with a maximum of 16 per axis. Exactly one Controller and at least one encoded Head are required. The entire machine validates together: incomplete or ambiguous specimens reject formation rather than being skipped.
+Vat exterior maxima (X/Y/Z) are Copper T1 9 × 7 × 9, Iron T2 9 × 9 × 9 and Blood Iron T3 12 × 12 × 12. Rectangular footprints are supported. The structural floor is 3 × 3 × 3; actual specimen and service geometry governs the minimum (one-cell chicken 3 × 3 × 3; normal two-cell cow 3 × 4 × 3). Exactly one Controller and at least one encoded Head are required. The entire machine validates together: incomplete or ambiguous specimens reject formation rather than being skipped.
+
+The tier-specific Controller is authoritative. Every tier-bearing shell cell, including glass and installed machinery/conduit/buffer cladding, must match it. Mixed shells report the offending position and expected material. Internal service placement does not select tier. Universal functional machinery keeps its existing item and entity behavior. Tier affects capacity only; hostile progression is not enabled. See [tier construction](design/VAT_TIERS_AND_CONSTRUCTION.md).
 
 Each Head supplies persisted `SimulacrumGeometry`. The ownership map validates every Head/Flesh occupied cell; extra unowned Flesh and overlapping bodies are invalid. Multiple independent specimens are implemented. Touching, one-gap and wider layouts may form if substrate and service requirements are satisfied. Space affects productivity through comfort; it is not an automatic packing system.
 
@@ -224,7 +226,7 @@ Vat/Mixer controller, casing, glass, rotor, drives, specimen substrate and other
 
 ### 2.4.2 Installed material and interactions
 
-The single `cladding_material` enum property supports `none`, `vat_t1_casing`, `vat_t1_glass`, `mixer_t1_casing` and `mixer_t1_glass`. It determines the exact material item, shell family and glass/casing treatment. No additional entity exists solely to store cladding, and no NBT field duplicates installed material.
+The single `cladding_material` enum property supports `none`, Vat casing/glass for each of `t1`, `t2`, `t3`, and `mixer_t1_casing` / `mixer_t1_glass`. It determines the exact material item, shell family and glass/casing treatment. No additional entity exists solely to store cladding, and no NBT field duplicates installed material. Harness and Sump retain `vat_harness` / `vat_drain` and use this same mechanism: shell mounts require matching cladding, while bare interior supports retain their geometry and association rules.
 
 Place the bare function item, then shift-right-click it with an actual casing/glass item. The casing/glass item's `useOn` handles Minecraft's sneaking placement bypass and invokes the same shared policy as the block interaction. Survival installation consumes one item. Creative installation consumes none. Identical material does nothing. Replacement returns the old material to inventory, dropping it if insertion fails. Unsupported materials are rejected. Vat-only service functions reject Mixer material; the five shared port/pump/void functions support both families.
 

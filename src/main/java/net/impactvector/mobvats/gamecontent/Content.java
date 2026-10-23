@@ -5,6 +5,7 @@ import net.impactvector.mobvats.MobVats;
 import net.impactvector.mobvats.gamecontent.item.ItemEssence;
 import net.impactvector.mobvats.gamecontent.item.ItemSyringe;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.VatPartType;
+import net.impactvector.mobvats.gamecontent.multiblock.vat.VatTier;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.part.AbstractVatEntity;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.part.VatConstructionBlock;
 import net.impactvector.mobvats.gamecontent.multiblock.vat.part.VatGlassBlock;
@@ -93,6 +94,8 @@ public final class Content {
     public static final DeferredItem<ItemEssence> ESSENCE =
             ITEMS.register("essence", () -> new ItemEssence(new Item.Properties().stacksTo(16)));
 
+    private static final java.util.Map<String, DeferredBlock<Block>> TIER_BLOCKS = new java.util.HashMap<>();
+
     static {
         net.impactvector.mobvats.gamecontent.product.ProductContent.initialize();
         net.impactvector.mobvats.gamecontent.extruder.ExtruderContent.initialize();
@@ -100,6 +103,19 @@ public final class Content {
         net.impactvector.mobvats.gamecontent.multiblock.conduit.ConduitContent.initialize();
         net.impactvector.mobvats.gamecontent.multiblock.conduit.FluidBufferContent.initialize();
         net.impactvector.mobvats.gamecontent.creative.CreativeContent.initialize();
+        for (var tier : VatTier.values()) {
+            if (tier == VatTier.T1) continue;
+            for (var type : new VatPartType[] {VatPartType.Casing, VatPartType.Glass, VatPartType.Controller}) {
+                var block = BLOCKS.<Block>register(
+                        tier.id(type), () -> type == VatPartType.Glass ? new VatGlassBlock() : new VatPartBlock(type));
+                TIER_BLOCKS.put(tier.id(type), block);
+                if (type == VatPartType.Controller) ITEMS.registerSimpleBlockItem(block);
+                else
+                    ITEMS.register(
+                            tier.id(type),
+                            () -> new net.impactvector.mobvats.gamecontent.item.CladdingBlockItem(block.get()));
+            }
+        }
         for (VatPartType type : VatPartType.values()) {
             var block = BLOCKS.<Block>register(
                     net.impactvector.mobvats.gamecontent.multiblock.common.MechanicalPartBlock.id(type),
@@ -139,7 +155,8 @@ public final class Content {
                     ENTITIES.register(
                             type.getSerializedName(),
                             () -> BlockEntityType.Builder.<AbstractVatEntity>of(
-                                            (pos, state) -> type.createTileEntity(state, pos), block.get())
+                                            (pos, state) -> type.createTileEntity(state, pos),
+                                            validBlocks(type, block.get()))
                                     .build(null)));
         }
         TABS.register(
@@ -149,6 +166,11 @@ public final class Content {
                         .icon(() -> new ItemStack(block(VatPartType.Controller)))
                         .displayItems((parameters, output) -> {
                             for (VatPartType type : VatPartType.values()) output.accept(block(type));
+                            for (var tier : VatTier.values())
+                                if (tier != VatTier.T1)
+                                    for (var type : new VatPartType[] {
+                                        VatPartType.Casing, VatPartType.Glass, VatPartType.Controller
+                                    }) output.accept(block(tier, type));
                             for (var type :
                                     net.impactvector.mobvats.gamecontent.multiblock.mixer.MixerPartType.values())
                                 if (net.impactvector.mobvats.gamecontent.multiblock.common.MechanicalPartBlock.shared(
@@ -175,6 +197,16 @@ public final class Content {
                                 output.accept(bucket);
                         })
                         .build());
+    }
+
+    private static Block[] validBlocks(VatPartType type, Block original) {
+        if (type != VatPartType.Casing && type != VatPartType.Glass && type != VatPartType.Controller)
+            return new Block[] {original};
+        return new Block[] {original, block(VatTier.T2, type), block(VatTier.T3, type)};
+    }
+
+    public static Block block(VatTier tier, VatPartType type) {
+        return tier == VatTier.T1 ? block(type) : TIER_BLOCKS.get(tier.id(type)).get();
     }
 
     public static Block block(VatPartType type) {

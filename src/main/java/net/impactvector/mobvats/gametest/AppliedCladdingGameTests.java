@@ -239,6 +239,7 @@ public final class AppliedCladdingGameTests {
             for (var material : CladdingMaterial.values())
                 for (var mode : ConduitMode.values()) {
                     var state = ConduitContent.state(resource, material.cladding(), material.shell())
+                            .setValue(CladdingMaterial.PROPERTY, material)
                             .setValue(ConduitBlock.MODE, mode);
                     var restored = net.minecraft.nbt.NbtUtils.readBlockState(
                             h.getLevel().holderLookup(net.minecraft.core.registries.Registries.BLOCK),
@@ -257,7 +258,7 @@ public final class AppliedCladdingGameTests {
                 .filter(id -> id.getNamespace().equals("mobvats"))
                 .count();
         h.assertTrue(
-                blocks == 46 && items == 53, "Unexpected registry count: " + blocks + " blocks, " + items + " items");
+                blocks == 52 && items == 59, "Unexpected registry count: " + blocks + " blocks, " + items + " items");
         org.slf4j.LoggerFactory.getLogger(AppliedCladdingGameTests.class)
                 .info("Unified registry: {} blocks, {} items", blocks, items);
         h.succeed();

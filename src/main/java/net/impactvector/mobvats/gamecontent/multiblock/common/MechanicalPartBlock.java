@@ -28,6 +28,8 @@ public final class MechanicalPartBlock extends VatPartBlock
     public static boolean supported(VatPartType type) {
         return switch (type) {
             case ItemPort,
+                    Harness,
+                    Sump,
                     FluidPort,
                     ToolPort,
                     FeedPort,
@@ -65,7 +67,9 @@ public final class MechanicalPartBlock extends VatPartBlock
     }
 
     public static String id(VatPartType type) {
-        return supported(type) ? type.getSerializedName().substring(4) : type.getSerializedName();
+        return supported(type) && type != VatPartType.Harness && type != VatPartType.Sump
+                ? type.getSerializedName().substring(4)
+                : type.getSerializedName();
     }
 
     public boolean accepts(CladdingMaterial material) {

@@ -405,7 +405,7 @@ class MobBiologicalArt {
 }
 
 class MobProceduralArt {
-    static final String VERSION = '1.14.0'
+    static final String VERSION = '1.15.0'
     static final List FACES = ['down','up','north','south','west','east']
     static Map cuboid(List from, List to, String material) {
         [from:from,to:to,faces:FACES.collectEntries { [(it):[uv:[0,0,16,16],texture:'#'+material]] }]
@@ -485,6 +485,21 @@ class MobProceduralArt {
                 if(finish=='t1') {
                     model("${family}_glass",[parent:"mobvats:block/procedural/${finish}/${family}_glass"])
                     model(family=='vat'?'formed_glass_material':'mixer_formed_glass_material',[parent:'minecraft:block/cube_all',render_type:'minecraft:translucent',textures:[all:base+"${family}_surface",particle:base+"${family}_trim"]])
+                }
+            }
+            if(finish in ['t2','t3']) {
+                def base="mobvats:block/procedural/${finish}/"
+                model("casing_material_${finish}",[parent:'minecraft:block/cube',render_type:'minecraft:solid',textures:[particle:base+'casing_clean',down:base+'casing_clean',up:base+'vat_trim',north:base+'vat_frame',south:base+'casing_clean',east:base+'casing_clean',west:base+'casing_clean']])
+                model("formed_glass_material_${finish}",[parent:'minecraft:block/cube_all',render_type:'minecraft:translucent',textures:[all:base+'vat_surface',particle:base+'vat_trim']])
+                ['casing','glass','controller'].each { part ->
+                    String id="vat_${part}_${finish}"
+                    model(id,part=='casing' ? [parent:'minecraft:block/cube_all',textures:[all:base+'casing_clean']] : [parent:"mobvats:block/procedural/${finish}/vat_${part}"])
+                    String itemPath="assets/mobvats/models/item/${id}.json"; assert productionPaths.add(itemPath)
+                    json(new File(output,itemPath),inventoryModel("mobvats:block/${id}"))
+                    String statePath="assets/mobvats/blockstates/${id}.json"; assert productionPaths.add(statePath)
+                    json(new File(output,statePath),[variants:['':[model:"mobvats:block/${id}"]]])
+                    String lootPath="data/mobvats/loot_table/blocks/${id}.json"; assert productionPaths.add(lootPath)
+                    json(new File(output,lootPath),[type:'minecraft:block',pools:[[rolls:1,entries:[[type:'minecraft:item',name:"mobvats:${id}"]],conditions:[[condition:'minecraft:survives_explosion']]]]])
                 }
             }
             conduitModels(geometry, finish, model,output,productionPaths)
@@ -741,13 +756,17 @@ class MobProceduralArt {
             writer("procedural/${finish}/${binding.block}",[render_type:'minecraft:solid',ambientocclusion:false,textures:materials,elements:elements])
             if(finish=='t1') {
                 writer(binding.block,[parent:"mobvats:block/procedural/t1/${binding.block}"])
-                if(binding.block in ['feed_port','blender','tool_port']) {
+                if(binding.block in ['feed_port','blender','tool_port','vat_harness','vat_drain']) {
                     def variants=[:]
-                    ['none','vat_t1_casing','vat_t1_glass','mixer_t1_casing','mixer_t1_glass'].each { installed ->
+                    ['none','vat_t1_casing','vat_t1_glass','vat_t2_casing','vat_t2_glass','vat_t3_casing','vat_t3_glass','mixer_t1_casing','mixer_t1_glass'].each { installed ->
                         def family=installed.startsWith('mixer')?'mixer':'vat'
                         def framed=[render_type:'minecraft:solid',ambientocclusion:false,
-                            textures:materials+[frame:base+family+'_frame',trim:base+family+'_trim',accent:base+family+'_accent'],
+                            textures:materials+[frame:base.replace('/t1/','/'+(installed.startsWith('vat_')?installed.split('_')[1]:'t1')+'/')+family+'_frame',trim:base.replace('/t1/','/'+(installed.startsWith('vat_')?installed.split('_')[1]:'t1')+'/')+family+'_trim',accent:base.replace('/t1/','/'+(installed.startsWith('vat_')?installed.split('_')[1]:'t1')+'/')+family+'_accent'],
                             elements:elements+(installed=='none' ? [] : frame(geometry,family,installed.endsWith('glass')))]
+                        if(binding.block in ['vat_harness','vat_drain']) {
+                            def supportFinish=installed=='none'?'master':installed.startsWith('vat_')?installed.split('_')[1]:'t1'
+                            framed=[parent:"mobvats:block/procedural/${supportFinish}/${binding.block}"]
+                        }
                         writer("mechanical/${binding.block}_${installed}",framed)
                         [false,true].each { outward -> variants["cladding_material=${installed},port_output=${outward}"]=[model:"mobvats:block/mechanical/${binding.block}_${installed}"] }
                     }
@@ -1046,16 +1065,16 @@ class MobProceduralArt {
                     productionPaths.add(basePath.toString()); json(new File(output,basePath),model)
                 }
                 if(consumer in ['item_port','fluid_port']) {
-                    ['none','vat_t1_casing','vat_t1_glass','mixer_t1_casing','mixer_t1_glass'].each { installed ->
+                    ['none','vat_t1_casing','vat_t1_glass','vat_t2_casing','vat_t2_glass','vat_t3_casing','vat_t3_glass','mixer_t1_casing','mixer_t1_glass'].each { installed ->
                         def family=installed.startsWith('mixer')?'mixer':'vat'
-                        def base='mobvats:block/procedural/t1/'
+                        def base='mobvats:block/procedural/'+(installed.startsWith('vat_')?installed.split('_')[1]:'t1')+'/'
                         def neutral=binding.resourceLocation.replace('/t1/','/master/')
                         def connector=cuboid([5,5,0],[11,11,2.75],'metal')
                         connector.faces.north.texture='#socket'
                         def plate=cuboid([2,2,0.5],[14,14,1],'metal')
                         plate.faces.north.texture='#faceplate'
                         def body=[render_type:'minecraft:solid',ambientocclusion:false,
-                            textures:[particle:neutral,socket:neutral,metal:'mobvats:block/procedural/master/socket_clean',mount:base+'casing_clean',faceplate:installed=='none'?neutral:binding.resourceLocation,frame:base+family+'_frame',trim:base+family+'_trim',accent:base+family+'_accent'],
+                            textures:[particle:neutral,socket:neutral,metal:'mobvats:block/procedural/master/socket_clean',mount:base+'casing_clean',faceplate:installed=='none'?neutral:binding.resourceLocation.replace('/t1/','/'+(installed.startsWith('vat_')?installed.split('_')[1]:'t1')+'/'),frame:base+family+'_frame',trim:base+family+'_trim',accent:base+family+'_accent'],
                             elements:[connector,plate]+(installed == 'none' ? [] : [cuboid([1,1,0.875],[15,15,2],'mount')]+MobProceduralArt.frame(geometry, family, installed.endsWith('glass')))]
                         String path="assets/mobvats/models/block/mechanical/${consumer}_${installed}_${binding.portOutput?'outward':'inward'}.json"
                         productionPaths.add(path.toString());json(new File(output,path),body)
@@ -1064,7 +1083,7 @@ class MobProceduralArt {
                 }
                 def statesPath="assets/mobvats/blockstates/${consumer}.json"
                 productionPaths.add(statesPath.toString())
-                def materialStates=consumer in ['item_port','fluid_port'] ? ['none','vat_t1_casing','vat_t1_glass','mixer_t1_casing','mixer_t1_glass'] : [null]
+                def materialStates=consumer in ['item_port','fluid_port'] ? ['none','vat_t1_casing','vat_t1_glass','vat_t2_casing','vat_t2_glass','vat_t3_casing','vat_t3_glass','mixer_t1_casing','mixer_t1_glass'] : [null]
                 def stateVariants=[:]
                 materialStates.each { material -> [false,true].each { outward ->
                     String key=(material==null?'':"cladding_material=${material},")+"port_output=${outward}"
@@ -1074,10 +1093,34 @@ class MobProceduralArt {
             }
         }
         if(new File(root,'geometry.json').isFile())conduitAssets(root,output,palettes,assets,names,productionPaths,geometry)
+        // Extend the established machinery loot templates, keeping functional drops/settings intact.
+        def lootRoot=new File(root.parentFile.parentFile,'src/main/resources/data/mobvats/loot_table/blocks')
+        lootRoot.eachFile { source ->
+            if(!source.name.endsWith('.json') || (!source.text.contains('vat_t1_') && !(source.name in ['vat_harness.json','vat_drain.json']))) return
+            def loot=new JsonSlurper().parse(source)
+            if(source.name in ['vat_harness.json','vat_drain.json']) {
+                ['casing','glass'].each { material ->
+                    loot.pools << [rolls:1,conditions:[[condition:'minecraft:survives_explosion'],[condition:'minecraft:block_state_property',block:'mobvats:'+source.name[0..-6],properties:[cladding_material:'vat_t1_'+material]]],entries:[[type:'minecraft:item',name:'mobvats:vat_'+material]]]
+                }
+            }
+            def materialPools=loot.pools.findAll { pool -> pool.conditions?.any { it.properties?.cladding_material?.startsWith('vat_t1_') } }
+            ['t2','t3'].each { tier -> materialPools.each { pool ->
+                def installed=new JsonSlurper().parseText(JsonOutput.toJson(pool))
+                installed.conditions.each { condition ->
+                    if(condition.properties?.cladding_material?.startsWith('vat_t1_'))
+                        condition.properties.cladding_material=condition.properties.cladding_material.replace('vat_t1_','vat_'+tier+'_')
+                }
+                installed.entries.each { it.name=it.name+'_'+tier }
+                loot.pools << installed
+            } }
+            String path='data/mobvats/loot_table/blocks/'+source.name
+            assert productionPaths.add(path)
+            json(new File(output,path),loot)
+        }
         MobBiologicalArt.generate(root,output,assets,names)
         output.eachFileRecurse { file ->
             def path=output.toPath().relativize(file.toPath()).toString().replace('\\','/')
-            if (file.isFile() && path.startsWith('assets/') && path.endsWith('.json') && !productionPaths.contains(path)) file.delete()
+            if (file.isFile() && (path.startsWith('assets/') || path.startsWith('data/')) && path.endsWith('.json') && !productionPaths.contains(path)) file.delete()
         }
         def script=new File(root.parentFile.parentFile,'gradle/procedural-art.gradle')
         def generatedModels=productionPaths.findAll { it.startsWith('assets/mobvats/models/') }.sort().collect { path -> [path:path,sha256:hash(new File(output,path)),provenance:'AUTHORED_PROCEDURAL'] }
@@ -1280,6 +1323,7 @@ def generateProceduralArt = tasks.register('generateProceduralArt') {
     dependsOn exportArtGeometry
     inputs.file(artGeometry)
     inputs.dir('src/main/resources/assets/mobvats/models/block')
+    inputs.dir('src/main/resources/data/mobvats/loot_table/blocks')
     outputs.dir(proceduralOutput)
     doLast { MobProceduralArt.generate(proceduralSources.asFile,proceduralOutput.get().asFile,MobArtwork.read(artGeometry.get().asFile).geometry) }
 }
@@ -1350,7 +1394,7 @@ tasks.register('testProceduralArt') {
         assert new File(first,'META-INF/mobvats-procedural-art.json').bytes == new File(second,'META-INF/mobvats-procedural-art.json').bytes
         ['item_port','fluid_port'].each { id ->
             ['inward','outward'].each { direction ->
-                ['none','vat_t1_casing','vat_t1_glass','mixer_t1_casing','mixer_t1_glass'].each { cladding ->
+                ['none','vat_t1_casing','vat_t1_glass','vat_t2_casing','vat_t2_glass','vat_t3_casing','vat_t3_glass','mixer_t1_casing','mixer_t1_glass'].each { cladding ->
                     def model=new JsonSlurper().parse(new File(first,"assets/mobvats/models/block/mechanical/${id}_${cladding}_${direction}.json"))
                     assert model.textures.socket=="mobvats:block/procedural/master/socket_${id=='item_port'?'item':'fluid'}_${direction}"
                     def core=model.elements.find { it.faces.north.texture=='#socket' }
@@ -1361,7 +1405,7 @@ tasks.register('testProceduralArt') {
                     assert model.elements.count { it.faces.north.texture=='#mount' }==(cladding=='none'?0:1) : 'Missing or duplicate cladding collar'
                     assert plates.every { it.from[2]>0 && it.to[2]<=2 && it.from[0]>0 && it.to[0]<16 } : 'Full-block or unrecessed faceplate'
                     assert plates.first().to[0]-plates.first().from[0]>=12 : 'Procedural exterior plate lost readable socket footprint'
-                    assert model.textures.faceplate.startsWith(cladding=='none'?'mobvats:block/procedural/master/':'mobvats:block/procedural/t1/')
+                    assert model.textures.faceplate.startsWith(cladding=='none'?'mobvats:block/procedural/master/':'mobvats:block/procedural/'+(cladding.startsWith('vat_')?cladding.split('_')[1]:'t1')+'/')
                 }
             }
         }
@@ -1849,7 +1893,7 @@ tasks.register('verifyProceduralArtResources') {
                 def model=new JsonSlurper().parse(zip.getInputStream(zip.getEntry("assets/mobvats/models/block/${b.block}.json".toString())))
                 assert model.parent=="mobvats:block/procedural/t1/${b.block}"
                 def states=new JsonSlurper().parse(zip.getInputStream(zip.getEntry("assets/mobvats/blockstates/${b.block}.json".toString())))
-                assert states.variants.values().every { b.block in ['feed_port','blender','tool_port']?it.model.startsWith("mobvats:block/mechanical/${b.block}_"):it.model=="mobvats:block/${b.block}" }
+                assert states.variants.values().every { b.block in ['feed_port','blender','tool_port','vat_harness','vat_drain']?it.model.startsWith("mobvats:block/mechanical/${b.block}_"):it.model=="mobvats:block/${b.block}" }
                 def item=new JsonSlurper().parse(zip.getInputStream(zip.getEntry("assets/mobvats/models/item/${b.block}.json".toString())))
                 assert item.parent=="mobvats:block/${b.block}" && item.display.gui.rotation==[30,b.kind in ['feeder','blender','tool']?45:225,0]
             }
