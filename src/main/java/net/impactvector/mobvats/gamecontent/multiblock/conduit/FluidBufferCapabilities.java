@@ -23,7 +23,9 @@ public final class FluidBufferCapabilities {
                         return level != null
                                         && entity.routingAvailable()
                                         && level.hasChunkAt(pos)
-                                        && level.getBlockEntity(pos) == entity
+                                        && net.impactvector.mobvats.gamecontent.multiblock.common.LoadedWorld
+                                                        .blockEntity(level, pos)
+                                                == entity
                                 ? entity.interactionCluster().tank()
                                 : EmptyFluidHandler.INSTANCE;
                     }

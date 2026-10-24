@@ -631,7 +631,7 @@ public final class MultiblockMixer
     }
 
     protected boolean updateServer() {
-        if (!isAssembled()) return false;
+        if (!canTickMachine()) return false;
         boolean storageChanged = storage.evacuate();
         state.activeTick();
         if (processingEnabled()) tickDrive();
@@ -648,7 +648,10 @@ public final class MultiblockMixer
                     : intake.getX() == getBoundingBox().getMax().getX()
                             ? Direction.EAST
                             : intake.getZ() == getBoundingBox().getMin().getZ() ? Direction.NORTH : Direction.SOUTH;
-            var water = getWorld().getFluidState(intake.relative(face));
+            var outside = intake.relative(face);
+            var chunk = net.impactvector.mobvats.gamecontent.multiblock.common.LoadedWorld.chunk(getWorld(), outside);
+            if (chunk == null) continue;
+            var water = chunk.getFluidState(outside);
             if (water.is(FluidTags.WATER) && water.isSource())
                 intakeChanged |= storage.handler(intake, true, s -> s.is(Fluids.WATER))
                                 .fill(new FluidStack(Fluids.WATER, SlurryBalance.WATER_PER_INTAKE), FluidAction.EXECUTE)

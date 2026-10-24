@@ -164,7 +164,8 @@ public final class FluidBufferEntity extends BlockEntity implements ResourceEndp
         while (!queue.isEmpty()) {
             var pos = queue.removeFirst();
             if (!seen.add(pos) || !level.hasChunkAt(pos)) continue;
-            if (level.getBlockEntity(pos) instanceof FluidBufferEntity member
+            if (net.impactvector.mobvats.gamecontent.multiblock.common.LoadedWorld.blockEntity(level, pos)
+                            instanceof FluidBufferEntity member
                     && member.routingAvailable()
                     && ConduitStructure.containing(level, pos) == owner) {
                 members.add(member);

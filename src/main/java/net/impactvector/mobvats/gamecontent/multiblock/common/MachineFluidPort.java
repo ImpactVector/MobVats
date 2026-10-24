@@ -75,7 +75,7 @@ public final class MachineFluidPort<
         boolean input = port.getIoDirection().isInput();
         // Direct machine adjacency has a single owner, independent of controller tick order.
         if (input) {
-            var entity = port.getLevel().getBlockEntity(neighborPos);
+            var entity = LoadedWorld.blockEntity(port.getLevel(), neighborPos);
             if (entity instanceof ActiveBoundaryPort other
                     && other.endpoint().resource() == EndpointConfiguration.Resource.FLUID
                     && other.getIoDirection().isOutput()

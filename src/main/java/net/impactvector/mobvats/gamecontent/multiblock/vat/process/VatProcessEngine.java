@@ -420,7 +420,8 @@ public final class VatProcessEngine {
         controller.getTopology().toolLoading().forEach(r -> toolPorts.add(r.actor()));
         controller.toolPorts().forEach(p -> toolPorts.add(p.getBlockPos()));
         for (var pos : toolPorts)
-            if (controller.getWorld().getBlockEntity(pos)
+            if (net.impactvector.mobvats.gamecontent.multiblock.common.LoadedWorld.blockEntity(
+                                    controller.getWorld(), pos)
                             instanceof net.impactvector.mobvats.gamecontent.multiblock.vat.part.VatToolPortEntity tool
                     && !tool.redstoneInhibited()) {
                 var produced = tool.results().snapshot();

@@ -105,6 +105,21 @@ public abstract class ConduitCuboidController<C extends ConduitCuboidController<
         ConduitStructure.register(this);
     }
 
+    /** ZeroCore ticks assembled controllers at level scope, including FULL, non-ticking chunks.
+     * Follow Minecraft's block-ticking lifetime without changing ZC assembly or ownership.
+     * In particular, returning false at FULL prevents ZC's dirty-chunk getChunk from renewing tickets.
+     */
+    protected final boolean canTickMachine() {
+        if (!(getWorld() instanceof net.minecraft.server.level.ServerLevel level)) return false;
+        var bounds = structuralEnvelope;
+        if (bounds == null || !isAssembled()) return false;
+        for (int x = bounds.getMinX() >> 4; x <= (bounds.getMaxX() >> 4); ++x)
+            for (int z = bounds.getMinZ() >> 4; z <= (bounds.getMaxZ() >> 4); ++z)
+                if (!level.getChunkSource().isPositionTicking(net.minecraft.world.level.ChunkPos.asLong(x, z)))
+                    return false;
+        return true;
+    }
+
     @Override
     protected boolean isMachineWhole(it.zerono.mods.zerocore.lib.multiblock.validation.IMultiblockValidator validator) {
         // Passive shell cells have no ZC part to pause the machine during chunk eviction.

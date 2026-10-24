@@ -38,7 +38,7 @@ public final class WorldFluidPumps {
     }
 
     public static boolean infiniteWater(Level level, BlockPos p) {
-        var fluid = level.getFluidState(p);
+        var fluid = LoadedWorld.blockState(level, p).getFluidState();
         if (!(level instanceof ServerLevel server)
                 || !fluid.is(Fluids.WATER)
                 || !fluid.isSource()
@@ -46,10 +46,10 @@ public final class WorldFluidPumps {
             return false;
         int count = 0;
         for (var face : Direction.Plane.HORIZONTAL) {
-            var other = level.getFluidState(p.relative(face));
+            var other = LoadedWorld.blockState(level, p.relative(face)).getFluidState();
             if (other.is(Fluids.WATER) && other.isSource()) ++count;
         }
-        var below = level.getBlockState(p.below());
+        var below = LoadedWorld.blockState(level, p.below());
         return count >= 2
                 && (below.isSolid()
                         || below.getFluidState().is(Fluids.WATER)
@@ -57,11 +57,14 @@ public final class WorldFluidPumps {
     }
 
     public static boolean pull(Level level, BlockPos root, IFluidHandler destination, Endpoint e) {
-        if (!level.hasChunkAt(root)) {
+        if (LoadedWorld.chunk(level, root) == null
+                || LoadedWorld.chunk(level, root.below()) == null
+                || java.util.stream.StreamSupport.stream(Direction.Plane.HORIZONTAL.spliterator(), false)
+                        .anyMatch(face -> LoadedWorld.chunk(level, root.relative(face)) == null)) {
             e.status("Adjacent source unloaded");
             return false;
         }
-        var state = level.getBlockState(root);
+        var state = LoadedWorld.blockState(level, root);
         var fluid = state.getFluidState();
         if (!(state.getBlock() instanceof LiquidBlock) || !fluid.isSource()) {
             e.status("No adjacent source");
@@ -92,16 +95,19 @@ public final class WorldFluidPumps {
 
     private static boolean traversable(Level level, BlockPos p, Fluid fluid) {
         if (!level.hasChunkAt(p) || level.isOutsideBuildHeight(p)) return false;
-        var state = level.getBlockState(p);
+        var chunk = LoadedWorld.chunk(level, p);
+        if (chunk == null) return false;
+        var state = chunk.getBlockState(p);
         return state.getBlock() instanceof LiquidBlock
                         && state.getFluidState().getType().isSame(fluid)
                 || state.canBeReplaced()
-                        && level.getBlockEntity(p) == null
+                        && LoadedWorld.blockEntity(level, p) == null
                         && state.getFluidState().isEmpty();
     }
 
     private static boolean placeable(Level level, BlockPos p, Fluid fluid) {
-        return traversable(level, p, fluid) && !level.getFluidState(p).isSource();
+        return traversable(level, p, fluid)
+                && !LoadedWorld.blockState(level, p).getFluidState().isSource();
     }
     /** Bounded loaded-cell search, sorted by depth, root distance, then x/z. */
     public static BlockPos placement(Level level, BlockPos root, Fluid fluid) {
@@ -151,6 +157,15 @@ public final class WorldFluidPumps {
             if (target == null) {
                 e.status("Placement blocked");
                 continue;
+            }
+            // setBlock notifies neighboring cells through vanilla loading world reads. Do not
+            // cross an unavailable boundary merely because the selected placement cell is loaded.
+            boolean neighborhoodLoaded = true;
+            for (var face : Direction.Plane.HORIZONTAL)
+                neighborhoodLoaded &= LoadedWorld.chunk(level, target.relative(face)) != null;
+            if (!neighborhoodLoaded) {
+                e.status("Placement neighborhood unloaded");
+                return false;
             }
             // World mutation must succeed before spending private bus contents.
             if (!level.setBlock(target, state, 3)) {

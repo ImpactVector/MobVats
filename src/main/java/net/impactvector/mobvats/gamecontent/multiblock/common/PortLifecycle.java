@@ -41,7 +41,10 @@ public final class PortLifecycle<
     }
 
     public boolean isItemConnected() {
-        return remoteItems != null && remoteItems.getCapability() != null;
+        return remoteItems != null
+                && outward != null
+                && LoadedWorld.chunk(port.getLevel(), port.getBlockPos().relative(outward)) != null
+                && remoteItems.getCapability() != null;
     }
 
     public boolean boundaryAvailable() {

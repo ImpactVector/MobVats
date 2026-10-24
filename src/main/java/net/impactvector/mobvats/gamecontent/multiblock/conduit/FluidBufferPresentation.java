@@ -44,7 +44,8 @@ public final class FluidBufferPresentation {
         for (var origin : dirty) {
             if (!level.hasChunkAt(origin)
                     || visited.contains(origin)
-                    || !(level.getBlockEntity(origin) instanceof FluidBufferEntity)) continue;
+                    || !(net.impactvector.mobvats.gamecontent.multiblock.common.LoadedWorld.blockEntity(level, origin)
+                            instanceof FluidBufferEntity)) continue;
             var owner = ConduitStructure.containing(level, origin);
             var members = new ArrayList<FluidBufferEntity>();
             var queue = new ArrayDeque<BlockPos>();
@@ -53,7 +54,8 @@ public final class FluidBufferPresentation {
                 var pos = queue.removeFirst();
                 if (visited.contains(pos)
                         || !level.hasChunkAt(pos)
-                        || !(level.getBlockEntity(pos) instanceof FluidBufferEntity member)
+                        || !(net.impactvector.mobvats.gamecontent.multiblock.common.LoadedWorld.blockEntity(level, pos)
+                                instanceof FluidBufferEntity member)
                         || ConduitStructure.containing(level, pos) != owner) continue;
                 visited.add(pos);
                 members.add(member);

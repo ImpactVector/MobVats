@@ -157,14 +157,13 @@ public final class PhysicalFluidStorage {
     public boolean evacuate(java.util.function.Predicate<BlockPos> enabled) {
         boolean movedAny = false;
         for (var e : services.entrySet())
-            if (enabled.test(e.getKey()))
-                for (var tank : e.getValue().tanks())
-                    if (!tank.isEmpty()) {
-                        int moved = destination(e.getKey(), true, s -> true)
-                                .fill(tank.getFluid().copy(), IFluidHandler.FluidAction.EXECUTE);
-                        tank.drain(moved, IFluidHandler.FluidAction.EXECUTE);
-                        movedAny |= moved > 0;
-                    }
+            for (var tank : e.getValue().tanks())
+                if (!tank.isEmpty() && enabled.test(e.getKey())) {
+                    int moved = destination(e.getKey(), true, s -> true)
+                            .fill(tank.getFluid().copy(), IFluidHandler.FluidAction.EXECUTE);
+                    tank.drain(moved, IFluidHandler.FluidAction.EXECUTE);
+                    movedAny |= moved > 0;
+                }
         return movedAny;
     }
     /** Only the producing endpoint's stage may accept newly completed production. */
@@ -237,7 +236,8 @@ public final class PhysicalFluidStorage {
         var out = new ArrayList<FluidBufferEntity>();
         for (var pos : BlockPos.betweenClosed(min, max))
             if (level.hasChunkAt(pos)
-                    && level.getBlockEntity(pos) instanceof FluidBufferEntity e
+                    && net.impactvector.mobvats.gamecontent.multiblock.common.LoadedWorld.blockEntity(level, pos)
+                            instanceof FluidBufferEntity e
                     && e.routingAvailable()) out.add(e);
         out.sort(Comparator.comparing(FluidBufferEntity::getBlockPos, ConduitTopology.POSITION));
         return out;
@@ -323,7 +323,9 @@ public final class PhysicalFluidStorage {
                 // The loaded guard precedes every world lookup, including the unload-callback interval.
                 if (level != null
                         && (!level.hasChunkAt(pos)
-                                || level.getBlockEntity(pos) != member
+                                || net.impactvector.mobvats.gamecontent.multiblock.common.LoadedWorld.blockEntity(
+                                                level, pos)
+                                        != member
                                 || ConduitStructure.containing(level, pos) != owner)) return false;
                 var stored = member.tank.getFluid();
                 if (!stored.isEmpty()) {

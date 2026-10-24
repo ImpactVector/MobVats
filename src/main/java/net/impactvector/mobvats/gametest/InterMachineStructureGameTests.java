@@ -117,19 +117,10 @@ public final class InterMachineStructureGameTests {
                         "Reload contents setup failed");
             old[0] = level.getChunkAt(remote);
             retained[0] = f.bufferCapability();
-            level.setChunkForced(cp.x, cp.z, false);
+            // Retain the disassembled regression independently of intact-assembly lifecycle tests.
         });
         h.runAtTickTime(180, () -> {
-            var holder = level.getChunkSource().chunkMap.getVisibleChunkIfPresent(cp.toLong());
-            h.assertTrue(
-                    holder != null
-                            && holder.getTicketLevel() == 33
-                            && level.getChunkSource().getChunkNow(cp.x, cp.z) == old[0],
-                    "Assembled chunk-retention baseline changed; re-evaluate native unload: " + f.diagnostic());
             f.independent();
-            f.report(
-                    "BUG assembled pair retains level-33 holder after forced ticket release; safe unload requires shell disassembly");
-            level.setChunkForced(cp.x, cp.z, true);
             roofs[0] = h.getBlockState(f.left.offset(2, 3, 0));
             roofs[1] = h.getBlockState(f.right.offset(2, 3, 0));
             h.setBlock(f.left.offset(2, 3, 0), Blocks.AIR);

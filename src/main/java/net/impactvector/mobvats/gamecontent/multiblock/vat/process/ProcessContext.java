@@ -72,20 +72,26 @@ public final class ProcessContext {
             fluidPositions.addAll(route.fluidOutputs());
         }
         for (var pos : fluidPositions)
-            if (controller().getWorld().getBlockEntity(pos) instanceof VatFluidPortEntity port
+            if (net.impactvector.mobvats.gamecontent.multiblock.common.LoadedWorld.blockEntity(
+                                    controller().getWorld(), pos)
+                            instanceof VatFluidPortEntity port
                     && port.getMultiblockController()
                             .filter(c -> c == controller())
                             .isPresent()) fluidPorts.put(pos, port);
         for (var contact : topology.itemContacts()) if (contact.head().equals(head)) positions.add(contact.input());
         for (var pos : positions)
-            if (controller().getWorld().getBlockEntity(pos) instanceof VatItemPortEntity port
+            if (net.impactvector.mobvats.gamecontent.multiblock.common.LoadedWorld.blockEntity(
+                                    controller().getWorld(), pos)
+                            instanceof VatItemPortEntity port
                     && port.getMultiblockController()
                             .filter(c -> c == controller())
                             .isPresent()) items.put(pos, port);
     }
 
     private void cacheActor(VatTopology.Assignment route) {
-        if (controller().getWorld().getBlockEntity(route.actor()) instanceof AbstractVatEntity part) {
+        if (net.impactvector.mobvats.gamecontent.multiblock.common.LoadedWorld.blockEntity(
+                        controller().getWorld(), route.actor())
+                instanceof AbstractVatEntity part) {
             actorEntities.put(route.actor(), part);
             if (part instanceof VatToolPortEntity tool) tools.put(route.actor(), tool);
         }

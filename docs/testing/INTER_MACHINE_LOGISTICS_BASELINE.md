@@ -1,4 +1,9 @@
 # Inter-machine logistics baseline
+> Historical October 23 baseline. The assembled chunk-retention finding below is
+> superseded by [the October 24 lifecycle follow-up](ASSEMBLED_CHUNK_LIFECYCLE.md),
+> which records actual XR2 controls, the retention mechanism, the correction and
+> native intact-assembly unload/reload acceptance. The old BUG characterization
+> is not the current acceptance condition; the disassembled reload regressions remain.
 
 Production baseline: `385beb82b6017fe8123f151dfcdd45b273475468` (`origin/main` at task start).
 Runtime: NeoForge 1.21.1 / 21.1.252, Zero CORE 2 2.4.18, Java 21.

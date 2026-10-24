@@ -19,6 +19,20 @@ final class ServerChunkEviction {
     private static final Field UPDATING = field(ChunkMap.class, "updatingChunkMap");
     private static final Field PENDING = field(ChunkMap.class, "pendingUnloads");
     private static final Field LOADED = field(net.minecraft.world.level.chunk.LevelChunk.class, "loaded");
+    private static final Field TICKETS = field(DistanceManager.class, "tickets");
+
+    static String diagnostic(ServerLevel level, ChunkPos pos) {
+        try {
+            var map = level.getChunkSource().chunkMap;
+            var holder = map.getVisibleChunkIfPresent(pos.toLong());
+            var tickets = ((Long2ObjectMap<?>) TICKETS.get(map.getDistanceManager())).get(pos.toLong());
+            return pos + " holder="
+                    + (holder == null ? "absent" : holder.getTicketLevel() + " refs=" + holder.getGenerationRefCount())
+                    + " tickets=" + tickets;
+        } catch (IllegalAccessException error) {
+            throw new IllegalStateException(error);
+        }
+    }
 
     static boolean loaded(net.minecraft.world.level.chunk.LevelChunk chunk) throws IllegalAccessException {
         return LOADED.getBoolean(chunk);
