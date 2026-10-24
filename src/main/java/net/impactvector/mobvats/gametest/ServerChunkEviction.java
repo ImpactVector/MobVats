@@ -26,8 +26,9 @@ final class ServerChunkEviction {
 
     @SuppressWarnings("unchecked")
     static void request(ServerLevel level, ChunkPos pos) throws ReflectiveOperationException {
-        if (!Boolean.getBoolean("mobvats.lifecycleAcceptance"))
-            throw new IllegalStateException("Dedicated acceptance run required");
+        boolean gameTest = level.getServer() instanceof net.minecraft.gametest.framework.GameTestServer;
+        if (!Boolean.getBoolean("mobvats.lifecycleAcceptance") && !gameTest)
+            throw new IllegalStateException("Dedicated acceptance or GameTest server required");
         var map = level.getChunkSource().chunkMap;
         var holder = map.getVisibleChunkIfPresent(pos.toLong());
         if (holder == null || holder.getTicketLevel() != 34 || holder.getGenerationRefCount() != 0)

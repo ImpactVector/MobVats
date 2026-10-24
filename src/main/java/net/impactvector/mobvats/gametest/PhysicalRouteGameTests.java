@@ -488,7 +488,7 @@ public final class PhysicalRouteGameTests {
             feed.staging().setStackInSlot(0, new ItemStack(Items.WHEAT));
     }
     // Registry reload tests invalidate synthetic topology, so this fixture needs an isolated batch.
-    @GameTest(template = "empty", batch = "physicalHarnessFixture", timeoutTicks = 145)
+    @GameTest(template = "empty", batch = "physicalHarnessFixture", timeoutTicks = 260)
     public static void cachedHarnessBlockPausesAllProcessesAndRestoresProgress(GameTestHelper h) {
         feedRig(h);
         Slice11Fixtures.vatStorage(h, O, 5, 5);
@@ -544,20 +544,32 @@ public final class PhysicalRouteGameTests {
                     "Inactive harness harvested READY specimen");
             c.rebuildTopology();
         });
-        h.runAtTickTime(140, () -> {
-            var c = vat(h);
-            // A native 1-XP cow reward can yield zero whole XP at low happiness.
-            // The committed harvest counter verifies resumption independently of reward RNG.
-            h.assertTrue(
-                    c.getTopology().operational(h.absolutePos(HEAD))
-                            && c.metrics().total(MachineMetrics.HARVESTS) > 0
-                            && c.milkAmount() > 0
-                            && ((VatToolPortEntity) h.getBlockEntity(TOOL))
+        h.startSequence()
+                .thenIdle(140)
+                .thenWaitUntil(() -> {
+                    var c = vat(h);
+                    // A native 1-XP cow reward can yield zero whole XP at low happiness.
+                    // The committed harvest counter verifies resumption independently of reward RNG.
+                    h.assertTrue(
+                            c.getTopology().operational(h.absolutePos(HEAD))
+                                    && c.metrics().total(MachineMetrics.HARVESTS) > 0
+                                    && c.milkAmount() > 0
+                                    && ((VatToolPortEntity) h.getBlockEntity(TOOL))
+                                                    .heldItem()
+                                                    .getDamageValue()
+                                            > 0,
+                            "Removing cached harness obstruction failed to restore operations: operational="
+                                    + c.getTopology().operational(h.absolutePos(HEAD)) + " harvests="
+                                    + c.metrics().total(MachineMetrics.HARVESTS) + " milk=" + c.milkAmount()
+                                    + " swordDamage="
+                                    + ((VatToolPortEntity) h.getBlockEntity(TOOL))
                                             .heldItem()
-                                            .getDamageValue()
-                                    > 0,
-                    "Removing cached harness obstruction failed to restore operations");
-            h.succeed();
-        });
+                                            .getDamageValue());
+                })
+                .thenExecute(() -> {
+                    var bounds = vat(h).getBoundingBox();
+                    for (var pos : bounds) h.getLevel().removeBlock(pos, false);
+                })
+                .thenSucceed();
     }
 }

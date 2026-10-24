@@ -105,7 +105,7 @@ public final class HostileSpecimenGameTests {
         for (int i = 0; i < count; i++) vat(h).processEngine().tick();
     }
 
-    @GameTest(batch = "hostileSpecimens", template = "empty", timeoutTicks = 1000)
+    @GameTest(batch = "interMachineIsolation", template = "empty", timeoutTicks = 1000)
     public static void activatedHeadSurvivesActualChunkUnloadReload(GameTestHelper h) {
         rig(h, VatTier.T2, false);
         var r = rod(h, H);
@@ -127,6 +127,19 @@ public final class HostileSpecimenGameTests {
         h.startSequence()
                 .thenIdle(50)
                 .thenWaitUntil(() -> {
+                    var holder = h.getLevel().getChunkSource().chunkMap.getVisibleChunkIfPresent(chunkPos.toLong());
+                    h.assertTrue(
+                            holder == null || holder.getTicketLevel() == 34 && holder.getGenerationRefCount() == 0,
+                            "Waiting for settled activated-head dependency holder: "
+                                    + (holder == null ? "absent" : holder.getTicketLevel()));
+                    if (holder != null)
+                        try {
+                            ServerChunkEviction.request(h.getLevel(), chunkPos);
+                        } catch (ReflectiveOperationException error) {
+                            throw new IllegalStateException(error);
+                        }
+                })
+                .thenWaitUntil(() -> {
                     try {
                         h.assertTrue(
                                 h.getLevel().getChunkSource().getChunkNow(chunkPos.x, chunkPos.z) == null
@@ -144,6 +157,9 @@ public final class HostileSpecimenGameTests {
                             level.getBlockEntity(remote) instanceof VatHeadEntity head && head.lightningActivated(),
                             "Actual chunk save/unload/reload lost activation");
                     level.removeBlock(remote, false);
+                    // This persistence fixture now runs early; retire its local source machine too.
+                    var bounds = vat(h).getBoundingBox();
+                    for (var pos : bounds) level.removeBlock(pos, false);
                 })
                 .thenSucceed();
     }
