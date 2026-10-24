@@ -49,6 +49,25 @@ Universal machinery uses Copper for fluid transport/storage, ports, pumps, valve
 
 Blood Iron is intended to be made using the Mixer from T2 Iron Casing and material derived from hostile specimens (provisionally Strange Meat), potentially with XP or another reagent. Favor direct production of Blood Iron Casing over inventing an unnecessary intermediate. Craft T3 glass from T3 casing. **No final Blood Iron recipe or precise Strange Meat form has been agreed yet.**
 
+## Future option: unstable under-tier containment and breaches
+
+**Status: speculative / not implemented.** Current tier eligibility remains a hard requirement. In particular, Endermen require T3 Blood Iron because their teleportation must be contained; a T2 Iron Vat cannot currently process them.
+
+A possible later system would allow *selected* T3 specimens in T2 Iron Vats with a nonzero chance of containment failure. This should be explicit per-specimen eligibility, not blanket permission for every T3 mob or boss. Blood Iron remains the safe, reliable way to contain the same specimen.
+
+On a failure, the encoded specimen escapes as an actual mob outside the Vat, and its Head/Flesh representation is removed or cleared from the machine. This is a real loss of the captured specimen, not merely a temporary paused state. A more severe breach may additionally destroy a contiguous patch of the Vat's own exterior shell, approximately matching the specimen's captured width and height on the affected wall. The resulting structural opening naturally invalidates/disassembles the Vat until repaired; other specimens may be affected by that loss of formation.
+
+Possible balancing direction: roll on committed biological events (e.g. growth/harvest), not continuously per tick or while unloaded, to make risk track operation without idle-time punishment. Exact chance, eligible mobs, trigger events, whether shell damage is probabilistic or always occurs, wall selection, geometry constraints, material drops, fluid-spill handling and configuration are **undecided**.
+
+Safety/design constraints for any implementation:
+- Confine optional structural destruction to eligible blocks belonging to the breached Vat; never damage unrelated buildings.
+- Respect Minecraft protection and mob-griefing expectations, and check for a safe real-world spawn location.
+- Clear the correct Head/Flesh ownership and process state atomically to avoid duplicate escapes or drops, including across save/reload.
+- Never attempt escape rolls or load world chunks while the Vat is unloaded.
+- Test multi-specimen assemblies and cases where a wall patch intersects ports, glass, cladding or controller blocks.
+
+This is deliberately deferred until after normal T3 containment/progression design. Do not implement or relax today's tier gates as part of documenting the idea.
+
 ## Implementation acceptance
 
 - Tier-compatible shells only, including clad exterior machinery; universal functional items preserved.
