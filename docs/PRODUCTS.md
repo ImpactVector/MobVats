@@ -61,15 +61,7 @@ creates the texture; the standard dynamic bucket model uses the same fluid
 appearance as tanks, buffers and world rendering. No hand-maintained PNG copy is
 added. In-client visual acceptance remains an operator task.
 
-Hostile-specimen Blender production is future work and must respect T2+ shells
-and lightning-activated Heads. No hostile defaults, capture policies or activation
-rules change here. Existing `harvest.blender` configuration accepts the explicit
-`mobvats:strange_meat` output and execution honors that ID; compatible output
-storage must accept it. Passive defaults still produce ordinary Meat. General
-resource-process fluid outputs also resolve registered IDs normally. This does
-not introduce an automatic hostile output rule or a new Mixer processing stage.
-Blood Iron manufacturing, essence requirements and Strange Meat solid products
-remain undecided.
+Activated hostile specimens in T2+ Vats use `mobvats:strange_meat` Blender profiles. Passive defaults retain ordinary Meat. Both fluids use the existing transactional output path, with separate registered identities and service tanks. See [hostile specimens](HOSTILE_SPECIMENS.md) for activation, feeding and relocation. Explicit profile overrides and general resource-process outputs continue resolving registered IDs normally. Blood Iron manufacturing and Strange Meat solid products remain unresolved.
 
 `ProductGameTests` covers registration/order, eating, cooking recipe resolution,
 fertilization and consumption, survival placement/mining/replacement and required

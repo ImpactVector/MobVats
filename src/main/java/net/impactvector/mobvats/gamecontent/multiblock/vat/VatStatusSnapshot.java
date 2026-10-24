@@ -363,6 +363,8 @@ public record VatStatusSnapshot(List<String> pages) {
     }
 
     private static String replacementStatus(MultiblockVat vat, BlockPos head, CowProcesses.Snapshot state) {
+        if (vat.getWorld().getBlockEntity(head) instanceof VatHeadEntity specimen && !specimen.activationReady())
+            return "Awaiting Lightning";
         if (!vat.getTopology().operational(head)) return "Inactive: harness obstruction";
         if (state.replacement().equals("GROWING")) return "Growing replacement";
 

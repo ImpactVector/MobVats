@@ -750,16 +750,16 @@ public final class DynamicResourceGameTests {
     public static void arbitraryEntityIdentityRunsConfiguredTransformsWithoutSpeciesCode(GameTestHelper h)
             throws Exception {
         var dir = directory();
-        write(dir, "zombie.json", fixture("minecraft:zombie"), "minecraft:zombie");
+        write(dir, "axolotl.json", fixture("minecraft:axolotl"), "minecraft:axolotl");
         var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
-        var d = loaded.definitions().get(ResourceLocation.parse("minecraft:zombie"));
+        var d = loaded.definitions().get(ResourceLocation.parse("minecraft:axolotl"));
         rig(h);
         h.runAtTickTime(30, () -> {
             var vat = vat(h);
             var head = (VatHeadEntity) h.getBlockEntity(HEAD);
             var original = head.syncDataTo(new CompoundTag(), h.getLevel().registryAccess(), SyncReason.FullSync);
             var tag = original.copy();
-            tag.putString("entity", "minecraft:zombie");
+            tag.putString("entity", "minecraft:axolotl");
             try {
                 // Identity transport retains the preformed geometry/topology; all processing uses the new ID.
                 head.syncDataFrom(tag, h.getLevel().registryAccess(), SyncReason.FullSync);

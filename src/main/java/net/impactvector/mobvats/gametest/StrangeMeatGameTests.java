@@ -216,7 +216,9 @@ public final class StrangeMeatGameTests {
                 "Explicit Strange Meat output rejected: " + loaded.errors());
         for (var d : PassiveDefaults.data().values()) {
             if (d.lifecycle())
-                h.assertTrue(d.harvest().blender().equals("mobvats:meat"), "Passive Meat default changed");
+                h.assertTrue(
+                        d.harvest().blender().equals(d.hostile() ? "mobvats:strange_meat" : "mobvats:meat"),
+                        "Classified Blender default changed");
             else h.assertTrue(d.harvest() == null, "New hostile production was introduced");
         }
         h.succeed();

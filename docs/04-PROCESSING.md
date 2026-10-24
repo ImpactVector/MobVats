@@ -276,3 +276,7 @@ definitions. Mixing legacy fields with `strategies`/`outputs` is rejected.
 Known untouched bundled v1 defaults upgrade to v2; authored defaults are
 preserved. Mixer cadence, batch timing, drive behavior, spin-up and power
 balance are unchanged.
+
+## Hostile activation (Slice 3)
+
+Complete hostile specimens form in T2/T3 while dormant. Per-Head activation gates every process before actor execution, including custom processes. A genuine strike on the vanilla rod directly above an owned roof Harness activates only that Head. Encoding resets activation; disk/network serialization and portable Head drops retain it. Default hostile Blenders produce Strange Meat through the existing fluid transaction path; Sword processing retains entity loot and XP. See [gameplay and placement](HOSTILE_SPECIMENS.md).

@@ -13,6 +13,43 @@ public class VatHeadEntity extends AbstractVatEntity {
     // Legacy Head fields are retained only for old-world NBT compatibility.
     // Active timers and milk storage belong to MultiblockVat/VatProcessEngine.
     private ResourceLocation identity;
+    private boolean lightningActivated;
+
+    public boolean hostile() {
+        return identity != null
+                && net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
+                        .getOptional(identity)
+                        .map(t -> t.getCategory() == net.minecraft.world.entity.MobCategory.MONSTER)
+                        .orElse(false);
+    }
+
+    public boolean lightningActivated() {
+        return hostile() && lightningActivated;
+    }
+
+    public boolean activationReady() {
+        return !hostile() || lightningActivated;
+    }
+
+    /** Only the verified server lightning integration calls this after structural validation. */
+    public void activateFromLightning() {
+        if (getLevel() == null || getLevel().isClientSide || !hostile() || lightningActivated) return;
+        lightningActivated = true;
+        ++renderRevision;
+        setChanged();
+        getMultiblockController().ifPresent(MultiblockVat::rebuildTopology);
+        notifyBlockUpdate();
+    }
+
+    private void refreshSubstrateModels() {
+        if (getLevel() == null || !getLevel().isClientSide || geometry == null) return;
+        for (var pos : geometry.occupiedCells(getBlockPos())) {
+            if (getLevel().getBlockEntity(pos) instanceof AbstractVatEntity part) part.requestModelDataUpdate();
+            var state = getLevel().getBlockState(pos);
+            getLevel().sendBlockUpdated(pos, state, state, 8);
+        }
+    }
+
     private java.util.UUID specimenId = java.util.UUID.randomUUID();
 
     public java.util.UUID specimenId() {
@@ -145,6 +182,20 @@ public class VatHeadEntity extends AbstractVatEntity {
                         identity, getBlockState().getValue(VatHeadBlock.FACING)));
     }
 
+    public void clearSpecimen() {
+        identity = null;
+        lightningActivated = false;
+        specimenId = java.util.UUID.randomUUID();
+        specimenState = new CompoundTag();
+        geometry = null;
+        geometryError = null;
+        invalidGeometry = null;
+        ++renderRevision;
+        setChanged();
+        notifyBlockUpdate();
+        getMultiblockController().ifPresent(c -> c.checkIfMachineIsWhole());
+    }
+
     public void encode(
             ResourceLocation identity, net.impactvector.mobvats.gamecontent.mob.SimulacrumGeometry resolved) {
         encode(identity, resolved, new CompoundTag());
@@ -154,7 +205,8 @@ public class VatHeadEntity extends AbstractVatEntity {
             ResourceLocation identity,
             net.impactvector.mobvats.gamecontent.mob.SimulacrumGeometry resolved,
             CompoundTag state) {
-        if (this.identity != null && !this.identity.equals(identity)) specimenId = java.util.UUID.randomUUID();
+        lightningActivated = false;
+        specimenId = java.util.UUID.randomUUID();
         specimenState = net.impactvector.mobvats.gamecontent.mob.CapturedSpecimen.filter(state);
         lifeStage = specimenState.getBoolean("Baby")
                 ? net.impactvector.mobvats.gamecontent.multiblock.vat.process.LifeStage.JUVENILE
@@ -184,9 +236,11 @@ public class VatHeadEntity extends AbstractVatEntity {
         } catch (IllegalArgumentException ignored) {
         }
         var previousIdentity = identity;
+        boolean previousActivationReady = activationReady();
         if (data.hasUUID("specimenId")) specimenId = data.getUUID("specimenId");
         var previousGeometry = geometry;
         identity = data.getString("entity").isEmpty() ? null : ResourceLocation.tryParse(data.getString("entity"));
+        lightningActivated = identity != null && data.getBoolean("lightningActivated");
         specimenState =
                 net.impactvector.mobvats.gamecontent.mob.CapturedSpecimen.filter(data.getCompound("specimen_state"));
         geometry = null;
@@ -211,6 +265,9 @@ public class VatHeadEntity extends AbstractVatEntity {
                 0,
                 net.impactvector.mobvats.gamecontent.multiblock.vat.process.CowBalance.MILK_INTERVAL - 1);
         milkReady = data.getBoolean("milkReady");
+        if (previousActivationReady != activationReady()
+                || !java.util.Objects.equals(previousIdentity, identity)
+                || !java.util.Objects.equals(previousGeometry, geometry)) refreshSubstrateModels();
         // Encoding changes part data, not block identity: ask ZeroCore2 to revalidate after its sync arrives.
         if (getLevel() != null
                 && getLevel().isClientSide
@@ -225,6 +282,7 @@ public class VatHeadEntity extends AbstractVatEntity {
         super.syncDataTo(data, registries, reason);
         if (reason == SyncReason.NetworkUpdate) data.put("presentation", presentation.save());
         if (identity != null) data.putString("entity", identity.toString());
+        data.putBoolean("lightningActivated", lightningActivated());
         data.putUUID("specimenId", specimenId);
         data.putInt("specimen_version", 1);
         data.put("specimen_state", specimenState.copy());

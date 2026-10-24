@@ -93,17 +93,19 @@ public record VatSpecimenSnapshot(
                         ? "Identity missing"
                         : !valid
                                 ? "Invalid geometry"
-                                : !vat.getTopology().operational(pos)
-                                        ? "Harness obstructed"
-                                        : !vat.isMachineActive()
-                                                ? "Paused by operator"
-                                                : vat.controllerInhibited()
-                                                        ? "Redstone inhibited"
-                                                        : definition == null
-                                                                ? "Definition unavailable"
-                                                                : runtime == null
-                                                                        ? "Waiting for process data"
-                                                                        : "Operational";
+                                : !h.activationReady()
+                                        ? "Awaiting Lightning"
+                                        : !vat.getTopology().operational(pos)
+                                                ? "Harness obstructed"
+                                                : !vat.isMachineActive()
+                                                        ? "Paused by operator"
+                                                        : vat.controllerInhibited()
+                                                                ? "Redstone inhibited"
+                                                                : definition == null
+                                                                        ? "Definition unavailable"
+                                                                        : runtime == null
+                                                                                ? "Waiting for process data"
+                                                                                : "Operational";
         double yield = valid ? vat.yieldMultiplier(pos) : 0.5;
         var processes = valid ? vat.processEngine().presentation(pos) : List.<Process>of();
         if (status.equals("Operational")) {

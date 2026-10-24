@@ -254,8 +254,7 @@ public final class VatProcessEngine {
             int elapsed = state == null ? 0 : state.elapsed;
             int duration = timer == null ? 0 : timer.progress().duration();
             double rate = timer == null ? 0 : timer.progress().rate().applyAsDouble(context);
-            boolean suspended =
-                    !controller.processingEnabled() || !controller.getTopology().operational(head);
+            boolean suspended = !controller.processingEnabled() || !context.operational();
             boolean running = !suspended
                     && state != null
                     && state.phase == ProcessState.Phase.RUNNING
@@ -263,9 +262,11 @@ public final class VatProcessEngine {
                     && evaluated.reason() == ProcessResult.Reason.RUNNING;
             String text = !controller.processingEnabled()
                     ? (controller.controllerInhibited() ? "Redstone inhibited" : "Paused")
-                    : !controller.getTopology().operational(head)
-                            ? "Harness obstructed"
-                            : evaluated == null ? "Waiting" : VatSpecimenSnapshot.reason(evaluated.reason());
+                    : !context.assembly().head().activationReady()
+                            ? "Awaiting Lightning"
+                            : !controller.getTopology().operational(head)
+                                    ? "Harness obstructed"
+                                    : evaluated == null ? "Waiting" : VatSpecimenSnapshot.reason(evaluated.reason());
             String name =
                     entry.getKey().substring(entry.getKey().indexOf(':') + 1).replace('/', ' ');
             result.add(new VatSpecimenSnapshot.Process(

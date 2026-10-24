@@ -183,3 +183,7 @@ Use the commands in section 7.2 for current integration/acceptance validation. T
 ### 7.6.2 Unified mechanical materials
 
 Fixture builders place universal functional blocks with their final `cladding_material` state directly. Material-specific mechanical IDs and direction-only Mixer port IDs are removed; reset disposable worlds with `buildTestWorld`. Gameplay cladding is tested separately through the actual casing/glass item interaction. Run `python tools/verify_unified_world.py run/saves/MobVatsAcceptance run/saves/MobVatsMinimumXp` to verify saved palettes, material/mode properties and fixture inventory IDs. See [current cladding](02-MULTIBLOCKS.md#24-universal-mechanical-parts-and-installed-materials) for replacement, recovery and ZeroCore ownership behavior.
+
+## Hostile specimens (Slice 3)
+
+HostileSpecimenGameTests exercises actual LightningBolt ticks, natural/Channeling-origin source metadata, tier/geometry rejection, independent activation and model selection, Head save/network/item state, dormant actors, Strange Meat and output backpressure. The [manual client scenario](HOSTILE_SPECIMENS.md#manual-client-acceptance-outstanding) remains outstanding; headless tests do not establish GPU visibility.

@@ -160,8 +160,8 @@ public final class SpecimenPresentationGameTests {
         var drops = net.minecraft.world.level.block.Block.getDrops(
                 placed.getBlockState(), h.getLevel(), placed.getBlockPos(), placed);
         h.assertTrue(
-                drops.size() == 1 && !drops.getFirst().has(DataComponents.BLOCK_ENTITY_DATA),
-                "Existing blank Head drop semantics changed");
+                drops.size() == 1 && drops.getFirst().has(DataComponents.BLOCK_ENTITY_DATA),
+                "Head drops must retain encoded specimen data");
         h.succeed();
     }
 }

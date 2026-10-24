@@ -52,10 +52,10 @@ public final class PassiveDefaults {
                 // Undead horses have no breeding lifecycle and remain progression gated.
                 boolean undead = Set.of("skeleton_horse", "zombie_horse").contains(name);
                 var food = FOODS.get(name);
-                boolean lifecycle = food != null && !hostile && !boss;
+                boolean lifecycle = (food != null || hostile) && !boss;
                 var outputs = new ArrayList<PassiveMobDefinition.SecondaryOutput>();
                 if (Set.of("cow", "goat", "mooshroom").contains(name)) outputs.add(milk());
-                if (lifecycle) outputs.add(waste());
+                if (lifecycle && !hostile) outputs.add(waste());
                 var processes = new ArrayList<PassiveMobDefinition.ResourceProcess>();
                 if (name.equals("chicken"))
                     processes.add(new PassiveMobDefinition.ResourceProcess(
@@ -73,7 +73,7 @@ public final class PassiveDefaults {
                 net.impactvector.mobvats.gamecontent.mob.SimulacrumGeometry.resolve(
                         size.width(), size.height(), size.width(), net.minecraft.core.Direction.NORTH, null);
                 var capture = new PassiveMobDefinition.Capture(
-                        !boss && !hostile && !undead,
+                        !boss && !undead,
                         "mobvats:syringe",
                         new PassiveMobDefinition.CaptureCost(List.of("minecraft:glass_bottle"), 1),
                         0,
@@ -84,23 +84,28 @@ public final class PassiveDefaults {
                         true,
                         boss
                                 ? "boss progression unavailable"
-                                : hostile || undead
-                                        ? "hostile progression unavailable"
-                                        : lifecycle
-                                                ? "passive lifecycle; special interactions not implemented"
-                                                : "representation only; special reproduction/interactions not implemented");
+                                : hostile
+                                        ? "T2+; one-time lightning activation on encoded Head"
+                                        : undead
+                                                ? "undead horse progression unavailable"
+                                                : lifecycle
+                                                        ? "passive lifecycle; special interactions not implemented"
+                                                        : "representation only; special reproduction/interactions not implemented");
                 var definition = new PassiveMobDefinition(
                         id.toString(),
                         lifecycle
                                 ? new PassiveMobDefinition.Feed(
-                                        name.equals("cow") ? List.of(food, "minecraft:wheat") : List.of(food), 1)
+                                        hostile
+                                                ? List.of("minecraft:rotten_flesh")
+                                                : name.equals("cow") ? List.of(food, "minecraft:wheat") : List.of(food),
+                                        1)
                                 : null,
                         lifecycle ? (name.equals("sniffer") ? 48000 : 24000) : 0,
                         outputs,
                         lifecycle
                                 ? new PassiveMobDefinition.Harvest(
                                         "mobvats:vanilla_entity_death_loot",
-                                        "mobvats:meat",
+                                        hostile ? "mobvats:strange_meat" : "mobvats:meat",
                                         1000,
                                         0,
                                         PassiveUses.HARVEST,

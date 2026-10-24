@@ -55,7 +55,7 @@ public record VatPresentation(List<Link> tools, List<Link> feeds, boolean operat
                 .map(c -> link(vat, assembly, c.actor(), true, true))
                 .filter(Objects::nonNull)
                 .toList();
-        return new VatPresentation(tools, feeds, topology.operational(head));
+        return new VatPresentation(tools, feeds, assembly.head().activationReady() && topology.operational(head));
     }
 
     private static Link link(MultiblockVat vat, MobAssembly assembly, BlockPos port, boolean assigned, boolean feed) {

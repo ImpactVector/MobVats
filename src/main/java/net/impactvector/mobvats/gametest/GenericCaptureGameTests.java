@@ -94,14 +94,25 @@ public final class GenericCaptureGameTests {
                 loaded.errors().isEmpty() && loaded.definitions().keySet().equals(expected),
                 "Catalog differs from all vanilla Mob types: " + loaded.errors() + " expected=" + expected.size()
                         + " actual=" + loaded.definitions().size());
-        for (var name : List.of("cow", "sheep", "pig", "chicken", "axolotl", "cod", "allay", "villager"))
+        for (var name : List.of(
+                "cow",
+                "sheep",
+                "pig",
+                "chicken",
+                "axolotl",
+                "cod",
+                "allay",
+                "villager",
+                "zombie",
+                "skeleton",
+                "creeper"))
             h.assertTrue(
                     loaded.definitions()
                             .get(ResourceLocation.withDefaultNamespace(name))
                             .capture()
                             .enabled(),
                     "Passive capture disabled: " + name);
-        for (var name : List.of("zombie", "skeleton", "creeper", "wither", "ender_dragon", "warden", "elder_guardian"))
+        for (var name : List.of("wither", "ender_dragon", "warden", "elder_guardian"))
             h.assertTrue(
                     !loaded.definitions()
                             .get(ResourceLocation.withDefaultNamespace(name))
@@ -164,7 +175,7 @@ public final class GenericCaptureGameTests {
     @GameTest(template = "empty", timeoutTicks = 10)
     public static void disabledDeadBabyWrongToolAndInsufficientCostsConsumeNothing(GameTestHelper h) {
         var p = player(h, false, 2);
-        var zombie = EntityType.ZOMBIE.create(h.getLevel());
+        var zombie = EntityType.WITHER.create(h.getLevel());
         h.assertTrue(
                 capture(p, zombie) == InteractionResult.FAIL
                         && bottles(p) == 2

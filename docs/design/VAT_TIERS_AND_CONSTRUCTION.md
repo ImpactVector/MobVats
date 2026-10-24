@@ -1,6 +1,6 @@
 # Vat tiers and construction — design decisions
 
-Status: Slice 1 structural tiers implemented; survival progression and hostile activation remain future work.
+Status: Slices 1–3 implemented: structural tiers, T1/T2 Survival construction, and per-Head hostile activation.
 Last updated: 2026-10-23.
 
 ## Principle
@@ -29,7 +29,7 @@ Preserve the current installed-material/cladding architecture and its material d
 
 ## Implemented construction (Slice 1)
 
-Creative exposes Copper casing/glass/Controller under the established IDs `vat_casing`, `vat_glass`, `vat_controller`; Iron uses the corresponding `_t2` suffix and Blood Iron uses `_t3`. All Controllers share the existing entity, menu, management APIs and process engine. Tier is derived from the Controller block; it adds no process multiplier or hostile eligibility.
+Creative exposes Copper casing/glass/Controller under the established IDs `vat_casing`, `vat_glass`, `vat_controller`; Iron uses the corresponding `_t2` suffix and Blood Iron uses `_t3`. All Controllers share the existing entity, menu, management APIs and process engine. Tier is derived from the Controller block; it adds no process multiplier. T2+ permits hostile specimens subject to per-Head lightning activation.
 
 Installed materials `vat_t2_casing`, `vat_t2_glass`, `vat_t3_casing`, `vat_t3_glass` extend the existing `cladding_material` property. Sneak-installation/replacement consumes and recovers the corresponding structural item. Functional item registrations remain universal. Harness/Sump shell mounts also require installed matching material; their existing IDs, interior support geometry and association rules remain intact.
 
@@ -43,15 +43,7 @@ T1 Copper and T2 Iron are Survival-craftable. One Copper/Iron ingot plus ordinar
 
 Universal machinery uses Copper for fluid transport/storage, ports, pumps, valves, disposal, feed delivery and Sumps; Iron for item transport, ports, tools and motion; Iron plus Leather for Harnesses; and Iron, a Stonecutter and a Diamond for the Blender. These are crafting costs, not mechanical tiers. Conduits still craft in batches of four, and Mixer Shafts in batches of three. Existing pump/void mode switches and conduit trunk/tap conversions remain reversible. Matching structural cladding is still charged separately for exterior mechanisms, including Harnesses and Sumps. No functional tier variants, transfer/actor speed changes or inventory changes are introduced. See [recipe audit](../SURVIVAL_RECIPES.md).
 
-`mobvats:strange_meat` is a distinct registered fluid with its own source, flowing state, FluidType and bucket. It is available in Creative for fluid-handling checks. It cannot enter ordinary Meat extrusion even if optional composition is absent or mentions Meat. Hostile production still requires a future T2+ and lightning-activated Head feature; this slice adds no activation or hostile processing. Explicit Blender output configuration can select Strange Meat, but passive defaults remain ordinary Meat. Solid Strange Meat products and extrusion outputs are undecided. See [products](../PRODUCTS.md).
-
-## Future hostile Head progression
-
-Current default hostile catalog entries disable capture and have no production processes. Manually encoded representation-only Heads retain their existing formation behavior in every tier. Constructing T2/T3 does not enable capture, add hostile processes or activate a Head.
-
-A hostile specimen requires **both** a T2-or-higher Vat and an encoded hostile Head activated once by lightning. Lightning activation is a persistent Boolean on the Head associated with the current encoded specimen. Re-encoding/replacing the specimen resets activation; relocating the Head while preserving its encoded specimen retains activation. No FE, fuel, charge budget or repeated lightning upkeep is intended.
-
-A vanilla lightning rod at/adjacent to the Head is a possible activation interface, but exact placement and whether an unactivated hostile Head prevents formation versus merely preventing processing are not yet settled.
+`mobvats:strange_meat` is a distinct registered fluid with its own source, flowing state, FluidType and bucket. It is available in Creative for fluid-handling checks. It cannot enter ordinary Meat extrusion even if optional composition is absent or mentions Meat. Activated hostile Blenders produce Strange Meat; passive defaults remain ordinary Meat. No Strange Meat solids or extrusion recipes are implemented. See [hostile specimens](../HOSTILE_SPECIMENS.md) for formation, rod placement, dormancy and persistence rules.
 
 ## Future Blood Iron manufacturing
 
@@ -62,5 +54,5 @@ Blood Iron is intended to be made using the Mixer from T2 Iron Casing and materi
 - Tier-compatible shells only, including clad exterior machinery; universal functional items preserved.
 - Rectangular vats and geometry-derived minima; T1 maximum 9 x 7 x 9.
 - No accidental bonus for higher tier alone.
-- Hostile gating and lightning behavior documented separately from current implementation.
+- Hostile T2+ formation and independent lightning activation are covered by headless tests.
 - Validate actual specimen/Tool Port line of sight and construction in GameTests; do not assume illustrative layouts are formable.

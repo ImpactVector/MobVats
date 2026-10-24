@@ -184,9 +184,11 @@ public class MultiblockVat
         String specimens = assemblies.stream()
                 .map(a ->
                         a.head().getIdentity() + " @ " + a.head().getBlockPos().toShortString() + ": "
-                                + (topology.operational(a.head().getBlockPos())
-                                        ? a.head().lifeStage().name()
-                                        : "inactive: harness obstruction"))
+                                + (!a.head().activationReady()
+                                        ? "Awaiting Lightning"
+                                        : topology.operational(a.head().getBlockPos())
+                                                ? a.head().lifeStage().name()
+                                                : "inactive: harness obstruction"))
                 .collect(java.util.stream.Collectors.joining("; "));
         return products.status() + " | Specimens " + assemblies.size() + " [" + specimens + "] | XP "
                 + getExperienceMb() + " mB | Items buffered " + killOutputStackCount() + " stacks";
@@ -466,19 +468,22 @@ public class MultiblockVat
         }
         for (var part : attachedPorts)
             if (part instanceof VatBlenderEntity blender) {
-                blender.service()
-                        .tank(new FluidStack(net.impactvector.mobvats.gamecontent.fluid.ProductFluids.MEAT.get(), 1))
-                        .setCapacity(Math.max(
-                                2000,
-                                assemblies.stream()
-                                        .map(a -> net.impactvector.mobvats.gamecontent.multiblock.vat.process
-                                                .PassiveMobDefinitionRegistry.resolve(
-                                                a.head().getIdentity()))
-                                        .filter(d -> d != null && d.lifecycle())
-                                        .mapToInt(d ->
-                                                Math.multiplyExact(d.harvest().blender_amount(), 2))
-                                        .max()
-                                        .orElse(2000)));
+                for (var fluid : java.util.List.of(
+                        net.impactvector.mobvats.gamecontent.fluid.ProductFluids.MEAT.get(),
+                        net.impactvector.mobvats.gamecontent.fluid.ProductFluids.STRANGE_MEAT.get()))
+                    blender.service()
+                            .tank(new FluidStack(fluid, 1))
+                            .setCapacity(Math.max(
+                                    2000,
+                                    assemblies.stream()
+                                            .map(a -> net.impactvector.mobvats.gamecontent.multiblock.vat.process
+                                                    .PassiveMobDefinitionRegistry.resolve(
+                                                    a.head().getIdentity()))
+                                            .filter(d -> d != null && d.lifecycle())
+                                            .mapToInt(d -> Math.multiplyExact(
+                                                    d.harvest().blender_amount(), 2))
+                                            .max()
+                                            .orElse(2000)));
                 services.put(blender.getBlockPos(), blender.service());
             }
         for (var tool : toolPorts()) {
@@ -574,6 +579,14 @@ public class MultiblockVat
                 .toList();
     }
 
+    /** Validate current blocks without reassembling an already valid machine or resetting its runtime. */
+    public boolean validForLightning() {
+        if (!isAssembled()) return false;
+        if (isMachineWhole(this)) return true;
+        checkIfMachineIsWhole();
+        return false;
+    }
+
     @Override
     protected boolean isMachineWhole(IMultiblockValidator validator) {
         assemblies = List.of();
@@ -616,7 +629,14 @@ public class MultiblockVat
                 .map(VatHeadEntity.class::cast)
                 .sorted(Comparator.comparing(VatHeadEntity::getBlockPos, VatTopologyCompiler.POSITION))
                 .toList();
-        for (var head : heads)
+        for (var head : heads) {
+            if (head.hostile() && tier == VatTier.T1) {
+                validator.setLastError(
+                        head.getBlockPos(),
+                        "multiblock.mobvats.geometry",
+                        "Hostile specimens require T2 Iron or T3 Blood Iron");
+                return false;
+            }
             if (head.getIdentity() == null
                     || head.geometry() == null
                     || (!getWorld().isClientSide
@@ -631,6 +651,7 @@ public class MultiblockVat
                                 : head.geometryError());
                 return false;
             }
+        }
         try {
             var claims = heads.stream()
                     .map(head -> new SpecimenGeometry.Claim(head.getBlockPos(), head.geometry()))

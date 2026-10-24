@@ -140,6 +140,7 @@ public class VatHeadEntityRenderer implements BlockEntityRenderer<AbstractVatEnt
         visuals.world(current);
         var vat = entity.getMultiblockController().filter(MultiblockVat::isAssembled);
         if (!(entity instanceof VatHeadEntity head)
+                || !head.activationReady()
                 || vat.isEmpty()
                 || current == null
                 || entity.getLevel() != current

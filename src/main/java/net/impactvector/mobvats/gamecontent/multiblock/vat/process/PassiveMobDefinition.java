@@ -155,7 +155,7 @@ public record PassiveMobDefinition(
                     harvest.acquisition_priority(),
                     "retain",
                     null));
-        if (lifecycle())
+        if (lifecycle() && !hostile())
             result.add(new ToolInteractionDefinition(
                     "mobvats:shear",
                     "mobvats:regrowing_entity_item_interaction",
@@ -203,6 +203,13 @@ public record PassiveMobDefinition(
 
     public boolean lifecycle() {
         return feed != null;
+    }
+
+    public boolean hostile() {
+        return net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
+                        .get(identity())
+                        .getCategory()
+                == net.minecraft.world.entity.MobCategory.MONSTER;
     }
 
     public List<String> tagDiagnostics() {

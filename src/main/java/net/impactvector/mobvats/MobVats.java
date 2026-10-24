@@ -13,6 +13,8 @@ public final class MobVats {
     public MobVats(IEventBus bus, ModContainer container) {
         net.neoforged.neoforge.common.NeoForgeMod.enableMilkFluid();
         Content.register(bus);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                net.impactvector.mobvats.gamecontent.multiblock.vat.HostileActivation::lightningStrike);
         net.impactvector.mobvats.gamecontent.multiblock.vat.menu.VatSpecimenNetworking.register(bus);
         net.impactvector.mobvats.gamecontent.fluid.compound.CompoundFluids.register(bus);
         net.impactvector.mobvats.gamecontent.multiblock.mixer.process.MixerDefinitionEvents.register(bus);

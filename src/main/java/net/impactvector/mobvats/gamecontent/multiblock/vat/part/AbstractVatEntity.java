@@ -203,14 +203,25 @@ public abstract class AbstractVatEntity extends AbstractMultiblockEntity<Multibl
     @Override
     protected ModelData getUpdatedModelData() {
         // XR2 turbine pattern: construction at index 0, hidden model at index 1.
-        var data = CuboidPartVariantsModelData.from(
-                type.ordinal(),
-                isMachineAssembled() && (type == VatPartType.Head || type == VatPartType.Flesh) ? 1 : 0,
-                getOutwardFacings());
+        var data =
+                CuboidPartVariantsModelData.from(type.ordinal(), hidesSpecimenSubstrate() ? 1 : 0, getOutwardFacings());
         return type.usesWallPanel()
                 ? data.derive()
                         .with(VatWallPanelState.PROPERTY, getWallPanelState())
                         .build()
                 : data;
+    }
+
+    /** Shared by model selection and headless rendering acceptance tests. */
+    public boolean hidesSpecimenSubstrate() {
+        if (!isMachineAssembled() || (type != VatPartType.Head && type != VatPartType.Flesh)) return false;
+        if (this instanceof VatHeadEntity head) return head.activationReady();
+        return getMultiblockController().stream()
+                .flatMap(v -> v.getAssemblies().stream())
+                .filter(a -> a.head()
+                        .geometry()
+                        .occupiedCells(a.head().getBlockPos())
+                        .contains(getBlockPos()))
+                .anyMatch(a -> a.head().activationReady());
     }
 }

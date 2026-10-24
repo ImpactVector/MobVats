@@ -42,10 +42,15 @@ public class ItemEssence extends Item {
         if (id == null
                 || !(context.getLevel().getBlockEntity(context.getClickedPos()) instanceof VatHeadEntity head)
                 || head.isMachineAssembled()
-                || head.getIdentity() != null) return InteractionResult.PASS;
+                || head.getIdentity() != null
+                        && (context.getPlayer() == null || !context.getPlayer().isShiftKeyDown()))
+            return InteractionResult.PASS;
         if (!context.getLevel().isClientSide) {
             try {
-                encode(context.getItemInHand(), head);
+                encode(
+                        context.getItemInHand(),
+                        head,
+                        context.getPlayer() != null && context.getPlayer().isShiftKeyDown());
             } catch (IllegalArgumentException error) {
                 if (context.getPlayer() != null)
                     context.getPlayer()
@@ -60,8 +65,13 @@ public class ItemEssence extends Item {
     }
 
     public static void encode(ItemStack essence, VatHeadEntity head) {
-        if (head.isMachineAssembled() || head.getIdentity() != null)
-            throw new IllegalArgumentException("Head must be empty and unassembled");
+        encode(essence, head, false);
+    }
+
+    /** Sneak-use explicitly replaces an existing encoding on an unassembled Head. */
+    public static void encode(ItemStack essence, VatHeadEntity head, boolean replace) {
+        if (head.isMachineAssembled() || head.getIdentity() != null && !replace)
+            throw new IllegalArgumentException("Head must be unassembled; sneak-use to replace an encoding");
         var specimen = net.impactvector.mobvats.gamecontent.mob.CapturedSpecimen.load(
                 essence.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY)
                         .copyTag(),

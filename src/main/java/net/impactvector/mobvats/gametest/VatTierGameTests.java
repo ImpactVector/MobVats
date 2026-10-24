@@ -425,7 +425,7 @@ public final class VatTierGameTests {
     }
 
     @GameTest(template = "empty", timeoutTicks = 100)
-    public static void bloodIronDoesNotUnlockHostiles(GameTestHelper h) {
+    public static void bloodIronHostilesAwaitLightning(GameTestHelper h) {
         build(h, VatTier.T3, 5, 4, 5, false);
         var zombie = ResourceLocation.withDefaultNamespace("zombie");
         head(h).encode(zombie);
@@ -438,8 +438,8 @@ public final class VatTierGameTests {
                             zombie);
             h.assertTrue(vat(h).isAssembled(), "Existing representation-only hostile behavior changed");
             h.assertTrue(
-                    !definition.capture().enabled() && profile.definitions().isEmpty(),
-                    "Higher tier unlocked hostile capture/processing");
+                    definition.capture().enabled() && !profile.definitions().isEmpty() && !head(h).activationReady(),
+                    "Higher tier must permit dormant hostile processing profiles");
             h.succeed();
         });
     }

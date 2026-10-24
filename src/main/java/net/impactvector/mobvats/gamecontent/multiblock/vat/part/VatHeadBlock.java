@@ -33,6 +33,19 @@ public final class VatHeadBlock extends VatConstructionBlock {
     }
 
     @Override
+    protected java.util.List<net.minecraft.world.item.ItemStack> getDrops(
+            BlockState state, net.minecraft.world.level.storage.loot.LootParams.Builder builder) {
+        var drops = super.getDrops(state, builder);
+        var entity = builder.getOptionalParameter(
+                net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY);
+        if (entity instanceof VatHeadEntity head && head.getLevel() != null && head.getIdentity() != null)
+            for (int i = 0; i < drops.size(); i++)
+                if (drops.get(i).is(asItem()))
+                    drops.set(i, getCloneItemStack(head.getLevel(), head.getBlockPos(), state));
+        return drops;
+    }
+
+    @Override
     public net.minecraft.world.item.ItemStack getCloneItemStack(
             net.minecraft.world.level.LevelReader level, net.minecraft.core.BlockPos pos, BlockState state) {
         var stack = new net.minecraft.world.item.ItemStack(this);
@@ -41,7 +54,8 @@ public final class VatHeadBlock extends VatConstructionBlock {
             var tag = saved.getCompound("zcvase_payload");
             // Clone specimen data, not controller ownership, presentation or process identity.
             var specimen = new net.minecraft.nbt.CompoundTag();
-            for (var key : java.util.List.of("entity", "geometry", "specimen_version", "specimen_state", "lifeStage"))
+            for (var key : java.util.List.of(
+                    "entity", "geometry", "specimen_version", "specimen_state", "lifeStage", "lightningActivated"))
                 if (tag.contains(key)) specimen.put(key, tag.get(key).copy());
             var itemData = new net.minecraft.nbt.CompoundTag();
             itemData.putInt("zcvase_version", saved.getInt("zcvase_version"));

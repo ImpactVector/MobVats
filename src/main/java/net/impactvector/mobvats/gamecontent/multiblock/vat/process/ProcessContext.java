@@ -140,7 +140,7 @@ public final class ProcessContext {
     }
 
     public boolean operational() {
-        return controller().getTopology().operational(head());
+        return assembly().head().activationReady() && controller().getTopology().operational(head());
     }
 
     public List<VatTopology.Assignment> routes(String use) {
