@@ -49,6 +49,27 @@ Universal machinery uses Copper for fluid transport/storage, ports, pumps, valve
 
 Blood Iron is intended to be made using the Mixer from T2 Iron Casing and material derived from hostile specimens (provisionally Strange Meat), potentially with XP or another reagent. Favor direct production of Blood Iron Casing over inventing an unnecessary intermediate. Craft T3 glass from T3 casing. **No final Blood Iron recipe or precise Strange Meat form has been agreed yet.**
 
+## Planned specimen tier requirements and discoverability
+
+**Status: agreed design direction, not implemented. Boss containment is excluded from this phase.**
+
+Containment requirements must be **configurable per entity type**, including third-party modded entities. A default tier must also be discoverable for a newly installed mod's mobs without requiring a prewritten MobVats config file.
+
+- **T1 Copper:** ordinary passive/non-hostile mobs.
+- **T2 Iron:** conventional Overworld hostile mobs.
+- **T3 Blood Iron:** Nether and End mobs, teleporting/warping species and other supernatural containment exceptions. **Endermen are explicitly T3**, even in the Overworld, because their warping requires Blood Iron.
+- **Bosses:** do not assign automatic T3 permission, implement boss farming, or include them in the current progression pass. Boss eligibility and resource costs require a separate future design (possibly involving a Nether Star and further components).
+
+Treat these as **default classifications**, not immutable rules. An operator-authored exact entity-ID override wins over inferred/default tier. Support data-driven tags/group overrides where practical, so modpacks can adjust multiple species. Integrate with the existing capture policy and profile configuration instead of creating a conflicting second whitelist.
+
+### Unknown modded mobs
+
+Provide a documented *best-effort* discovery/classification path for registered mobs that lack explicit profiles. Use trustworthy metadata when present (entity type category, data-pack entity tags, known or configured dimension affinities and explicit special-case overrides), with clear provenance. Do not infer an entity's native dimension solely from where one individual happened to spawn, and do not assume the registry namespace or hitbox size determines magical containment. Not all modded mob abilities, including teleportation, are reliably introspectable; an exact override or tag is the correct fallback.
+
+A generated/inspected entry should expose entity ID, inferred minimum tier, reason/source for the inference, capture support status and any unresolved classification. Discoverability should not imply every modded entity is safely capturable or processable: species missing supported geometry, representation, lifecycle or handlers need explicit diagnostics and must not silently bypass safety gates. Unknown or ambiguous supernatural properties must not accidentally grant risky T1 containment; settle the conservative fallback policy in implementation design and test it.
+
+Tests should demonstrate an unconfigured ordinary modded passive, an Overworld hostile, a Nether/End creature, the Enderman exception, explicit overrides, ambiguous/unknown species and boss rejection. Expose the effective tier in the relevant specimen/Head inspection interface.
+
 ## Future option: unstable under-tier containment and breaches
 
 **Status: speculative / not implemented.** Current tier eligibility remains a hard requirement. In particular, Endermen require T3 Blood Iron because their teleportation must be contained; a T2 Iron Vat cannot currently process them.
