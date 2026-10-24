@@ -48,7 +48,8 @@ public final class PassiveDefaults {
             if (targeted(type)) {
                 var id = BuiltInRegistries.ENTITY_TYPE.getKey(type);
                 var name = id.getPath();
-                boolean boss = BOSSES.contains(name), hostile = type.getCategory() == MobCategory.MONSTER;
+                boolean boss = BOSSES.contains(name) || type.is(net.neoforged.neoforge.common.Tags.EntityTypes.BOSSES),
+                        hostile = type.getCategory() == MobCategory.MONSTER;
                 // Undead horses have no breeding lifecycle and remain progression gated.
                 boolean undead = Set.of("skeleton_horse", "zombie_horse").contains(name);
                 var food = FOODS.get(name);
@@ -81,7 +82,7 @@ public final class PassiveDefaults {
                         true,
                         !boss,
                         true,
-                        true,
+                        !boss,
                         boss
                                 ? "boss progression unavailable"
                                 : hostile
@@ -130,7 +131,9 @@ public final class PassiveDefaults {
                         id.toString(),
                         definition
                                 .withToolInteractions(interactions)
-                                .withMinimumVatTier(name.equals("enderman") ? 3 : hostile ? 2 : 1));
+                                .withMinimumVatTier(
+                                        MobTierClassification.classify(id, type.getCategory(), Set.of(), Set.of())
+                                                .tier()));
             }
         return Collections.unmodifiableMap(result);
     }

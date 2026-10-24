@@ -1,6 +1,6 @@
 # Mob profile schema and tier discovery — two implementation slices
 
-Status: **Slice 1 implemented and validated. Slice 2 planned.** Recorded 2026-10-24. See [profile configuration](../MOB_PROFILES.md) for the implemented storage and schema contract. Slice 1 validation: Java 21 spotlessCheck/build and all 1,171 required autonomous headless GameTests passed on 2026-10-24.
+Status: **Slices 1 and 2 implemented and validated.** Recorded 2026-10-24. See [profile configuration](../MOB_PROFILES.md) for the implemented storage and schema contract. Slice 1 validation passed 1,171 required autonomous headless GameTests. Final Slice 2 validation: Java 21 spotlessCheck/build and all 1,178 required autonomous headless GameTests passed on 2026-10-24.
 
 ## Boundaries
 

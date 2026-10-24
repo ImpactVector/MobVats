@@ -135,8 +135,7 @@ public final class MobProfileSchemaGameTests {
     }
 
     @GameTest(template = "empty", timeoutTicks = 10)
-    public static void pathsAndCompatibilityPolicyAreIndependentOfCaptureAndTierData(GameTestHelper h)
-            throws Exception {
+    public static void pathsAndConfiguredTierAreIndependentOfCapturePermissions(GameTestHelper h) throws Exception {
         var dir = directory();
         h.assertTrue(
                 MobProfileFixtures.file(dir, "somepack:creatures/cow").endsWith("somepack/creatures/cow.json"),
@@ -154,12 +153,21 @@ public final class MobProfileSchemaGameTests {
         document.addProperty("minimum_vat_tier", 3);
         write(dir, document);
         var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
-        h.assertTrue(
-                loaded.definitions().get(COW).minimum_vat_tier() == 3
-                        && MobEligibility.allows(COW, VatTier.T1)
-                        && !MobEligibility.allows(ResourceLocation.parse("minecraft:zombie"), VatTier.T1)
-                        && MobEligibility.allows(ResourceLocation.parse("minecraft:zombie"), VatTier.T2),
-                "Slice 1 changed tier enforcement");
+        var original = new PassiveMobDefinitionRegistry.Loaded(
+                PassiveMobDefinitionRegistry.definitions(), Map.of(), List.of());
+        try {
+            PassiveMobDefinitionRegistry.publish(loaded);
+            h.assertTrue(
+                    loaded.definitions().get(COW).minimum_vat_tier() == 3
+                            && !MobEligibility.allows(COW, VatTier.T1)
+                            && MobEligibility.allows(COW, VatTier.T3)
+                            && loaded.definitions().get(COW).capture().enabled()
+                            && !MobEligibility.allows(ResourceLocation.parse("minecraft:zombie"), VatTier.T1)
+                            && MobEligibility.allows(ResourceLocation.parse("minecraft:zombie"), VatTier.T2),
+                    "Configured containment tier or capture policy was ignored");
+        } finally {
+            PassiveMobDefinitionRegistry.publish(original);
+        }
         h.succeed();
     }
 

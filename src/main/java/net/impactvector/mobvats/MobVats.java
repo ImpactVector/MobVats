@@ -22,6 +22,10 @@ public final class MobVats {
                 net.impactvector.mobvats.gamecontent.multiblock.vat.process.PassiveDefinitionEvents::startup);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
                 net.impactvector.mobvats.gamecontent.multiblock.vat.process.PassiveDefinitionEvents::commands);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                net.impactvector.mobvats.gamecontent.multiblock.vat.process.PassiveDefinitionEvents::tagsUpdated);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                net.impactvector.mobvats.gamecontent.multiblock.vat.process.PassiveDefinitionEvents::stopped);
         Config.initialize(container);
     }
 }

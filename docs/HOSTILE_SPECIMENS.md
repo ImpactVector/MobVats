@@ -1,8 +1,6 @@
 # Hostile specimens and lightning activation
 
-T2 Iron and T3 Blood Iron Vats accept encoded hostile specimens with complete
-captured Flesh geometry, their normal Harness corner plane, Sump, and valid shell.
-T1 Copper rejects hostile specimens. An uncharged hostile specimen can form; its
+The configured minimum Vat tier controls hostile containment. Ordinary Overworld hostiles initially require T2 Iron; otherworldly species such as Enderman initially require T3 Blood Iron. Default profiles reject hostile specimens in T1 Copper. Formation also requires complete captured Flesh geometry, the normal Harness corner plane, Sump, and a valid shell. An uncharged hostile specimen can form; its
 inspection status is **Awaiting Lightning**. Its physical Head/Flesh stays visible,
 its mob replacement is hidden, and none of its processes run. Passive specimens
 and already activated hostile specimens in the same Vat continue independently.
@@ -62,7 +60,7 @@ same transactional output path and separate service tanks. Strange Meat has no
 solid products or Extruder recipes. Boss capture and undead-horse progression
 remain gated. Blood Iron manufacturing and T3 Survival recipes remain unresolved.
 
-Profiles remain operator-owned at config/mobvats/mobs/<namespace>/<path>.json. Existing species files are preserved. The old passive_mobs bundle/override directory is no longer loaded. Edit an individual hostile profile and reload with /mobvats reload_passive_mobs. See [mob profiles](MOB_PROFILES.md) for schema upgrades and disabled-profile handling. No tier recipes change.
+Profiles remain operator-owned at `config/mobvats/mobs/<namespace>/<path>.json`. The configured minimum tier controls formation and reload revalidates existing Vats immediately; T2 is the initial tier for ordinary Overworld hostiles, while otherworldly species start at T3. Existing species files are preserved. The old passive_mobs bundle/override directory is no longer loaded. Edit an individual hostile profile and reload with /mobvats reload_passive_mobs. See [mob profiles](MOB_PROFILES.md) for schema upgrades and disabled-profile handling. No tier recipes change.
 
 ## Manual client acceptance (outstanding)
 

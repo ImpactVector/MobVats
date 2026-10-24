@@ -5,7 +5,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.MobCategory;
 
-/** Single containment policy. Enforcement of the configured tier is deferred to slice 2. */
+/** Species containment is controlled by the loaded profile, independently of capture and activation. */
 public final class MobEligibility {
     public static boolean legacyHostile(ResourceLocation id) {
         return id != null
@@ -16,8 +16,15 @@ public final class MobEligibility {
     }
 
     public static boolean allows(ResourceLocation id, VatTier tier) {
-        // Temporary compatibility gate; minimum_vat_tier remains data only in slice 1.
-        return tier != VatTier.T1 || !legacyHostile(id);
+        var definition = id == null ? null : PassiveMobDefinitionRegistry.resolve(id);
+        return definition != null && tier.ordinal() + 1 >= definition.minimum_vat_tier();
+    }
+
+    public static String requirement(ResourceLocation id, VatTier tier) {
+        var definition = id == null ? null : PassiveMobDefinitionRegistry.resolve(id);
+        return definition == null
+                ? "No valid loaded mob profile: " + id
+                : id + " requires minimum Vat tier T" + definition.minimum_vat_tier() + "; current tier " + tier;
     }
 
     private MobEligibility() {}

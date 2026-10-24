@@ -1,0 +1,8 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#minecraft:is_overworld",
+  "spawners": [
+    {"type":"mobvats:capture_fixture","weight":1,"minCount":1,"maxCount":1},
+    {"type":"mobvats:discovery_passive","weight":1,"minCount":1,"maxCount":1}
+  ]
+}

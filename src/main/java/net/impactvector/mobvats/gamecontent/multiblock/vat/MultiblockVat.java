@@ -28,6 +28,26 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 public class MultiblockVat
         extends net.impactvector.mobvats.gamecontent.multiblock.conduit.ConduitCuboidController<MultiblockVat>
         implements it.zerono.mods.zerocore.lib.IActivableMachine {
+    private static final Set<MultiblockVat> LIVE =
+            Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
+
+    /** Server reloads revalidate disassembled Vats too; unloaded chunks retain normal load-time validation. */
+    public static void profilesReloaded(net.minecraft.server.MinecraftServer server) {
+        List<MultiblockVat> vats;
+        synchronized (LIVE) {
+            vats = List.copyOf(LIVE);
+        }
+        for (var vat : vats)
+            if (vat.getWorld() instanceof net.minecraft.server.level.ServerLevel level && level.getServer() == server)
+                vat.revalidateProfiles();
+    }
+
+    public void revalidateProfiles() {
+        if (getWorld().isClientSide || isPaused() || getConnectedParts().isEmpty()) return;
+        checkIfMachineIsWhole();
+        if (isAssembled()) rebuildTopology();
+    }
+
     private boolean active = true;
 
     public boolean controllerInhibited() {
@@ -512,6 +532,7 @@ public class MultiblockVat
         }
         storage.services(services);
         products.bind(storage);
+        LIVE.add(this);
         medium.compile(getWorld(), getBoundingBox().getMin(), getBoundingBox().getMax());
         medium.migrate(getWorld());
         attachedPorts.stream()
@@ -545,6 +566,7 @@ public class MultiblockVat
     public MultiblockVat(Level level) {
         super(level);
         products.bind(storage);
+        LIVE.add(this);
     }
 
     public List<VatBoundaryEntity> voids(
@@ -630,12 +652,14 @@ public class MultiblockVat
                 .sorted(Comparator.comparing(VatHeadEntity::getBlockPos, VatTopologyCompiler.POSITION))
                 .toList();
         for (var head : heads) {
-            if (!net.impactvector.mobvats.gamecontent.multiblock.vat.process.MobEligibility.allows(
-                    head.getIdentity(), tier)) {
+            if (!getWorld().isClientSide
+                    && !net.impactvector.mobvats.gamecontent.multiblock.vat.process.MobEligibility.allows(
+                            head.getIdentity(), tier)) {
                 validator.setLastError(
                         head.getBlockPos(),
                         "multiblock.mobvats.geometry",
-                        "Hostile specimens require T2 Iron or T3 Blood Iron");
+                        net.impactvector.mobvats.gamecontent.multiblock.vat.process.MobEligibility.requirement(
+                                head.getIdentity(), tier));
                 return false;
             }
             if (head.getIdentity() == null

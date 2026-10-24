@@ -2,7 +2,7 @@
 
 ## 4.1 Capture, encoding and configuration
 
-Server entity profiles live individually at `config/mobvats/mobs/<namespace>/<path>.json`. Existing files are authoritative; there are no bundle overrides. See [mob profiles](MOB_PROFILES.md) for schema versions, migration backups, validation and unavailable-species behavior. /mobvats reload_passive_mobs reloads profiles and culture configuration. Configuration samples are in [examples](examples/README.md).
+Server entity profiles live individually at `config/mobvats/mobs/<namespace>/<path>.json`. Existing files are authoritative; there are no bundle overrides. See [mob profiles](MOB_PROFILES.md) for schema versions, migration backups, registered-mob discovery, configured tier enforcement and unavailable-species behavior. /mobvats reload_passive_mobs reloads profiles and culture configuration. Configuration samples are in [examples](examples/README.md).
 
 `CaptureTransaction` checks configured capture policy, costs, geometry and output capacity before committing. Creative bypasses configured item/health payment but still obeys capture gates and output capacity. The default legacy policy requires an adult configured mob, syringe and bottle. Hostile/boss capture is gated by explicit profile policy; declaring a tool selector does not install a handler on another mod's item.
 

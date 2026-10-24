@@ -14,7 +14,7 @@ These references describe the current source implementation. Read in order:
 | [Java code style](CODE_STYLE.md) | Pinned formatter, seven-file enforcement scope and staged migration |
 | [Survival recipe audit](SURVIVAL_RECIPES.md) | T1/T2 construction, universal machinery costs and retained quantities |
 | [Products and fluids](PRODUCTS.md) | Meat/Waste products, Extruder conversions and distinct Strange Meat fluid |
-| [Mob profiles](MOB_PROFILES.md) | Individual species files, versioned schema upgrades, diagnostics and deferred tier enforcement |
+| [Mob profiles](MOB_PROFILES.md) | Individual species files, schema upgrades, registered-mob discovery, tier enforcement and reload revalidation |
 | [Hostile specimens](HOSTILE_SPECIMENS.md) | T2+ dormancy, roof rods, independent Head activation, relocation and Strange Meat production |
 
 [Configuration examples](examples/README.md), [future designs](design/FUTURE-FEATURES.md), [historical records](history/README.md), and [generated Mixer clearance tables](generated/MIXER_CLEARANCE_GENERATED.md) complement the current references. The [consolidation record](history/2026-10-12-documentation-consolidation.md) records the original inventory, moves, dates and validation.

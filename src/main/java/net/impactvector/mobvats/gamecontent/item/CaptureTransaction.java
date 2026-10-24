@@ -17,8 +17,8 @@ public final class CaptureTransaction {
     public record Result(boolean success, String diagnostic) {}
 
     public static boolean boss(EntityType<?> type) {
-        return Set.of("minecraft:wither", "minecraft:ender_dragon", "minecraft:elder_guardian", "minecraft:warden")
-                .contains(BuiltInRegistries.ENTITY_TYPE.getKey(type).toString());
+        return MobTierClassification.builtInBoss(BuiltInRegistries.ENTITY_TYPE.getKey(type))
+                || type.is(net.neoforged.neoforge.common.Tags.EntityTypes.BOSSES);
     }
 
     public static String eligibility(ItemStack tool, LivingEntity target) {

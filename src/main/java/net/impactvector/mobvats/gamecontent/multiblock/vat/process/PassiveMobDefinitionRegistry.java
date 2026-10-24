@@ -23,7 +23,10 @@ public final class PassiveMobDefinitionRegistry {
     private static volatile Catalog current = new Catalog(Map.of(), Map.of(), Map.of(), 0);
 
     public static String source(ResourceLocation id) {
-        return current.sources().getOrDefault(id, "missing / processing disabled");
+        var catalog = current;
+        var definition = catalog.definitions().get(id);
+        return catalog.sources().getOrDefault(id, "missing / processing disabled")
+                + (definition == null ? "" : "; minimum_vat_tier=" + definition.minimum_vat_tier());
     }
 
     public record Loaded(
@@ -172,7 +175,13 @@ public final class PassiveMobDefinitionRegistry {
                 if (candidate.version() < MobProfileSchema.CURRENT_VERSION)
                     persistUpgrade(candidate.file(), candidate.original(), candidate.upgraded(), candidate.version());
                 definitions.put(definition.identity(), definition);
-                sources.put(definition.identity(), candidate.label());
+                sources.put(
+                        definition.identity(),
+                        candidate.label()
+                                + (candidate.upgraded().has("discovery")
+                                        ? "; initial discovery="
+                                                + candidate.upgraded().get("discovery")
+                                        : ""));
                 definition
                         .tagDiagnostics()
                         .forEach(issue -> diagnostic.accept(

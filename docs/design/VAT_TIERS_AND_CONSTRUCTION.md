@@ -1,7 +1,7 @@
 # Vat tiers and construction — design decisions
 
 Status: Slices 1–3 implemented: structural tiers, T1/T2 Survival construction, and per-Head hostile activation.
-Last updated: 2026-10-23.
+Last updated: 2026-10-24.
 
 ## Principle
 
@@ -11,9 +11,9 @@ Vats are purpose-built mob-production installations, not a mandatory upgrade lad
 
 | Vat tier | Structural material | Maximum exterior dimensions | Intended access |
 | --- | --- | --- | --- |
-| T1 | Copper | 9 x 7 x 9 | Passive specimens |
-| T2 | Iron | 9 x 9 x 9 | Passive and eligible hostile specimens |
-| T3 | Blood Iron | 12 x 12 x 12 | Larger/advanced specimens; future progression |
+| T1 | Copper | 9 x 7 x 9 | Species configured for T1; ordinary passive defaults |
+| T2 | Iron | 9 x 9 x 9 | Species configured for T1/T2; ordinary Overworld hostile defaults |
+| T3 | Blood Iron | 12 x 12 x 12 | All configured minimum tiers; otherworldly defaults |
 
 These are per-axis maxima, not required cubic footprints. The minimum exterior size is derived from the geometry and machinery needed for the installed specimen(s), with a valid 3 x 3 x 3 Vat possible for a one-cell chicken. Do not retain an arbitrary global 3 x 4 x 3 minimum.
 
@@ -29,7 +29,7 @@ Preserve the current installed-material/cladding architecture and its material d
 
 ## Implemented construction (Slice 1)
 
-Creative exposes Copper casing/glass/Controller under the established IDs `vat_casing`, `vat_glass`, `vat_controller`; Iron uses the corresponding `_t2` suffix and Blood Iron uses `_t3`. All Controllers share the existing entity, menu, management APIs and process engine. Tier is derived from the Controller block; it adds no process multiplier. T2+ permits hostile specimens subject to per-Head lightning activation.
+Creative exposes Copper casing/glass/Controller under the established IDs `vat_casing`, `vat_glass`, `vat_controller`; Iron uses the corresponding `_t2` suffix and Blood Iron uses `_t3`. All Controllers share the existing entity, menu, management APIs and process engine. Tier is derived from the Controller block; it adds no process multiplier. Each species profile defines its minimum tier. Ordinary Overworld hostile defaults require T2, while otherworldly defaults require T3; hostile activation still requires per-Head lightning.
 
 Installed materials `vat_t2_casing`, `vat_t2_glass`, `vat_t3_casing`, `vat_t3_glass` extend the existing `cladding_material` property. Sneak-installation/replacement consumes and recovers the corresponding structural item. Functional item registrations remain universal. Harness/Sump shell mounts also require installed matching material; their existing IDs, interior support geometry and association rules remain intact.
 
@@ -49,9 +49,9 @@ Universal machinery uses Copper for fluid transport/storage, ports, pumps, valve
 
 Blood Iron is intended to be made using the Mixer from T2 Iron Casing and material derived from hostile specimens (provisionally Strange Meat), potentially with XP or another reagent. Favor direct production of Blood Iron Casing over inventing an unnecessary intermediate. Craft T3 glass from T3 casing. **No final Blood Iron recipe or precise Strange Meat form has been agreed yet.**
 
-## Planned specimen tier requirements and discoverability
+## Specimen tier requirements and discoverability
 
-**Status: agreed design direction, not implemented. Boss containment is excluded from this phase.** See the ordered [mob-profile schema (Slice 1) and tier discovery (Slice 2) implementation plan](MOB_PROFILE_SCHEMA_AND_TIER_DISCOVERY_SLICES.md). Slice 1 records the minimum-tier field without enforcing it; Slice 2 supplies classification and tier enforcement.
+**Status: implemented and validated. Boss containment is excluded from this phase.** See [mob profile configuration](../MOB_PROFILES.md) for initial classification signals, conservative fallbacks, persisted provenance and immediate reload revalidation. The ordered [two-slice plan](MOB_PROFILE_SCHEMA_AND_TIER_DISCOVERY_SLICES.md) records the acceptance criteria.
 
 Containment requirements must be **configurable per entity type**, including third-party modded entities. A default tier must also be discoverable for a newly installed mod's mobs without requiring a prewritten MobVats config file.
 
@@ -60,7 +60,7 @@ Containment requirements must be **configurable per entity type**, including thi
 - **T3 Blood Iron:** Nether and End mobs, teleporting/warping species and other supernatural containment exceptions. **Endermen are explicitly T3**, even in the Overworld, because their warping requires Blood Iron.
 - **Bosses:** do not assign automatic T3 permission, implement boss farming, or include them in the current progression pass. Boss eligibility and resource costs require a separate future design (possibly involving a Nether Star and further components).
 
-Treat these as **one-time generated classifications**, not immutable rules. Once written to an individual per-species config file, values are operator-owned and never automatically re-inferred. An operator-authored exact entity-ID override wins over inferred/default tier. Support data-driven tags/group overrides where practical, so modpacks can adjust multiple species. Integrate with the existing capture policy and profile configuration instead of creating a conflicting second whitelist.
+Treat these as **one-time generated classifications**, not immutable rules. Once written to an individual per-species config file, values are operator-owned and never automatically re-inferred. An authored exact entity-ID file is authoritative. Recognized entity tags and biome groups affect generation of missing files only. Integrate with the existing capture policy and profile configuration instead of creating a conflicting second whitelist.
 
 ### Unknown modded mobs
 
@@ -72,7 +72,7 @@ Tests should demonstrate an unconfigured ordinary modded passive, an Overworld h
 
 ## Future option: unstable under-tier containment and breaches
 
-**Status: speculative / not implemented.** Current tier eligibility remains a hard requirement. In particular, Endermen require T3 Blood Iron because their teleportation must be contained; a T2 Iron Vat cannot currently process them.
+**Status: speculative / not implemented.** Current tier eligibility remains a hard requirement. In particular, initial Enderman profiles require T3 Blood Iron because their teleportation must be contained; T2 Iron cannot process them unless an operator deliberately lowers the configured tier.
 
 A possible later system would allow *selected* T3 specimens in T2 Iron Vats with a nonzero chance of containment failure. This should be explicit per-specimen eligibility, not blanket permission for every T3 mob or boss. Blood Iron remains the safe, reliable way to contain the same specimen.
 

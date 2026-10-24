@@ -15,8 +15,9 @@ refreshed from inferred defaults, even after a mod update. The old
 `config/mobvats/passive_mobs/` bundle and override layout is no longer loaded;
 it may be discarded. There is no compatibility migration or override precedence.
 To deliberately regenerate a built-in profile, remove that species file and reload.
-Automatic discovery of modded mobs is deferred to slice 2; a manually supplied,
-valid registered entity profile can still load.
+Startup and server datapack/tag refresh discover previously unknown registered mobs.
+The reload command also scans for missing profiles. Existing documents are never
+reclassified because tags, biome spawns or mod versions changed.
 
 Schema versions are independent of the mod version. Schema 1 upgrades to schema 2
 by adding `minimum_vat_tier: 1` only if absent. An authored tier is preserved.
@@ -49,9 +50,60 @@ process state and lightning charge; the loader does not delete or re-encode
 them. Server formation rejects a Head with no loaded definition. Repairing the
 file or restoring the mod and reloading allows normal revalidation.
 
-Slice 1 stores the minimum tier but does not enforce it. Built-in initial data
-uses T1 for non-hostiles, T2 for hostiles and T3 for Enderman. The isolated legacy
-containment gate still prevents hostile specimens from forming in T1; hostile
-Heads still require their existing lightning activation. Other tier assignments,
-registered-mob discovery and applying tier edits to existing Vats belong to
-slice 2.
+The loaded `minimum_vat_tier` controls formation for every encoded specimen.
+A server reload immediately revalidates loaded Vats, including previously
+disassembled Vats. Raising a species tier can disassemble an existing Vat;
+lowering it or repairing the profile can allow it to form again. There is no
+grandfathering and no per-capture classification. Unloaded structures use the new
+catalog when they load. Heads keep their identities, geometry and saved state.
+Capture permissions and lightning activation remain independent. A hostile Head
+still requires a real strike on its roof Harness rod in a valid formed Vat.
+Authored tier reductions are honored, including T1, without a second hidden T2 gate.
+
+## Discovery and initial tiers
+
+Discovery runs at ServerStartingEvent, after worlds, registry tags, biome data
+and NeoForge biome modifiers are ready. Server-side tag refresh queues another
+scan after datapack replacement completes; client tag packets do not trigger it.
+Entity factories are inspected once for missing species files to establish
+whether the type is a Mob. These temporary instances are never spawned, ticked
+or captured. Factory/geometry failures produce diagnostics and no replacement
+file. Non-Mob entities do not receive profiles.
+
+Initial classification uses these signals, in order:
+
+- Known vanilla bosses and the entity-type tag `c:bosses` are excluded. Tagged
+  modded bosses receive no automatically enabled profile. New built-in boss records
+  remain disabled, with no lifecycle/farming and no new Essence encoding.
+- Explicit vanilla otherworldly exceptions are Enderman, Endermite, Shulker,
+  Blaze, Ghast, Magma Cube, Piglin, Piglin Brute, Zombified Piglin, Hoglin, Zoglin,
+  Strider, Wither Skeleton and Vex. Their initial tier is T3.
+- Entity-type tags `mobvats:nether_mobs`, `mobvats:end_mobs`,
+  `mobvats:teleporting_mobs` and `mobvats:supernatural_mobs` request T3.
+- Spawn entries in biomes tagged as Nether or End by Minecraft or the common
+  biome tags request T3, even if the species also spawns in the Overworld.
+- Ordinary Overworld monsters start at T2. A modded monster with no recognized
+  Overworld affinity starts conservatively at T3 with an ambiguity diagnostic.
+- Other non-MISC mob categories start at T1. MISC mobs start at T3 with an
+  ambiguity diagnostic.
+
+Enderman’s initial T3 comes from species data, independent of capture location.
+The profile remains authoritative afterward; an editor may deliberately change
+its tier. Existing Slice 1 files keep their previous assignments. To adopt newly
+classified defaults, explicitly back up and remove only the desired species files
+before reloading; there is no automatic upgrade of inferred values.
+
+New files include a `discovery` metadata object with their initial tier,
+ambiguity flag and the category, observed tags, biome affinities and explicit
+exceptions used. Source inspection includes this provenance and the currently
+configured minimum tier. Metadata describes initial generation, not a live
+classification override. Unknown tags are recorded as unclassified signals;
+their abilities or meaning are not guessed.
+
+Generic modded profiles enable configured capture/encoding and representation
+but have empty processes and Tool interactions, without inferred breeding,
+feed, loot or special abilities. Vanilla profiles retain their supported
+processing defaults. Boss recognition is limited to known species and the boss
+tag; magical abilities, boss status, special interactions and renderer
+compatibility cannot be universally detected. Review ambiguous or unsupported
+species explicitly. Missing-mod files persist and are never deleted by a scan.

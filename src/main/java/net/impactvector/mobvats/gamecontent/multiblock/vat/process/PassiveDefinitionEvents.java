@@ -3,25 +3,49 @@ package net.impactvector.mobvats.gamecontent.multiblock.vat.process;
 import com.mojang.logging.LogUtils;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 
 /** Startup and explicit server-thread reload. No client config or player-distance state. */
 public final class PassiveDefinitionEvents {
-    public static PassiveMobDefinitionRegistry.Loaded reload() {
+    private static volatile MinecraftServer activeServer;
+
+    public static PassiveMobDefinitionRegistry.Loaded reload(MinecraftServer server) {
+        MobProfileDiscovery.discover(
+                server,
+                FMLPaths.CONFIGDIR.get().resolve("mobvats/mobs"),
+                message -> LogUtils.getLogger().info("Mob profile discovery: {}", message));
         CultureProfiles.reload();
         var loaded = PassiveMobDefinitionRegistry.load(
                 FMLPaths.CONFIGDIR.get().resolve("mobvats/mobs"),
                 message -> LogUtils.getLogger().error("Passive mob definitions: {}", message));
         PassiveMobDefinitionRegistry.publish(loaded);
+        net.impactvector.mobvats.gamecontent.multiblock.vat.MultiblockVat.profilesReloaded(server);
         LogUtils.getLogger()
                 .info("Loaded {} passive mob definitions", loaded.definitions().size());
         return loaded;
     }
 
-    public static void startup(ServerAboutToStartEvent event) {
-        reload();
+    public static void startup(ServerStartingEvent event) {
+        activeServer = event.getServer();
+        reload(activeServer);
+    }
+
+    public static void stopped(ServerStoppedEvent event) {
+        if (activeServer == event.getServer()) activeServer = null;
+    }
+
+    public static void tagsUpdated(TagsUpdatedEvent event) {
+        var server = activeServer;
+        if (server == null || event.getUpdateCause() != TagsUpdatedEvent.UpdateCause.SERVER_DATA_LOAD) return;
+        // Enqueue after datapack replacement completes, even when the tag event fires on the server thread.
+        server.tell(new net.minecraft.server.TickTask(server.getTickCount(), () -> {
+            if (activeServer == server) reload(server);
+        }));
     }
 
     public static void commands(RegisterCommandsEvent event) {
@@ -29,7 +53,7 @@ public final class PassiveDefinitionEvents {
                 .register(Commands.literal("mobvats")
                         .requires(source -> source.hasPermission(2))
                         .then(Commands.literal("reload_passive_mobs").executes(context -> {
-                            var loaded = reload();
+                            var loaded = reload(context.getSource().getServer());
                             context.getSource()
                                     .sendSuccess(
                                             () -> Component.literal("Loaded "

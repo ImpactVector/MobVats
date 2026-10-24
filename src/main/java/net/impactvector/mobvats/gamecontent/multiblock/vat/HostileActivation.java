@@ -24,7 +24,6 @@ public final class HostileActivation {
                 || !(level.getBlockEntity(rod.below()) instanceof VatHarnessEntity harness)) return;
         harness.getMultiblockController().ifPresent(vat -> {
             if (!vat.isAssembled()
-                    || vat.structuralTier() == VatTier.T1
                     || harness.getBlockPos().getY()
                             != vat.getBoundingBox().getMax().getY()) return;
             // Revalidate current blocks: a strike must not exploit pending topology invalidation.

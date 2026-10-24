@@ -105,6 +105,30 @@ public final class HostileSpecimenGameTests {
         for (int i = 0; i < count; i++) vat(h).processEngine().tick();
     }
 
+    @GameTest(batch = "authoredHostileTier", template = "empty", timeoutTicks = 80)
+    public static void authoredTierControlsHostileFormationAndLightningWithoutHiddenT2Gate(GameTestHelper h) {
+        var original = new PassiveMobDefinitionRegistry.Loaded(
+                PassiveMobDefinitionRegistry.definitions(), java.util.Map.of(), java.util.List.of());
+        var changed = new java.util.HashMap<>(original.definitions());
+        changed.put(id("zombie"), changed.get(id("zombie")).withMinimumVatTier(1));
+        PassiveMobDefinitionRegistry.publish(
+                new PassiveMobDefinitionRegistry.Loaded(changed, java.util.Map.of(), java.util.List.of()));
+        rig(h, VatTier.T1, false);
+        var r = rod(h, H);
+        h.runAtTickTime(40, () -> {
+            try {
+                formed(h);
+                h.assertTrue(!head(h, H).activationReady(), "Authored tier skipped lightning activation");
+                strike(h, r, false);
+                h.assertTrue(head(h, H).lightningActivated(), "Hidden T2 check ignored the authored species tier");
+            } finally {
+                PassiveMobDefinitionRegistry.publish(original);
+                MultiblockVat.profilesReloaded(h.getLevel().getServer());
+            }
+            h.succeed();
+        });
+    }
+
     @GameTest(batch = "interMachineIsolation", template = "empty", timeoutTicks = 1000)
     public static void activatedHeadSurvivesActualChunkUnloadReload(GameTestHelper h) {
         rig(h, VatTier.T2, false);

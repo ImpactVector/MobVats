@@ -245,9 +245,18 @@ public final class GenericCaptureGameTests {
                         && bottles(p) == 2
                         && essence(p).isEmpty(),
                 "Invalid geometry consumed cost");
-        h.assertTrue(
-                capture(p, CaptureTestEntity.TYPE.create(h.getLevel())) == InteractionResult.FAIL && bottles(p) == 2,
-                "Missing fixture profile consumed cost");
+        var original = snapshot();
+        try {
+            var missing = new HashMap<>(original.definitions());
+            missing.remove(CaptureTestEntity.ID);
+            PassiveMobDefinitionRegistry.publish(new PassiveMobDefinitionRegistry.Loaded(missing, Map.of(), List.of()));
+            h.assertTrue(
+                    capture(p, CaptureTestEntity.TYPE.create(h.getLevel())) == InteractionResult.FAIL
+                            && bottles(p) == 2,
+                    "Missing fixture profile consumed cost");
+        } finally {
+            PassiveMobDefinitionRegistry.publish(original);
+        }
         h.succeed();
     }
 
