@@ -51,7 +51,7 @@ Blood Iron is intended to be made using the Mixer from T2 Iron Casing and materi
 
 ## Planned specimen tier requirements and discoverability
 
-**Status: agreed design direction, not implemented. Boss containment is excluded from this phase.**
+**Status: agreed design direction, not implemented. Boss containment is excluded from this phase.** See the ordered [mob-profile schema (Slice 1) and tier discovery (Slice 2) implementation plan](MOB_PROFILE_SCHEMA_AND_TIER_DISCOVERY_SLICES.md). Slice 1 records the minimum-tier field without enforcing it; Slice 2 supplies classification and tier enforcement.
 
 Containment requirements must be **configurable per entity type**, including third-party modded entities. A default tier must also be discoverable for a newly installed mod's mobs without requiring a prewritten MobVats config file.
 
@@ -60,7 +60,7 @@ Containment requirements must be **configurable per entity type**, including thi
 - **T3 Blood Iron:** Nether and End mobs, teleporting/warping species and other supernatural containment exceptions. **Endermen are explicitly T3**, even in the Overworld, because their warping requires Blood Iron.
 - **Bosses:** do not assign automatic T3 permission, implement boss farming, or include them in the current progression pass. Boss eligibility and resource costs require a separate future design (possibly involving a Nether Star and further components).
 
-Treat these as **default classifications**, not immutable rules. An operator-authored exact entity-ID override wins over inferred/default tier. Support data-driven tags/group overrides where practical, so modpacks can adjust multiple species. Integrate with the existing capture policy and profile configuration instead of creating a conflicting second whitelist.
+Treat these as **one-time generated classifications**, not immutable rules. Once written to an individual per-species config file, values are operator-owned and never automatically re-inferred. An operator-authored exact entity-ID override wins over inferred/default tier. Support data-driven tags/group overrides where practical, so modpacks can adjust multiple species. Integrate with the existing capture policy and profile configuration instead of creating a conflicting second whitelist.
 
 ### Unknown modded mobs
 
