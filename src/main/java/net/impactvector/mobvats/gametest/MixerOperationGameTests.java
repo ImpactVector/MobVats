@@ -506,6 +506,13 @@ public final class MixerOperationGameTests {
                             Objects.requireNonNull(in).readAllBytes(), java.nio.charset.StandardCharsets.UTF_8))
                     .getAsJsonObject();
         }
+        // Item outputs were introduced in v2 and cannot be represented by the legacy fixture.
+        legacy.getAsJsonObject("recipes")
+                .entrySet()
+                .removeIf(e -> e.getValue()
+                        .getAsJsonObject()
+                        .getAsJsonObject("outputs")
+                        .has("items"));
         for (var entry : legacy.getAsJsonObject("recipes").entrySet()) {
             var r = entry.getValue().getAsJsonObject();
             r.remove("priority");

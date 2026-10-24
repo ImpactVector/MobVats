@@ -89,7 +89,7 @@ public final class Slice12GameTests {
             """);
         var loaded = MixerRecipeRegistry.load(directory, s -> {});
         h.assertTrue(
-                loaded.recipes().size() == 6
+                loaded.recipes().size() == 7
                         && loaded.recipes()
                                 .keySet()
                                 .containsAll(List.of(

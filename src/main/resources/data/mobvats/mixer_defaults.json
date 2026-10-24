@@ -1,5 +1,39 @@
 {
   "recipes": {
+    "mobvats:blood_iron_vat_casing": {
+      "batch_ticks": 200,
+      "priority": -1000,
+      "strategies": [
+        {
+          "id": "default",
+          "priority": 0,
+          "items": [
+            {
+              "selector": "mobvats:vat_casing_t2",
+              "amount": 4
+            },
+            {
+              "selector": "minecraft:soul_sand",
+              "amount": 1
+            }
+          ],
+          "fluids": [
+            {
+              "selector": "mobvats:strange_meat",
+              "amount": 100
+            }
+          ]
+        }
+      ],
+      "outputs": {
+        "items": [
+          {
+            "item": "mobvats:vat_casing_t3",
+            "amount": 4
+          }
+        ]
+      }
+    },
     "feeding_slurry": {
       "batch_ticks": 200,
       "priority": -1000,
