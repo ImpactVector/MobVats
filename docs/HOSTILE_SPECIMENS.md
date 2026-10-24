@@ -62,10 +62,7 @@ same transactional output path and separate service tanks. Strange Meat has no
 solid products or Extruder recipes. Boss capture and undead-horse progression
 remain gated. Blood Iron manufacturing and T3 Survival recipes remain unresolved.
 
-Profiles remain operator-owned. Existing `_defaults.json` files are preserved;
-an older catalog keeps its old disabled hostile policies. Back it up and regenerate
-the generated defaults, or install complete hostile profile overrides, then reload
-with `/mobvats reload_passive_mobs`. Keep authored overrides. No tier recipes change.
+Profiles remain operator-owned at config/mobvats/mobs/<namespace>/<path>.json. Existing species files are preserved. The old passive_mobs bundle/override directory is no longer loaded. Edit an individual hostile profile and reload with /mobvats reload_passive_mobs. See [mob profiles](MOB_PROFILES.md) for schema upgrades and disabled-profile handling. No tier recipes change.
 
 ## Manual client acceptance (outstanding)
 

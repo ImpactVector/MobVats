@@ -124,7 +124,7 @@ public final class SimulacrumGeometryGameTests {
                 .add(
                         "simulacrum",
                         com.google.gson.JsonParser.parseString("{\"dimensions\":[2,3,1],\"head_offset\":[1,1,0]}"));
-        Files.writeString(dir.resolve("10_geometry.json"), root.toString());
+        MobProfileFixtures.write(dir, root);
         var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
         h.assertTrue(
                 loaded.errors().isEmpty()
@@ -137,15 +137,10 @@ public final class SimulacrumGeometryGameTests {
         root.getAsJsonObject("minecraft:cow")
                 .getAsJsonObject("simulacrum")
                 .add("head_offset", com.google.gson.JsonParser.parseString("[9,0,0]"));
-        Files.writeString(dir.resolve("10_geometry.json"), root.toString());
+        MobProfileFixtures.write(dir, root);
         loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
         h.assertTrue(
-                !loaded.errors().isEmpty()
-                        && loaded.definitions()
-                                        .get(ItemEssence.COW)
-                                        .simulacrum()
-                                        .dimensions()
-                                == null,
+                !loaded.errors().isEmpty() && !loaded.definitions().containsKey(ItemEssence.COW),
                 "Invalid override replaced valid defaults");
         h.succeed();
     }

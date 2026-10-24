@@ -126,7 +126,11 @@ public final class PassiveDefaults {
                             "sniffer_dig", List.of("#minecraft:sniffer_diggable_block"), List.of(), 120, 9600));
                 if (name.equals("armadillo"))
                     interactions.add(environment("armadillo_brush", List.of(), List.of("brush_brush"), 20, 20));
-                result.put(id.toString(), definition.withToolInteractions(interactions));
+                result.put(
+                        id.toString(),
+                        definition
+                                .withToolInteractions(interactions)
+                                .withMinimumVatTier(name.equals("enderman") ? 3 : hostile ? 2 : 1));
             }
         return Collections.unmodifiableMap(result);
     }

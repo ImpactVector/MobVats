@@ -12,7 +12,7 @@ public final class PassiveDefinitionEvents {
     public static PassiveMobDefinitionRegistry.Loaded reload() {
         CultureProfiles.reload();
         var loaded = PassiveMobDefinitionRegistry.load(
-                FMLPaths.CONFIGDIR.get().resolve("mobvats/passive_mobs"),
+                FMLPaths.CONFIGDIR.get().resolve("mobvats/mobs"),
                 message -> LogUtils.getLogger().error("Passive mob definitions: {}", message));
         PassiveMobDefinitionRegistry.publish(loaded);
         LogUtils.getLogger()

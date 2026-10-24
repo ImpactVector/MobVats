@@ -51,7 +51,7 @@ public final class GenericCaptureGameTests {
         var dir = directory();
         var root = new JsonObject();
         root.add(id, definition);
-        Files.writeString(dir.resolve("90_override.json"), root.toString());
+        MobProfileFixtures.write(dir, root);
         var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
         if (!loaded.errors().isEmpty())
             throw new IllegalStateException(loaded.errors().toString());
@@ -119,9 +119,13 @@ public final class GenericCaptureGameTests {
                             .capture()
                             .enabled(),
                     "Progression accidentally enabled: " + name);
-        var text = Files.readString(dir.resolve("_defaults.json"));
+        var text = Files.readString(MobProfileFixtures.file(dir, "minecraft:cow"));
         h.assertTrue(
-                JsonParser.parseString(text).getAsJsonObject().size() == expected.size(),
+                JsonParser.parseString(text)
+                        .getAsJsonObject()
+                        .get("entity")
+                        .getAsString()
+                        .equals("minecraft:cow"),
                 "Duplicate/missing generated entries");
         h.assertTrue(
                 loaded.definitions()
@@ -506,28 +510,27 @@ public final class GenericCaptureGameTests {
     @GameTest(template = "empty", timeoutTicks = 10)
     public static void invalidCaptureConfigurationAndUnknownEntityRejectWholeSibling(GameTestHelper h)
             throws Exception {
-        var dir = directory();
-        var base = definition("minecraft:pig");
-        var root = new JsonObject();
-        root.add("minecraft:pig", base);
-        base.getAsJsonObject("capture").getAsJsonObject("cost").addProperty("count", 0);
-        Files.writeString(dir.resolve("10_cost.json"), root.toString());
-        base.getAsJsonObject("capture").getAsJsonObject("cost").addProperty("count", 1);
-        base.getAsJsonObject("capture").addProperty("tool", "#Bad Tag!");
-        Files.writeString(dir.resolve("20_tool.json"), root.toString());
-        root = new JsonObject();
-        root.add("missing:entity", definition("missing:entity"));
-        Files.writeString(dir.resolve("30_entity.json"), root.toString());
-        var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
-        h.assertTrue(
-                loaded.errors().size() == 3
-                        && loaded.errors().stream().anyMatch(s -> s.contains("capture.cost.count"))
-                        && loaded.errors().stream().anyMatch(s -> s.contains("Invalid selector ID"))
-                        && loaded.errors().stream().anyMatch(s -> s.contains("Unknown entity"))
-                        && loaded.sources()
-                                .get(ResourceLocation.withDefaultNamespace("pig"))
-                                .equals("_defaults.json"),
-                "Invalid capture schema/ID poorly diagnosed or partly applied");
+        for (int i = 0; i < 3; i++) {
+            var dir = directory();
+            var id = i == 2 ? "missing:entity" : "minecraft:pig";
+            var base = definition(id);
+            if (i == 0) base.getAsJsonObject("capture").getAsJsonObject("cost").addProperty("count", 0);
+            if (i == 1) base.getAsJsonObject("capture").addProperty("tool", "#Bad Tag!");
+            var root = new JsonObject();
+            root.add(id, base);
+            MobProfileFixtures.write(dir, root);
+            var file = MobProfileFixtures.file(dir, id);
+            var before = Files.readString(file);
+            var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
+            var reason = List.of("capture.cost.count", "Invalid selector ID", "Unknown entity")
+                    .get(i);
+            h.assertTrue(
+                    loaded.errors().size() == 1
+                            && loaded.errors().getFirst().contains(reason)
+                            && !loaded.definitions().containsKey(ResourceLocation.parse(id))
+                            && before.equals(Files.readString(file)),
+                    "Invalid definition was overwritten or loaded");
+        }
         h.succeed();
     }
 }

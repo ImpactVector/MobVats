@@ -2,7 +2,7 @@
 
 ## 4.1 Capture, encoding and configuration
 
-Server entity profiles live in `config/mobvats/passive_mobs/`. Missing bundled defaults are created once; authored files are preserved. Filename-sorted overrides replace complete profiles. `/mobvats reload_passive_mobs` reloads profiles and culture configuration. Configuration samples are in [examples](examples/README.md).
+Server entity profiles live individually at `config/mobvats/mobs/<namespace>/<path>.json`. Existing files are authoritative; there are no bundle overrides. See [mob profiles](MOB_PROFILES.md) for schema versions, migration backups, validation and unavailable-species behavior. /mobvats reload_passive_mobs reloads profiles and culture configuration. Configuration samples are in [examples](examples/README.md).
 
 `CaptureTransaction` checks configured capture policy, costs, geometry and output capacity before committing. Creative bypasses configured item/health payment but still obeys capture gates and output capacity. The default legacy policy requires an adult configured mob, syringe and bottle. Hostile/boss capture is gated by explicit profile policy; declaring a tool selector does not install a handler on another mod's item.
 
@@ -35,7 +35,7 @@ Culture JSON under `config/mobvats/culture/` assigns ordered medium rules throug
 Tool operations use registered executors and definition-owned stages, selectors, priorities, cooldowns and actor uses. The following configuration/API contract retains the detailed current interaction reference. Environmental Goat horn, Sniffer digging and Armadillo brushing adapters are now implemented; they use the same demand configuration and transactional output path. Buffered results backpressure completion, and cooldown begins after commit.
 
 
-Each entity entry in config/mobvats/passive_mobs/*.json can contain an
+Each species file in `config/mobvats/mobs/<namespace>/<path>.json` can contain an
 "interactions" array. The root entity ID is the specimen selector. Example:
 
   "interactions": [

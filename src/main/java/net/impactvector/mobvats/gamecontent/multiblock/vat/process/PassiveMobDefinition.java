@@ -18,7 +18,57 @@ public record PassiveMobDefinition(
         java.util.Map<String, ProductBufferDefinition> buffers,
         List<ResourceProcess> processes,
         Capture capture,
-        List<ToolInteractionDefinition> interactions) {
+        List<ToolInteractionDefinition> interactions,
+        int schema_version,
+        int minimum_vat_tier) {
+    public PassiveMobDefinition(
+            String entity,
+            Feed feed,
+            int growth,
+            List<SecondaryOutput> outputs,
+            Harvest harvest,
+            Slurry culture,
+            Slurry feeding,
+            Simulacrum simulacrum,
+            java.util.Map<String, ProductBufferDefinition> buffers,
+            List<ResourceProcess> processes,
+            Capture capture,
+            List<ToolInteractionDefinition> interactions) {
+        this(
+                entity,
+                feed,
+                growth,
+                outputs,
+                harvest,
+                culture,
+                feeding,
+                simulacrum,
+                buffers,
+                processes,
+                capture,
+                interactions,
+                MobProfileSchema.CURRENT_VERSION,
+                1);
+    }
+
+    public PassiveMobDefinition withMinimumVatTier(int tier) {
+        return new PassiveMobDefinition(
+                entity,
+                feed,
+                juvenile_growth_ticks,
+                secondary_outputs,
+                harvest,
+                culture_slurry,
+                feeding_slurry,
+                simulacrum,
+                buffers,
+                processes,
+                capture,
+                interactions,
+                schema_version,
+                tier);
+    }
+
     public PassiveMobDefinition(
             String entity,
             Feed feed,
@@ -198,7 +248,9 @@ public record PassiveMobDefinition(
                 buffers,
                 processes,
                 capture,
-                configured);
+                configured,
+                schema_version,
+                minimum_vat_tier);
     }
 
     public boolean lifecycle() {

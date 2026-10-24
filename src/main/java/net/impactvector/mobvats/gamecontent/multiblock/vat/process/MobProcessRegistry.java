@@ -87,13 +87,13 @@ public final class MobProcessRegistry {
     }
 
     public Profile resolve(ResourceLocation mob) {
-        return profiles.get(mob);
+        return this == DEFAULT ? PassiveMobDefinitionRegistry.compiled(mob) : profiles.get(mob);
     }
 
     private long revision;
 
     public long revision() {
-        return revision;
+        return this == DEFAULT ? PassiveMobDefinitionRegistry.revision() : revision;
     }
 
     void replace(Map<ResourceLocation, Profile> loaded) {

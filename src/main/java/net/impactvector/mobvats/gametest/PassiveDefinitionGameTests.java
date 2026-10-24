@@ -33,7 +33,8 @@ public final class PassiveDefinitionGameTests {
     }
 
     private static void write(Path dir, String name, Map<String, PassiveMobDefinition> definitions) throws Exception {
-        Files.writeString(dir.resolve(name), PassiveMobDefinitionRegistry.JSON.toJson(definitions));
+        MobProfileFixtures.write(
+                dir, PassiveMobDefinitionRegistry.JSON.toJsonTree(definitions).getAsJsonObject());
     }
 
     private static PassiveMobDefinition changed(
@@ -49,7 +50,7 @@ public final class PassiveDefinitionGameTests {
         var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
         h.assertTrue(
                 Files.isDirectory(dir)
-                        && Files.isRegularFile(dir.resolve("_defaults.json"))
+                        && Files.isRegularFile(MobProfileFixtures.file(dir, "minecraft:cow"))
                         && loaded.errors().isEmpty(),
                 "First launch failed to generate/load defaults");
         var d = loaded.definitions().get(COW);
@@ -58,75 +59,66 @@ public final class PassiveDefinitionGameTests {
                         && d.secondary_outputs().getFirst().requires_stage() == StageRequirement.ADULT,
                 "Canonical lifecycle incorrect");
         write(dir, "_defaults.json", Map.of("minecraft:cow", changed(d, d.entity(), 77, List.of())));
-        var before = Files.readString(dir.resolve("_defaults.json"));
+        var before = Files.readString(MobProfileFixtures.file(dir, "minecraft:cow"));
         var again = PassiveMobDefinitionRegistry.load(dir, s -> {});
         h.assertTrue(
                 again.definitions().get(COW).juvenile_growth_ticks() == 77
                         && again.definitions().get(COW).secondary_outputs().isEmpty()
-                        && before.equals(Files.readString(dir.resolve("_defaults.json"))),
+                        && before.equals(Files.readString(MobProfileFixtures.file(dir, "minecraft:cow"))),
                 "Runtime bypassed deserialization or rewrote defaults");
         h.succeed();
     }
 
     @GameTest(template = "empty", timeoutTicks = 10)
-    public static void deterministicWholeReplacementAndAdditiveFiles(GameTestHelper h) throws Exception {
+    public static void independentFilesHaveNoOverrideOrder(GameTestHelper h) throws Exception {
         var dir = directory();
         var d = PassiveDefaults.data().get("minecraft:cow");
-        write(dir, "00_before_defaults.json", Map.of(d.entity(), changed(d, d.entity(), 70, List.of())));
-        write(dir, "50_add.json", Map.of("minecraft:pig", changed(d, "minecraft:pig", 80, List.of())));
-        write(dir, "90_last.json", Map.of(d.entity(), changed(d, d.entity(), 90, List.of())));
-        var before = Files.readString(dir.resolve("00_before_defaults.json"));
+        write(
+                dir,
+                "ignored",
+                Map.of(
+                        d.entity(),
+                        changed(d, d.entity(), 70, List.of()),
+                        "minecraft:pig",
+                        changed(d, "minecraft:pig", 80, List.of())));
+        var before = Files.readString(MobProfileFixtures.file(dir, d.entity()));
         var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
         h.assertTrue(
                 loaded.errors().isEmpty()
-                        && loaded.definitions().size() == PassiveDefaults.data().size()
-                        && loaded.definitions().get(COW).juvenile_growth_ticks() == 90
-                        && loaded.sources().get(COW).equals("90_last.json")
-                        && loaded.definitions().get(COW).secondary_outputs().isEmpty(),
-                "Merge order/whole replacement/additive semantics incorrect");
-        h.assertTrue(
-                before.equals(Files.readString(dir.resolve("00_before_defaults.json"))),
-                "Generating defaults overwrote sibling");
-        Files.delete(dir.resolve("90_last.json"));
-        loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
-        h.assertTrue(
-                loaded.definitions().get(COW).juvenile_growth_ticks() == 70,
-                "Lexically early sibling loaded before defaults");
+                        && loaded.definitions().get(COW).juvenile_growth_ticks() == 70
+                        && loaded.definitions()
+                                        .get(ResourceLocation.parse("minecraft:pig"))
+                                        .juvenile_growth_ticks()
+                                == 80
+                        && loaded.sources().get(COW).equals("minecraft/cow.json")
+                        && before.equals(Files.readString(MobProfileFixtures.file(dir, d.entity()))),
+                "Independent files were replaced during generation");
         h.succeed();
     }
 
     @GameTest(template = "empty", timeoutTicks = 10)
     public static void invalidFileIsRejectedAtomicallyWithoutOverwrite(GameTestHelper h) throws Exception {
         var dir = directory();
-        var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
-        var d = loaded.definitions().get(COW);
+        var d = PassiveDefaults.data().get("minecraft:cow");
         var root = PassiveMobDefinitionRegistry.JSON
-                .toJsonTree(Map.of(
-                        "minecraft:cow",
-                        changed(d, d.entity(), 99, List.of()),
-                        "minecraft:pig",
-                        changed(d, "minecraft:pig", 90, List.of())))
+                .toJsonTree(Map.of(d.entity(), changed(d, d.entity(), -1, List.of())))
                 .getAsJsonObject();
-        root.getAsJsonObject("minecraft:pig").addProperty("juvenile_growth_ticks", -1);
-        var text = root.toString();
-        Files.writeString(dir.resolve("10_invalid.json"), text);
-        Files.writeString(dir.resolve("20_syntax.json"), "{broken");
-        write(dir, "90_valid.json", Map.of("minecraft:sheep", changed(d, "minecraft:sheep", 80, List.of())));
-        var errors = new ArrayList<String>();
-        loaded = PassiveMobDefinitionRegistry.load(dir, errors::add);
-        h.assertTrue(
-                loaded.definitions().get(COW).juvenile_growth_ticks() == 24000
-                        && loaded.definitions().size() == PassiveDefaults.data().size()
-                        && errors.stream().anyMatch(s -> s.contains("10_invalid.json") && s.contains("positive"))
-                        && errors.stream().anyMatch(s -> s.contains("20_syntax.json"))
-                        && text.equals(Files.readString(dir.resolve("10_invalid.json"))),
-                "Malformed file partly applied, overwritten or poorly diagnosed");
-        Files.writeString(dir.resolve("_defaults.json"), "{broken");
-        loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
+        MobProfileFixtures.write(dir, root);
+        var file = MobProfileFixtures.file(dir, d.entity());
+        var before = Files.readString(file);
+        var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
         h.assertTrue(
                 !loaded.definitions().containsKey(COW)
-                        && loaded.errors().stream().anyMatch(s -> s.contains("Required built-in")),
-                "Missing required definition was silently replaced");
+                        && loaded.definitions().size() == PassiveDefaults.data().size() - 1
+                        && loaded.errors().stream()
+                                .anyMatch(s -> s.contains("minecraft/cow.json") && s.contains("positive"))
+                        && before.equals(Files.readString(file)),
+                "Invalid file was replaced or partly applied");
+        Files.writeString(file, "{broken");
+        loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
+        h.assertTrue(
+                !loaded.definitions().containsKey(COW) && Files.readString(file).equals("{broken"),
+                "Malformed file silently regenerated");
         h.succeed();
     }
 
@@ -337,23 +329,23 @@ public final class PassiveDefinitionGameTests {
             throws Exception {
         var dir = directory();
         var d = PassiveDefaults.data().get("minecraft:cow");
-        write(dir, "10_hostile.json", Map.of("minecraft:zombie", changed(d, "minecraft:zombie", 20, List.of())));
         var invalid = PassiveMobDefinitionRegistry.JSON
                 .toJsonTree(Map.of(d.entity(), d))
                 .getAsJsonObject();
         invalid.getAsJsonObject(d.entity()).getAsJsonObject("harvest").addProperty("sword", "mobvats:arbitrary_java");
-        Files.writeString(dir.resolve("20_strategy.json"), invalid.toString());
-        invalid.getAsJsonObject(d.entity()).remove("feed");
-        Files.writeString(dir.resolve("30_partial.json"), invalid.toString());
+        MobProfileFixtures.write(dir, invalid);
         var loaded = PassiveMobDefinitionRegistry.load(dir, message -> {});
         h.assertTrue(
-                loaded.definitions().size() == PassiveDefaults.data().size()
-                        && loaded.definitions().containsKey(ResourceLocation.withDefaultNamespace("zombie"))
-                        && loaded.errors().stream()
-                                .anyMatch(e -> e.contains("20_strategy.json") && e.contains("Unsupported sword"))
-                        && loaded.errors().stream()
-                                .anyMatch(e -> e.contains("30_partial.json") && e.contains("require feed")),
-                "Unsupported/incomplete definitions escaped validation");
+                !loaded.definitions().containsKey(COW)
+                        && loaded.errors().stream().anyMatch(e -> e.contains("Unsupported sword")),
+                "Unsupported strategy escaped validation");
+        invalid.getAsJsonObject(d.entity()).remove("feed");
+        MobProfileFixtures.write(dir, invalid);
+        loaded = PassiveMobDefinitionRegistry.load(dir, message -> {});
+        h.assertTrue(
+                !loaded.definitions().containsKey(COW)
+                        && loaded.errors().stream().anyMatch(e -> e.contains("require feed")),
+                "Incomplete definition escaped validation");
         h.succeed();
     }
 

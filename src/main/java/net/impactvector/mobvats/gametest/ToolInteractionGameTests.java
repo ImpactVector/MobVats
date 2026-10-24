@@ -125,8 +125,16 @@ public final class ToolInteractionGameTests {
         var dir = Files.createTempDirectory(Path.of("build"), "interaction-definitions-");
         var base = PassiveDefaults.data().get("minecraft:cow");
         var bad = base.withToolInteractions(List.of(interaction("mobvats:unknown_executor", "minecraft:bread")));
-        Files.writeString(
-                dir.resolve("10_unknown.json"), PassiveMobDefinitionRegistry.JSON.toJson(Map.of(base.entity(), bad)));
+        MobProfileFixtures.write(
+                dir,
+                PassiveMobDefinitionRegistry.JSON
+                        .toJsonTree(Map.of(base.entity(), bad))
+                        .getAsJsonObject());
+        var rejected = PassiveMobDefinitionRegistry.load(dir, s -> {});
+        h.assertTrue(
+                rejected.errors().stream().anyMatch(e -> e.contains("Unknown interaction executor"))
+                        && !rejected.definitions().containsKey(ItemEssence.COW),
+                "Unknown executor was accepted");
         var root = PassiveMobDefinitionRegistry.JSON
                 .toJsonTree(Map.of(
                         base.entity(),
@@ -137,12 +145,11 @@ public final class ToolInteractionGameTests {
                 .get(0)
                 .getAsJsonObject()
                 .addProperty("method", "Sniffer.dig");
-        Files.writeString(dir.resolve("20_method.json"), root.toString());
+        MobProfileFixtures.write(dir, root);
         var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
         h.assertTrue(
-                loaded.errors().stream().anyMatch(e -> e.contains("Unknown interaction executor"))
-                        && loaded.errors().stream().anyMatch(e -> e.contains("unknown field method"))
-                        && loaded.definitions().get(ItemEssence.COW).equals(base),
+                loaded.errors().stream().anyMatch(e -> e.contains("unknown field method"))
+                        && !loaded.definitions().containsKey(ItemEssence.COW),
                 "Unknown executor/arbitrary method partly replaced the definition");
         h.succeed();
     }

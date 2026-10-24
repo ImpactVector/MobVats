@@ -22,6 +22,6 @@ Requirements: Minecraft **1.21.1**, NeoForge **21.1.252** for the development bu
 
 The local JAR is written to `build/libs/`. Public distribution requires the separate release-art validation described in the developer reference; a successful build does not authorize publication.
 
-Start with the [technical documentation index](docs/README.md), [development setup](docs/06-DEVELOPMENT.md), and [testing workflows](docs/07-TESTING.md). Server configuration samples are in [docs/examples](docs/examples/README.md). Proposed features are tracked separately in [future designs](docs/design/FUTURE-FEATURES.md).
+Start with the [technical documentation index](docs/README.md), [development setup](docs/06-DEVELOPMENT.md), and [testing workflows](docs/07-TESTING.md). Individual species configuration is documented in [mob profiles](docs/MOB_PROFILES.md). Server configuration samples are in [docs/examples](docs/examples/README.md). Proposed features are tracked separately in [future designs](docs/design/FUTURE-FEATURES.md).
 
 See [LICENSE](LICENSE) and [attribution](ATTRIBUTION.md) for rights and upstream notices.

@@ -630,7 +630,8 @@ public class MultiblockVat
                 .sorted(Comparator.comparing(VatHeadEntity::getBlockPos, VatTopologyCompiler.POSITION))
                 .toList();
         for (var head : heads) {
-            if (head.hostile() && tier == VatTier.T1) {
+            if (!net.impactvector.mobvats.gamecontent.multiblock.vat.process.MobEligibility.allows(
+                    head.getIdentity(), tier)) {
                 validator.setLastError(
                         head.getBlockPos(),
                         "multiblock.mobvats.geometry",

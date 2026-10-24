@@ -16,11 +16,7 @@ public class VatHeadEntity extends AbstractVatEntity {
     private boolean lightningActivated;
 
     public boolean hostile() {
-        return identity != null
-                && net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
-                        .getOptional(identity)
-                        .map(t -> t.getCategory() == net.minecraft.world.entity.MobCategory.MONSTER)
-                        .orElse(false);
+        return net.impactvector.mobvats.gamecontent.multiblock.vat.process.MobEligibility.legacyHostile(identity);
     }
 
     public boolean lightningActivated() {

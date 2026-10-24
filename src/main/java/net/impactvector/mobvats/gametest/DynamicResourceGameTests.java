@@ -313,7 +313,7 @@ public final class DynamicResourceGameTests {
     private static void write(Path dir, String name, JsonObject profile, String entity) throws Exception {
         var root = new JsonObject();
         root.add(entity, profile);
-        Files.writeString(dir.resolve(name), root.toString());
+        MobProfileFixtures.write(dir, root);
     }
 
     @GameTest(template = "empty", timeoutTicks = 10)
@@ -347,8 +347,9 @@ public final class DynamicResourceGameTests {
             "Unsupported output",
             "unknown field"
         };
-        var dir = directory();
+
         for (int i = 0; i < reasons.length; i++) {
+            var dir = directory();
             var p = fixture("minecraft:zombie");
             var process = p.getAsJsonArray("processes").get(0).getAsJsonObject();
             var input = process.getAsJsonArray("inputs");
@@ -370,18 +371,13 @@ public final class DynamicResourceGameTests {
                 case 9 -> process.addProperty("strategy", "produce_gold");
             }
             write(dir, "invalid_" + i + ".json", p, "minecraft:zombie");
-        }
-        var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
-        h.assertTrue(
-                loaded.sources().get(ResourceLocation.parse("minecraft:zombie")).equals("_defaults.json")
-                        && loaded.errors().size() == reasons.length,
-                "Invalid file partially applied");
-        for (int i = 0; i < reasons.length; i++) {
+            var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
             final int n = i;
             h.assertTrue(
-                    loaded.errors().stream()
-                            .anyMatch(s -> s.contains("invalid_" + n + ".json") && s.contains(reasons[n])),
-                    "Missing diagnostic: " + reasons[i]);
+                    !loaded.definitions().containsKey(ResourceLocation.parse("minecraft:zombie"))
+                            && loaded.errors().stream()
+                                    .anyMatch(s -> s.contains("minecraft/zombie.json") && s.contains(reasons[n])),
+                    "Missing diagnostic: " + reasons[i] + " / " + loaded.errors());
         }
         h.succeed();
     }
@@ -899,6 +895,11 @@ public final class DynamicResourceGameTests {
         var profile = fixture("minecraft:zombie");
         profile.getAsJsonArray("processes").get(0).getAsJsonObject().addProperty("requires_stage", "BOGUS");
         write(dir, "stage.json", profile, "minecraft:zombie");
+        var stageLoaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
+        h.assertTrue(
+                stageLoaded.errors().stream().anyMatch(s -> s.contains("unsupported value: BOGUS"))
+                        && !stageLoaded.definitions().containsKey(ResourceLocation.parse("minecraft:zombie")),
+                "Invalid stage escaped validation");
         profile = fixture("minecraft:zombie");
         profile.getAsJsonObject("buffers").add("water", JsonParser.parseString("{\"fluids\":[\"minecraft:water\"]}"));
         profile.getAsJsonObject("buffers")
@@ -906,8 +907,8 @@ public final class DynamicResourceGameTests {
         write(dir, "canonical.json", profile, "minecraft:zombie");
         var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
         h.assertTrue(
-                loaded.errors().stream().anyMatch(s -> s.contains("unsupported value: BOGUS"))
-                        && loaded.errors().stream().anyMatch(s -> s.contains("Duplicate canonical buffer ID")),
+                loaded.errors().stream().anyMatch(s -> s.contains("Duplicate canonical buffer ID"))
+                        && !loaded.definitions().containsKey(ResourceLocation.parse("minecraft:zombie")),
                 "Invalid stage or canonical duplicate escaped validation");
         h.succeed();
     }

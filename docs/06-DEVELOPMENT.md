@@ -33,7 +33,7 @@ Offline mode requires cached dependencies. Use `tasks --all` to inspect the actu
 
 See [configuration samples](examples/README.md) for Mixer, culture, generic resource and passive/vanilla profiles. Samples illustrate schemas; they are not runtime configuration and are not automatically loaded from `docs/`. Copy/adapt them deliberately into the appropriate server config directory.
 
-`/mobvats reload_passive_mobs` reloads specimen/culture definitions; `/mobvats reload_mixer` reloads Mixer recipes and compound names. Defaults are copied only when absent and authored overrides remain intact.
+`/mobvats reload_passive_mobs` reloads specimen/culture definitions; `/mobvats reload_mixer` reloads Mixer recipes and compound names. See [mob profiles](MOB_PROFILES.md) for individual species files and schema upgrades. Mixer and culture defaults are copied only when absent and their authored overrides remain intact.
 
 The development `build` task invokes `invalidateDevMixerDefaults`, deleting only `run/config/mobvats/mixer/_defaults.json` so next startup can restore the current bundled Mixer defaults. It refuses linked/non-file paths and leaves sibling overrides intact. This is local build housekeeping, not a production or startup rewrite.
 

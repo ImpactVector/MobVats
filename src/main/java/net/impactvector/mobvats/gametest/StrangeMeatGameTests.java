@@ -204,7 +204,7 @@ public final class StrangeMeatGameTests {
         cow.getAsJsonObject("harvest").addProperty("blender", "mobvats:strange_meat");
         var root = new JsonObject();
         root.add("minecraft:cow", cow);
-        Files.writeString(dir.resolve("explicit.json"), root.toString());
+        MobProfileFixtures.write(dir, root);
         var loaded = PassiveMobDefinitionRegistry.load(dir, s -> {});
         h.assertTrue(
                 loaded.errors().isEmpty()

@@ -1,0 +1,163 @@
+{
+  "entity": "minecraft:cow",
+  "feed": {
+    "items": [
+      "#minecraft:cow_food",
+      "minecraft:wheat"
+    ],
+    "count": 1
+  },
+  "juvenile_growth_ticks": 24000,
+  "secondary_outputs": [
+    {
+      "process": "mobvats:milk",
+      "buffer": "mobvats:milk",
+      "fluid": "minecraft:milk",
+      "amount": 1000,
+      "interval_ticks": 1200,
+      "requires_stage": "ADULT",
+      "actor_use": "",
+      "accelerated": true,
+      "metric": "milkMb",
+      "container": {
+        "input": "minecraft:bucket",
+        "output": "minecraft:milk_bucket",
+        "amount": 1000,
+        "actor_use": "mobvats:tool",
+        "acquisition_priority": 20
+      }
+    },
+    {
+      "process": "mobvats:waste",
+      "buffer": "mobvats:waste",
+      "fluid": "mobvats:waste",
+      "amount": 250,
+      "interval_ticks": 1200,
+      "requires_stage": "ANY",
+      "actor_use": "mobvats:drain",
+      "accelerated": false,
+      "metric": "wasteMb"
+    }
+  ],
+  "harvest": {
+    "sword": "mobvats:vanilla_entity_death_loot",
+    "blender": "mobvats:meat",
+    "blender_amount": 1000,
+    "blender_xp": 0,
+    "actor_use": "mobvats:kill",
+    "acquisition_priority": 10
+  },
+  "feeding_slurry": {
+    "supported": true,
+    "cost": 250
+  },
+  "simulacrum": {},
+  "buffers": {
+    "mobvats:culture_slurry": {
+      "fluids": [
+        "mobvats:culture_slurry"
+      ],
+      "capacity": 4000,
+      "input": true
+    },
+    "mobvats:feeding_slurry": {
+      "fluids": [
+        "mobvats:feeding_slurry"
+      ],
+      "capacity": 4000,
+      "input": true
+    },
+    "mobvats:meat": {
+      "fluids": [
+        "mobvats:meat"
+      ],
+      "capacity": 4000,
+      "input": false
+    },
+    "mobvats:milk": {
+      "fluids": [
+        "minecraft:milk"
+      ],
+      "capacity": 4000,
+      "input": true
+    },
+    "mobvats:waste": {
+      "fluids": [
+        "mobvats:waste"
+      ],
+      "capacity": 4000,
+      "input": false
+    }
+  },
+  "processes": [],
+  "capture": {
+    "enabled": true,
+    "tool": "mobvats:syringe",
+    "cost": {
+      "items": [
+        "minecraft:glass_bottle"
+      ],
+      "count": 1
+    },
+    "health_cost": 0,
+    "requires_alive": true,
+    "allow_hostile": true,
+    "allow_boss": true,
+    "adult_only": true,
+    "encoding_enabled": true,
+    "status": "passive lifecycle; special interactions not implemented"
+  },
+  "interactions": [
+    {
+      "id": "mobvats:weapon_harvest",
+      "executor": "mobvats:weapon_harvest",
+      "items": [
+        "#minecraft:swords"
+      ],
+      "abilities": [
+        "sword_sweep"
+      ],
+      "actor_use": "mobvats:kill",
+      "requires_stage": "ADULT",
+      "cooldown_ticks": 20,
+      "priority": 10,
+      "output_policy": "retain",
+      "duration_ticks": 0,
+      "block_items": []
+    },
+    {
+      "id": "mobvats:shear",
+      "executor": "mobvats:regrowing_entity_item_interaction",
+      "items": [],
+      "abilities": [
+        "shears_harvest"
+      ],
+      "actor_use": "mobvats:secondary",
+      "requires_stage": "ADULT",
+      "cooldown_ticks": 20,
+      "priority": 0,
+      "output_policy": "retain",
+      "duration_ticks": 0,
+      "block_items": []
+    },
+    {
+      "id": "mobvats:milk_container",
+      "executor": "mobvats:stored_container",
+      "items": [
+        "minecraft:bucket",
+        "minecraft:milk_bucket"
+      ],
+      "abilities": [],
+      "actor_use": "mobvats:tool",
+      "requires_stage": "ADULT",
+      "cooldown_ticks": 20,
+      "priority": 20,
+      "output_policy": "retain",
+      "source_process": "mobvats:milk",
+      "duration_ticks": 0,
+      "block_items": []
+    }
+  ],
+  "schema_version": 2,
+  "minimum_vat_tier": 1
+}

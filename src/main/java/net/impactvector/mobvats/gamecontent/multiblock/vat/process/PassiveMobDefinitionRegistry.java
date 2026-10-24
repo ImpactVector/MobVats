@@ -13,11 +13,17 @@ import net.minecraft.resources.ResourceLocation;
 public final class PassiveMobDefinitionRegistry {
     public static final Gson JSON =
             new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private static Map<ResourceLocation, PassiveMobDefinition> current = Map.of();
-    private static Map<ResourceLocation, String> sources = Map.of();
+
+    private record Catalog(
+            Map<ResourceLocation, PassiveMobDefinition> definitions,
+            Map<ResourceLocation, String> sources,
+            Map<ResourceLocation, MobProcessRegistry.Profile> profiles,
+            long revision) {}
+
+    private static volatile Catalog current = new Catalog(Map.of(), Map.of(), Map.of(), 0);
 
     public static String source(ResourceLocation id) {
-        return sources.getOrDefault(id, "missing / processing disabled");
+        return current.sources().getOrDefault(id, "missing / processing disabled");
     }
 
     public record Loaded(
@@ -26,19 +32,53 @@ public final class PassiveMobDefinitionRegistry {
             List<String> errors) {}
 
     public static PassiveMobDefinition resolve(ResourceLocation id) {
-        return current.get(id);
+        return current.definitions().get(id);
     }
 
     public static Map<ResourceLocation, PassiveMobDefinition> definitions() {
-        return current;
+        return current.definitions();
     }
 
     public static void publish(Loaded loaded) {
         var profiles = new HashMap<ResourceLocation, MobProcessRegistry.Profile>();
         loaded.definitions().forEach((id, d) -> profiles.put(id, PassiveProcessCompiler.compile(d)));
-        current = loaded.definitions();
-        sources = loaded.sources();
-        MobProcessRegistry.DEFAULT.replace(profiles);
+        current = new Catalog(
+                Map.copyOf(loaded.definitions()),
+                Map.copyOf(loaded.sources()),
+                Map.copyOf(profiles),
+                current.revision() + 1);
+    }
+
+    /** Canonical entity path; dot segments and ambiguous Windows names are never accepted. */
+    public static Path path(Path directory, ResourceLocation id) {
+        for (var segment : (id.getNamespace() + "/" + id.getPath()).split("/", -1)) {
+            require(
+                    !segment.isEmpty() && !segment.equals(".") && !segment.equals("..") && !segment.endsWith("."),
+                    "Unsafe entity path: " + id);
+            require(!segment.matches("(?i)(con|prn|aux|nul|com[1-9]|lpt[1-9])(\\..*)?"), "Unsafe entity path: " + id);
+        }
+        var root = directory.toAbsolutePath().normalize();
+        var file =
+                root.resolve(id.getNamespace()).resolve(id.getPath() + ".json").normalize();
+        require(file.startsWith(root), "Entity path escapes catalog: " + id);
+        return file;
+    }
+
+    private static void noLinks(Path root, Path file) {
+        var cursor = file.toAbsolutePath();
+        while (cursor != null) {
+            require(!Files.isSymbolicLink(cursor), "Symbolic links are not allowed: " + cursor);
+            cursor = cursor.getParent();
+        }
+        require(file.toAbsolutePath().normalize().startsWith(root), "Path escapes catalog");
+    }
+
+    static MobProcessRegistry.Profile compiled(ResourceLocation id) {
+        return current.profiles().get(id);
+    }
+
+    static long revision() {
+        return current.revision();
     }
 
     public static Loaded load(Path directory, Consumer<String> diagnostic) {
@@ -46,61 +86,121 @@ public final class PassiveMobDefinitionRegistry {
                 new TreeMap<ResourceLocation, PassiveMobDefinition>(Comparator.comparing(ResourceLocation::toString));
         var sources = new HashMap<ResourceLocation, String>();
         var errors = new ArrayList<String>();
+        record Candidate(
+                Path file,
+                String original,
+                JsonObject upgraded,
+                int version,
+                PassiveMobDefinition definition,
+                String label) {}
+        var candidates = new ArrayList<Candidate>();
+        var seen = new HashMap<ResourceLocation, Path>();
+        var duplicates = new HashSet<ResourceLocation>();
+        var root = directory.toAbsolutePath().normalize();
         try {
-            Files.createDirectories(directory);
-            var defaults = directory.resolve("_defaults.json");
-            if (!Files.exists(defaults)) {
-                // CREATE_NEW ensures an existing user file cannot be replaced, including a concurrent creation.
+            noLinks(root, root);
+            Files.createDirectories(root);
+            for (var definition : PassiveDefaults.data().values()) {
+                var file = path(root, definition.identity());
                 try {
-                    Files.writeString(
-                            defaults,
-                            JSON.toJson(new TreeMap<>(PassiveDefaults.data())) + "\n",
-                            StandardCharsets.UTF_8,
-                            StandardOpenOption.CREATE_NEW);
-                } catch (FileAlreadyExistsException ignored) {
+                    noLinks(root, file);
+                    Files.createDirectories(file.getParent());
+                    try {
+                        Files.writeString(
+                                file,
+                                JSON.toJson(definition) + "\n",
+                                StandardCharsets.UTF_8,
+                                StandardOpenOption.CREATE_NEW);
+                    } catch (FileAlreadyExistsException ignored) {
+                        // Existing files, including invalid/unavailable documents, are authoritative.
+                    }
+                } catch (Exception error) {
+                    errors.add(file + ": " + message(error));
                 }
             }
-            var files = new ArrayList<Path>();
-            files.add(defaults);
-            try (var stream = Files.list(directory)) {
-                stream.filter(p -> Files.isRegularFile(p)
-                                && p.getFileName().toString().endsWith(".json")
-                                && !p.equals(defaults))
-                        .sorted(Comparator.comparing(p -> p.getFileName().toString()))
-                        .forEach(files::add);
+            List<Path> files;
+            try (var stream = Files.walk(root)) {
+                files = stream.filter(p -> p.toString().endsWith(".json") || Files.isSymbolicLink(p))
+                        .sorted()
+                        .toList();
             }
             for (var file : files) {
+                var label = root.relativize(file).toString().replace('\\', '/');
                 try {
-                    var reader = new com.google.gson.stream.JsonReader(
-                            new java.io.StringReader(Files.readString(file, StandardCharsets.UTF_8)));
+                    noLinks(root, file);
+                    require(Files.isRegularFile(file, LinkOption.NOFOLLOW_LINKS), "Not a regular definition file");
+                    var original = Files.readString(file, StandardCharsets.UTF_8);
+                    var reader = new com.google.gson.stream.JsonReader(new java.io.StringReader(original));
                     var tree = uniqueJson(reader);
                     require(reader.peek() == com.google.gson.stream.JsonToken.END_DOCUMENT, "Trailing JSON data");
-                    require(tree.isJsonObject(), "root must be an object keyed by entity ID");
-                    var parsed = new LinkedHashMap<ResourceLocation, PassiveMobDefinition>();
-                    for (var entry : tree.getAsJsonObject().entrySet()) {
-                        shape(entry.getValue(), PassiveMobDefinition.class, entry.getKey());
-                        var definition = JSON.fromJson(entry.getValue(), PassiveMobDefinition.class);
-                        validate(entry.getKey(), definition);
-                        parsed.put(definition.identity(), definition);
+                    require(tree.isJsonObject(), "root must be one mob definition");
+                    var document = tree.getAsJsonObject();
+                    var entity = document.get("entity");
+                    require(
+                            entity != null
+                                    && entity.isJsonPrimitive()
+                                    && entity.getAsJsonPrimitive().isString(),
+                            "entity must be an exact registry ID");
+                    var key = entity.getAsString();
+                    id(key);
+                    var identity = ResourceLocation.parse(key);
+                    require(identity.toString().equals(key), "entity must be an exact registry ID");
+                    var previous = seen.putIfAbsent(identity, file);
+                    if (previous != null) {
+                        duplicates.add(identity);
+                        throw new IllegalArgumentException("Duplicate entity " + key + " also declared by " + previous);
                     }
-                    parsed.forEach((id, d) -> {
-                        definitions.put(id, d);
-                        sources.put(id, file.getFileName().toString());
-                        d.tagDiagnostics()
-                                .forEach(issue -> diagnostic.accept(
-                                        file.getFileName() + ": " + issue + " (membership is evaluated live)"));
-                    });
+                    require(path(root, identity).equals(file), "entity/path disagreement for " + key);
+                    int version = MobProfileSchema.version(document);
+                    var upgraded = MobProfileSchema.upgrade(document);
+                    shape(upgraded, PassiveMobDefinition.class, key);
+                    var definition = JSON.fromJson(upgraded, PassiveMobDefinition.class);
+                    validate(key, definition);
+                    PassiveProcessCompiler.compile(definition);
+                    candidates.add(new Candidate(file, original, upgraded, version, definition, label));
                 } catch (Exception error) {
-                    errors.add(file.getFileName() + ": " + error.getMessage());
+                    errors.add(label + ": " + message(error) + " (definition disabled; file retained)");
                 }
             }
         } catch (Exception error) {
-            errors.add(directory + ": " + error.getMessage());
+            errors.add(root + ": " + message(error));
+        }
+        for (var candidate : candidates) {
+            var definition = candidate.definition();
+            if (duplicates.contains(definition.identity())) continue;
+            try {
+                if (candidate.version() < MobProfileSchema.CURRENT_VERSION)
+                    persistUpgrade(candidate.file(), candidate.original(), candidate.upgraded(), candidate.version());
+                definitions.put(definition.identity(), definition);
+                sources.put(definition.identity(), candidate.label());
+                definition
+                        .tagDiagnostics()
+                        .forEach(issue -> diagnostic.accept(
+                                candidate.label() + ": " + issue + " (membership is evaluated live)"));
+            } catch (Exception error) {
+                errors.add(candidate.label() + ": " + message(error) + " (definition disabled; file retained)");
+            }
         }
         if (!definitions.containsKey(ResourceLocation.withDefaultNamespace("cow")))
             errors.add("Required built-in minecraft:cow has no valid loaded definition; its processing is disabled");
         errors.forEach(diagnostic);
         return new Loaded(Collections.unmodifiableMap(definitions), Map.copyOf(sources), List.copyOf(errors));
+    }
+
+    private static void persistUpgrade(Path file, String original, JsonObject upgraded, int version)
+            throws java.io.IOException {
+        var temporary = Files.createTempFile(file.getParent(), ".mob-profile-", ".tmp");
+        try {
+            Files.writeString(temporary, JSON.toJson(upgraded) + "\n", StandardCharsets.UTF_8);
+            require(
+                    Files.readString(file, StandardCharsets.UTF_8).equals(original),
+                    "File changed during migration; retry reload");
+            Files.copy(
+                    file, file.resolveSibling(file.getFileName() + ".v" + version + "." + UUID.randomUUID() + ".bak"));
+            Files.move(temporary, file, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        } finally {
+            Files.deleteIfExists(temporary);
+        }
     }
 
     private static JsonElement uniqueJson(com.google.gson.stream.JsonReader reader) throws java.io.IOException {
@@ -139,7 +239,8 @@ public final class PassiveMobDefinitionRegistry {
         var object = value.getAsJsonObject();
         var allowed = new HashSet<String>();
         for (var field : type.getRecordComponents()) allowed.add(field.getName());
-        for (var key : object.keySet()) require(allowed.contains(key), path + ": unknown field " + key);
+        for (var key : object.keySet())
+            require(type == PassiveMobDefinition.class || allowed.contains(key), path + ": unknown field " + key);
         for (var field : type.getRecordComponents()) {
             var name = field.getName();
             var element = object.get(name);
@@ -152,7 +253,9 @@ public final class PassiveMobDefinitionRegistry {
                             || type == ProductBufferDefinition.class
                             || type == PassiveMobDefinition.ResourceProcess.class
                                     && !Set.of("id", "duration_ticks").contains(name)
-                            || type == PassiveMobDefinition.class && !name.equals("entity")
+                            || type == PassiveMobDefinition.class
+                                    && !Set.of("entity", "schema_version", "minimum_vat_tier")
+                                            .contains(name)
                             || Set.of("container", "simulacrum", "dimensions", "head_offset", "fouling_mb")
                                     .contains(name))
                     && (element == null || element.isJsonNull())) continue;
@@ -266,8 +369,10 @@ public final class PassiveMobDefinitionRegistry {
     private static void validate(String key, PassiveMobDefinition d) {
         id(key);
         id(d.entity());
-        require(key.equals(d.entity()), "entity must match root key " + key);
+        require(key.equals(d.entity()), "entity must match path " + key);
         require(BuiltInRegistries.ENTITY_TYPE.containsKey(d.identity()), "Unknown entity: " + key);
+        require(d.schema_version() == MobProfileSchema.CURRENT_VERSION, "Unsupported schema_version");
+        require(d.minimum_vat_tier() >= 1 && d.minimum_vat_tier() <= 3, "minimum_vat_tier must be 1, 2 or 3");
         var capture = d.capture();
         require(!capture.tool().isEmpty(), "capture.tool must be an item/tag selector");
         ResourceSelectors.items(List.of(capture.tool()));
@@ -423,6 +528,11 @@ public final class PassiveMobDefinitionRegistry {
         require(
                 definition.fluids().stream().anyMatch(s -> s.startsWith("#") || s.equals(fluid)),
                 "Buffer/fluid incompatibility: " + id + " / " + fluid);
+    }
+
+    private static String message(Throwable error) {
+        while (error.getCause() != null && error.getCause() != error) error = error.getCause();
+        return error.getMessage() == null ? error.getClass().getSimpleName() : error.getMessage();
     }
 
     private static void require(boolean condition, String reason) {

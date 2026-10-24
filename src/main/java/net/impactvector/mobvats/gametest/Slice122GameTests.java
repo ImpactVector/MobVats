@@ -1341,19 +1341,24 @@ public final class Slice122GameTests {
     @GameTest(template = "empty")
     public static void definitionJsonAcceptsOptionalFoulingAndRejectsNegative(GameTestHelper h) throws Exception {
         var directory = java.nio.file.Files.createTempDirectory(java.nio.file.Path.of("build"), "slice122-process-");
-        java.nio.file.Files.writeString(
-                directory.resolve("process.json"),
-                "{\"minecraft:cow\":{\"entity\":\"minecraft:cow\",\"processes\":[{\"id\":\"test:bio\",\"duration_ticks\":1,\"accelerated\":true,\"fouling_mb\":25,\"outputs\":[{\"type\":\"item\",\"item\":\"minecraft:egg\",\"count\":1}]}]}}");
+        MobProfileFixtures.write(
+                directory,
+                com.google.gson.JsonParser.parseString(
+                                "{\"minecraft:cow\":{\"entity\":\"minecraft:cow\",\"processes\":[{\"id\":\"test:bio\",\"duration_ticks\":1,\"accelerated\":true,\"fouling_mb\":25,\"outputs\":[{\"type\":\"item\",\"item\":\"minecraft:egg\",\"count\":1}]}]}}")
+                        .getAsJsonObject());
         var loaded = PassiveMobDefinitionRegistry.load(directory, s -> {});
         h.assertTrue(
                 loaded.errors().isEmpty()
                         && loaded.definitions().get(COW).processes().getFirst().fouling_mb() == 25,
                 "Definition JSON override rejected");
-        java.nio.file.Files.writeString(
-                directory.resolve("process.json"),
-                "{\"minecraft:cow\":{\"entity\":\"minecraft:cow\",\"processes\":[{\"id\":\"test:bio\",\"duration_ticks\":1,\"accelerated\":true,\"fouling_mb\":-1,\"outputs\":[{\"type\":\"item\",\"item\":\"minecraft:egg\",\"count\":1}]}]}}");
+        MobProfileFixtures.write(
+                directory,
+                com.google.gson.JsonParser.parseString(
+                                "{\"minecraft:cow\":{\"entity\":\"minecraft:cow\",\"processes\":[{\"id\":\"test:bio\",\"duration_ticks\":1,\"accelerated\":true,\"fouling_mb\":-1,\"outputs\":[{\"type\":\"item\",\"item\":\"minecraft:egg\",\"count\":1}]}]}}")
+                        .getAsJsonObject());
         h.assertTrue(
-                PassiveMobDefinitionRegistry.load(directory, s -> {}).errors().size() == 1,
+                PassiveMobDefinitionRegistry.load(directory, s -> {}).errors().stream()
+                        .anyMatch(e -> e.contains("fouling_mb")),
                 "Negative definition fouling accepted");
         h.succeed();
     }
