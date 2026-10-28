@@ -67,17 +67,23 @@ The stone-brick workshop has a 41 × 41 clear interior footprint, 14 blocks of
 headroom (the T3 limit is 12), a solid roof, permanent floor/ceiling lighting, and bottom slabs over
 the roof. The central construction area is empty. It is enclosed without doors;
 break and replace a wall section if access outside is needed. The surrounding
-world is seeded superflat with structures disabled. Survival, Normal difficulty,
+world uses normal seeded terrain with structures enabled. The workshop is carved
+into a 43 × 43 footprint around the natural world spawn, with its floor at spawn
+height. Terrain and trees above that footprint are cleared; terrain outside it
+is left intact. Survival, Normal difficulty,
 cheats disabled, daylight, mob spawning, hunger, and ordinary consumption remain
-active. The world spawn is `(5, -60, 7)`; spawn radius is zero.
+active. The world spawn stays at its generated position inside the workshop;
+spawn radius is zero. Existing superflat saves require an explicit rebuild to
+receive the new terrain.
 
 Near spawn: three of each diamond tool, food, torches, ladders, buckets, drawer
 tools, crafting table, furnace, and a red bed. The north wall carries upgraded,
 locked Functional Storage drawers and an empty linked compacting drawer. The
 drawer fronts and controller face south into the workshop, using Functional
 Storage's own orientation properties. Jade provides the block inspection overlay.
-The controller at `(21, -60, 3)` connects through Tom's inventory connector to the
-crafting terminal at `(21, -60, 5)`. An air gap separates the controller from the
+The controller 16 blocks east and four blocks north of spawn connects through
+Tom's inventory connector to the crafting terminal 16 blocks east and two blocks
+north of spawn. An air gap separates the controller from the
 drawer bank to prevent counting both aggregate and member inventories. Use the terminal to retrieve ingredients and
 craft directly from the drawers. Locked drawers still allow normal extraction.
 
@@ -95,7 +101,8 @@ The south wall supplies four full MobVats fluid buffers (16 buckets) per registe
 MobVats source fluid, including Strange Meat. Use the stock Strange Meat buckets
 or connect fluid logistics to the buffers to test Blood Iron without mob farming.
 Each buffer is finite, initialized via its real tank API. A 2 × 2 renewable water
-pool is near `(37, -61, 39)`. Fluids without bucket items are provided as buffers.
+pool is 32 blocks east and 32 blocks south of spawn, recessed one block into the
+floor. Fluids without bucket items are provided as buffers.
 
 ## Changing stock
 
@@ -136,9 +143,11 @@ builds or normal GameTests. No automated client is launched. Manual client
 acceptance still covers first-entry presentation, drawer labels/fronts, bed use,
 JEI recipe transfer, and comfortable construction of a maximum-sized T3 Vat.
 
-Verified on October 28, 2026: generation and headless reload passed with 108 stocked
-drawers and 28 full fluid buffers. Repeated generation produced identical stock
-manifests. The runtime isolation check verifies that the added dependencies and
+Verified on October 28, 2026: isolated normal-terrain generation and headless reload
+passed with 108 stocked drawers and 28 full fluid buffers. The workshop was placed
+at natural spawn `(0, 74, 0)`, with first-login spawn, construction clearance,
+lighting, terminal crafting, and saved noise terrain generation verified. The
+existing Survival save was preserved. The runtime isolation check verifies that the added dependencies and
 fixture mod are absent from ordinary runs and the packaged MobVats JAR.
 
 Mob tier defaults were reviewed after initial validation exposed an incorrect

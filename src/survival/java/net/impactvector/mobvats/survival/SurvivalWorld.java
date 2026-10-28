@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
@@ -32,12 +33,13 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 @net.neoforged.fml.common.Mod("mobvats_survival")
 @EventBusSubscriber(modid = "mobvats_survival")
 public final class SurvivalWorld {
-    static final int Y = -60;
+    private static int floorY;
     private static final int HEIGHT = net.impactvector.mobvats.gamecontent.multiblock.vat.VatTier.T3.maxY + 2;
     // The air gap behind the controller prevents Tom's scan counting both aggregate and member inventories.
-    private static final BlockPos CONTROLLER = new BlockPos(21, Y, 3);
-    private static final BlockPos TERMINAL = new BlockPos(21, Y, 5);
-    private static final BlockPos SPAWN = new BlockPos(5, Y, 7);
+    private static BlockPos controllerPos;
+    private static BlockPos terminalPos;
+    private static BlockPos spawnPos;
+    private static BlockPos origin;
     private static final Map<BlockPos, Item> DRAWERS = new LinkedHashMap<>();
     private static final Map<BlockPos, net.minecraft.world.level.material.Fluid> TANKS = new LinkedHashMap<>();
     private static int ticks;
@@ -55,6 +57,14 @@ public final class SurvivalWorld {
         TANKS.clear();
         try {
             var level = event.getServer().overworld();
+            spawnPos = level.getSharedSpawnPos();
+            floorY = spawnPos.getY();
+            origin = new BlockPos(spawnPos.getX() - 5, floorY, spawnPos.getZ() - 7);
+            controllerPos = at(21, floorY, 3);
+            terminalPos = at(21, floorY, 5);
+            require(
+                    floorY > level.getMinBuildHeight() && floorY + HEIGHT + 1 < level.getMaxBuildHeight(),
+                    "Spawn height cannot fit the Survival workshop");
             require(
                     net.neoforged.fml.ModList.get().isLoaded("jade"),
                     "Jade inspection overlay is missing from the Survival runtime");
@@ -77,7 +87,7 @@ public final class SurvivalWorld {
                                     id -> id.getNamespace().equals("mobvats_lifecycle"))
                             .isEmpty(),
                     "Headless biome spawn fixtures present in Survival runtime");
-            for (int x = 0; x <= 2; x++) for (int z = 0; z <= 2; z++) level.setChunkForced(x, z, true);
+            forceWorkshopChunks(level, true);
             if (Boolean.getBoolean("mobvats.survival.verify")) {
                 var world = Path.of(System.getProperty("mobvats.survival.world"));
                 var rows = Files.readAllLines(world.resolve("survival-stock.csv"));
@@ -100,19 +110,27 @@ public final class SurvivalWorld {
             }
             for (int x = 0; x <= 42; x++) {
                 for (int z = 0; z <= 42; z++) {
-                    for (int y = Y - 1; y <= Y + HEIGHT; y++) {
-                        boolean shell = x == 0 || x == 42 || z == 0 || z == 42 || y == Y - 1 || y == Y + HEIGHT;
+                    // Remove terrain and trees above the roof within this footprint only.
+                    var column = at(x, floorY, z);
+                    int surface = level.getHeight(
+                            net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE,
+                            column.getX(),
+                            column.getZ());
+                    for (int y = surface - 1; y > floorY + HEIGHT + 1; y--)
+                        level.setBlockAndUpdate(at(x, y, z), Blocks.AIR.defaultBlockState());
+                    for (int y = floorY - 1; y <= floorY + HEIGHT; y++) {
+                        boolean shell =
+                                x == 0 || x == 42 || z == 0 || z == 42 || y == floorY - 1 || y == floorY + HEIGHT;
                         BlockState state = (shell ? Blocks.STONE_BRICKS : Blocks.AIR).defaultBlockState();
                         // Flush floor lights at six-block intervals; roof lights also protect the roof.
-                        if ((y == Y - 1 || y == Y + HEIGHT) && x % 6 == 3 && z % 6 == 3)
+                        if ((y == floorY - 1 || y == floorY + HEIGHT) && x % 6 == 3 && z % 6 == 3)
                             state = Blocks.SEA_LANTERN.defaultBlockState();
-                        level.setBlockAndUpdate(new BlockPos(x, y, z), state);
+                        level.setBlockAndUpdate(at(x, y, z), state);
                     }
-                    level.setBlockAndUpdate(
-                            new BlockPos(x, Y + HEIGHT + 1, z), Blocks.STONE_BRICK_SLAB.defaultBlockState());
+                    level.setBlockAndUpdate(at(x, floorY + HEIGHT + 1, z), Blocks.STONE_BRICK_SLAB.defaultBlockState());
                 }
             }
-            level.setDefaultSpawnPos(SPAWN, 180);
+            level.setDefaultSpawnPos(spawnPos, 180);
             level.getGameRules().getRule(GameRules.RULE_SPAWN_RADIUS).set(0, event.getServer());
             level.setDayTime(1000);
             tools(level);
@@ -127,15 +145,15 @@ public final class SurvivalWorld {
     private static void storage(ServerLevel level) {
         var stock = SurvivalStock.discover(level);
         if (stock.size() > 150) throw new IllegalStateException("Stock exceeds 150 drawer positions: " + stock.size());
-        put(level, CONTROLLER, "functionalstorage:storage_controller");
-        var controller = (StorageControllerTile<?>) level.getBlockEntity(CONTROLLER);
+        put(level, controllerPos, "functionalstorage:storage_controller");
+        var controller = (StorageControllerTile<?>) level.getBlockEntity(controllerPos);
         Objects.requireNonNull(controller);
         controller.getStorageUpgrades().setStackInSlot(0, stack("functionalstorage:copper_upgrade", 1));
         controller.recalculateUpgrades();
         int index = 0;
         var listing = new StringBuilder("id,count,x,y,z\n");
         for (var entry : stock.entrySet()) {
-            var pos = new BlockPos(9 + index % 25, Y + index / 25, 1);
+            var pos = at(9 + index % 25, floorY + index / 25, 1);
             put(level, pos, "functionalstorage:oak_1");
             var drawer = (DrawerTile) Objects.requireNonNull(level.getBlockEntity(pos));
             drawer.getStorageUpgrades().setStackInSlot(0, stack("functionalstorage:diamond_upgrade", 1));
@@ -166,20 +184,20 @@ public final class SurvivalWorld {
             index++;
         }
         // An empty compacting drawer is available for manual compaction tests.
-        var compact = new BlockPos(8, Y, 1);
+        var compact = at(8, floorY, 1);
         put(level, compact, "functionalstorage:compacting_drawer");
         if (!controller.addConnectedDrawers(ActionMode.ADD, compact))
             throw new IllegalStateException("Compacting link failed");
         controller.getConnectedDrawers().rebuild();
         controller.setChanged();
-        put(level, CONTROLLER.south(), "toms_storage:inventory_connector");
+        put(level, controllerPos.south(), "toms_storage:inventory_connector");
         var terminalState = block("toms_storage:crafting_terminal")
                 .defaultBlockState()
                 .setValue(AbstractStorageTerminalBlock.FACING, Direction.NORTH);
-        level.setBlockAndUpdate(TERMINAL, terminalState);
+        level.setBlockAndUpdate(terminalPos, terminalState);
         sign(
                 level,
-                TERMINAL.offset(2, 0, 0),
+                terminalPos.offset(2, 0, 0),
                 "Crafting terminal",
                 "Uses drawer stock",
                 "North wall",
@@ -188,7 +206,7 @@ public final class SurvivalWorld {
     }
 
     private static void tools(ServerLevel level) {
-        var pos = new BlockPos(4, Y, 5);
+        var pos = at(4, floorY, 5);
         level.setBlockAndUpdate(pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.SOUTH));
         var chest = (ChestBlockEntity) Objects.requireNonNull(level.getBlockEntity(pos));
         int slot = 0;
@@ -203,11 +221,11 @@ public final class SurvivalWorld {
         chest.setItem(slot, stack("functionalstorage:configuration_tool", 1));
         chest.setChanged();
         var bed = Blocks.RED_BED.defaultBlockState().setValue(BedBlock.FACING, Direction.NORTH);
-        level.setBlockAndUpdate(new BlockPos(7, Y, 5), bed.setValue(BedBlock.PART, BedPart.FOOT));
-        level.setBlockAndUpdate(new BlockPos(7, Y, 4), bed.setValue(BedBlock.PART, BedPart.HEAD));
-        level.setBlockAndUpdate(new BlockPos(2, Y, 5), Blocks.CRAFTING_TABLE.defaultBlockState());
-        level.setBlockAndUpdate(new BlockPos(2, Y, 6), Blocks.FURNACE.defaultBlockState());
-        sign(level, new BlockPos(4, Y, 6), "Survival workshop", "Tools in chest", "Bed to the right", "Storage: north");
+        level.setBlockAndUpdate(at(7, floorY, 5), bed.setValue(BedBlock.PART, BedPart.FOOT));
+        level.setBlockAndUpdate(at(7, floorY, 4), bed.setValue(BedBlock.PART, BedPart.HEAD));
+        level.setBlockAndUpdate(at(2, floorY, 5), Blocks.CRAFTING_TABLE.defaultBlockState());
+        level.setBlockAndUpdate(at(2, floorY, 6), Blocks.FURNACE.defaultBlockState());
+        sign(level, at(4, floorY, 6), "Survival workshop", "Tools in chest", "Bed to the right", "Storage: north");
     }
 
     private static void fluids(ServerLevel level) {
@@ -221,7 +239,7 @@ public final class SurvivalWorld {
         for (var entry : fluids) {
             // Four buffers per fluid; no assumptions about buckets or placeable fluid blocks.
             for (int i = 0; i < 4; i++) {
-                var pos = new BlockPos(2 + index * 2, Y + i, 40);
+                var pos = at(2 + index * 2, floorY + i, 40);
                 put(level, pos, "mobvats:fluid_buffer");
                 var buffer = (FluidBufferEntity) Objects.requireNonNull(level.getBlockEntity(pos));
                 if (buffer.tank.fill(new FluidStack(entry.getValue(), 4000), IFluidHandler.FluidAction.EXECUTE) != 4000)
@@ -231,7 +249,7 @@ public final class SurvivalWorld {
             }
             sign(
                     level,
-                    new BlockPos(2 + index * 2, Y, 39),
+                    at(2 + index * 2, floorY, 39),
                     entry.getKey().location().getPath().replace('_', ' '),
                     "16 buckets",
                     "Finite supply",
@@ -241,7 +259,7 @@ public final class SurvivalWorld {
         // Renewable ordinary water source beside the supply wall.
         for (int x = 37; x <= 38; x++)
             for (int z = 39; z <= 40; z++)
-                level.setBlockAndUpdate(new BlockPos(x, Y - 1, z), Blocks.WATER.defaultBlockState());
+                level.setBlockAndUpdate(at(x, floorY - 1, z), Blocks.WATER.defaultBlockState());
     }
 
     @SubscribeEvent
@@ -250,15 +268,14 @@ public final class SurvivalWorld {
         ++ticks;
         // Opening the terminal requests its normal item cache before the next server ticks.
         if (ticks == 100
-                && event.getServer().overworld().getBlockEntity(TERMINAL)
+                && event.getServer().overworld().getBlockEntity(terminalPos)
                         instanceof CraftingTerminalBlockEntity terminal) terminal.getStacks();
         if (ticks < 200) return;
         active = false;
         try {
             verify(event.getServer().overworld());
             passed = true;
-            for (int x = 0; x <= 2; x++)
-                for (int z = 0; z <= 2; z++) event.getServer().overworld().setChunkForced(x, z, false);
+            forceWorkshopChunks(event.getServer().overworld(), false);
             event.getServer().halt(false);
         } catch (Exception error) {
             fail(event.getServer(), error);
@@ -276,20 +293,20 @@ public final class SurvivalWorld {
                         "SurvivalProbe"),
                 net.minecraft.server.level.ClientInformation.createDefault());
         require(
-                newcomer.blockPosition().equals(SPAWN),
+                newcomer.blockPosition().equals(spawnPos),
                 "Vanilla first-login spawn is outside workshop: " + newcomer.blockPosition());
-        var terminal = (CraftingTerminalBlockEntity) Objects.requireNonNull(level.getBlockEntity(TERMINAL));
+        var terminal = (CraftingTerminalBlockEntity) Objects.requireNonNull(level.getBlockEntity(terminalPos));
         terminal.getStacks();
         terminal.updateServer();
-        var controller = (StorageControllerTile<?>) Objects.requireNonNull(level.getBlockEntity(CONTROLLER));
+        var controller = (StorageControllerTile<?>) Objects.requireNonNull(level.getBlockEntity(controllerPos));
         require(controller.getFacingDirection() == Direction.SOUTH, "Storage controller faces away from the workshop");
         require(
-                ((ControllableDrawerTile<?>) Objects.requireNonNull(level.getBlockEntity(new BlockPos(8, Y, 1))))
+                ((ControllableDrawerTile<?>) Objects.requireNonNull(level.getBlockEntity(at(8, floorY, 1))))
                                 .getFacingDirection()
                         == Direction.SOUTH,
                 "Compacting drawer faces away from the workshop");
         var connector = (com.tom.storagemod.block.entity.InventoryConnectorBlockEntity)
-                Objects.requireNonNull(level.getBlockEntity(CONTROLLER.south()));
+                Objects.requireNonNull(level.getBlockEntity(controllerPos.south()));
         LogUtils.getLogger()
                 .info(
                         "SURVIVAL storage network: controller slots={}, connector inventories={}, terminal entries={}, terminal state={}",
@@ -353,11 +370,10 @@ public final class SurvivalWorld {
         for (int x = 1; x <= 41; x++)
             for (int z = 1; z <= 41; z++) {
                 require(
-                        level.getBlockState(new BlockPos(x, Y + HEIGHT, z))
-                                .isSolidRender(level, new BlockPos(x, Y + HEIGHT, z)),
+                        level.getBlockState(at(x, floorY + HEIGHT, z)).isSolidRender(level, at(x, floorY + HEIGHT, z)),
                         "Roof gap");
-                for (int y = Y; y < Y + HEIGHT; y++) {
-                    var pos = new BlockPos(x, y, z);
+                for (int y = floorY; y < floorY + HEIGHT; y++) {
+                    var pos = at(x, y, z);
                     var state = level.getBlockState(pos);
                     if (x >= 9 && x <= 38 && z >= 6 && z <= 37)
                         require(state.isAir(), "Obstructed construction area: " + pos);
@@ -368,27 +384,27 @@ public final class SurvivalWorld {
                                 "Unlit spawnable surface: " + pos);
                 }
             }
-        var chest = (ChestBlockEntity) Objects.requireNonNull(level.getBlockEntity(new BlockPos(4, Y, 5)));
+        var chest = (ChestBlockEntity) Objects.requireNonNull(level.getBlockEntity(at(4, floorY, 5)));
         require(
                 java.util.stream.IntStream.range(0, 15)
                         .allMatch(i -> !chest.getItem(i).isEmpty()),
                 "Missing tool chest contents");
         require(
-                level.getBlockState(new BlockPos(7, Y, 5)).is(Blocks.RED_BED)
-                        && level.getBlockState(new BlockPos(7, Y, 4)).getValue(BedBlock.PART) == BedPart.HEAD,
+                level.getBlockState(at(7, floorY, 5)).is(Blocks.RED_BED)
+                        && level.getBlockState(at(7, floorY, 4)).getValue(BedBlock.PART) == BedPart.HEAD,
                 "Missing bed");
         for (int n = 0; n <= 42; n++)
-            for (int y = Y; y < Y + HEIGHT; y++) {
+            for (int y = floorY; y < floorY + HEIGHT; y++) {
                 require(
-                        level.getBlockState(new BlockPos(0, y, n)).is(Blocks.STONE_BRICKS)
-                                && level.getBlockState(new BlockPos(42, y, n)).is(Blocks.STONE_BRICKS)
-                                && level.getBlockState(new BlockPos(n, y, 0)).is(Blocks.STONE_BRICKS)
-                                && level.getBlockState(new BlockPos(n, y, 42)).is(Blocks.STONE_BRICKS),
+                        level.getBlockState(at(0, y, n)).is(Blocks.STONE_BRICKS)
+                                && level.getBlockState(at(42, y, n)).is(Blocks.STONE_BRICKS)
+                                && level.getBlockState(at(n, y, 0)).is(Blocks.STONE_BRICKS)
+                                && level.getBlockState(at(n, y, 42)).is(Blocks.STONE_BRICKS),
                         "Workshop wall gap");
             }
         require(
-                level.getBlockState(SPAWN).isAir()
-                        && level.getBlockState(SPAWN.above()).isAir(),
+                level.getBlockState(spawnPos).isAir()
+                        && level.getBlockState(spawnPos.above()).isAir(),
                 "Blocked spawn");
         LogUtils.getLogger()
                 .info(
@@ -429,10 +445,18 @@ public final class SurvivalWorld {
                             && !data.getBoolean("allowCommands"),
                     "Saved world is not Survival/Normal/cheats disabled");
             require(
-                    data.getInt("SpawnX") == SPAWN.getX()
-                            && data.getInt("SpawnY") == SPAWN.getY()
-                            && data.getInt("SpawnZ") == SPAWN.getZ(),
+                    data.getInt("SpawnX") == spawnPos.getX()
+                            && data.getInt("SpawnY") == spawnPos.getY()
+                            && data.getInt("SpawnZ") == spawnPos.getZ(),
                     "Saved spawn incorrect");
+            require(
+                    data.getCompound("WorldGenSettings")
+                            .getCompound("dimensions")
+                            .getCompound("minecraft:overworld")
+                            .getCompound("generator")
+                            .getString("type")
+                            .equals("minecraft:noise"),
+                    "Saved world does not use normal terrain generation");
             if (Boolean.getBoolean("mobvats.survival.verify")) {
                 Files.writeString(
                         world.resolve("survival-smoke-complete.txt"),
@@ -464,6 +488,16 @@ public final class SurvivalWorld {
 
     private static void require(boolean valid, String message) {
         if (!valid) throw new IllegalStateException(message);
+    }
+
+    private static BlockPos at(int x, int y, int z) {
+        return new BlockPos(origin.getX() + x, y, origin.getZ() + z);
+    }
+
+    private static void forceWorkshopChunks(ServerLevel level, boolean forced) {
+        var min = new ChunkPos(at(0, floorY, 0));
+        var max = new ChunkPos(at(42, floorY, 42));
+        for (int x = min.x; x <= max.x; x++) for (int z = min.z; z <= max.z; z++) level.setChunkForced(x, z, forced);
     }
 
     private static void sign(ServerLevel level, BlockPos pos, String... lines) {
