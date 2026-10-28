@@ -43,6 +43,13 @@ its bundled MezzConfig dependency. Version pins are in `gradle/survival.gradle`;
 the source sets and mod mappings keep these additions out of normal runs and the
 published MobVats JAR. `src/survival/` is a separate development fixture mod.
 
+Synthetic capture/discovery entities and their biome spawn data are enabled only
+in `runGameTestServer`. Survival generation rejects a runtime containing those
+fixtures. Earlier worlds may contain synthetic mobs without renderers; regenerate
+those worlds with the explicit reset command after updating this checkout.
+The isolation fix passed all 1,182 GameTests and fresh headless Survival generation
+with all 108 stocked drawers, 28 fluid buffers, and terminal crafting checks.
+
 Official release metadata:
 [Functional Storage](https://www.curseforge.com/minecraft/mc-mods/functional-storage/files/8459097),
 [Titanium](https://modrinth.com/mod/titanium/version/vbCgpf68),

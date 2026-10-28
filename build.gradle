@@ -121,6 +121,7 @@ neoForge {
             // Keep generated test defaults independent of operator-authored run/config files.
             gameDirectory = file('.cache/gametest')
             systemProperty 'neoforge.enabledGameTestNamespaces', mod_id + ',mobvats_lifecycle'
+            systemProperty 'mobvats.captureFixtures', 'true'
         }
     }
     mods { mobvats { sourceSet sourceSets.main } }

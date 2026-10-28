@@ -18,6 +18,7 @@ public final class CaptureTestEntity {
 
     @SubscribeEvent
     public static void register(RegisterEvent event) {
+        if (!Boolean.getBoolean("mobvats.captureFixtures")) return;
         event.register(Registries.ENTITY_TYPE, helper -> {
             TYPE = EntityType.Builder.of(Cow::new, MobCategory.MONSTER)
                     .sized(2.4f, 1.7f)
@@ -39,6 +40,7 @@ public final class CaptureTestEntity {
 
     @SubscribeEvent
     public static void attributes(EntityAttributeCreationEvent event) {
+        if (!Boolean.getBoolean("mobvats.captureFixtures")) return;
         event.put(TYPE, Cow.createAttributes().build());
         DISCOVERY
                 .values()

@@ -55,6 +55,25 @@ public final class SurvivalWorld {
         TANKS.clear();
         try {
             var level = event.getServer().overworld();
+            for (var id : List.of(
+                    "capture_fixture",
+                    "discovery_passive",
+                    "discovery_nether",
+                    "discovery_end",
+                    "discovery_ambiguous",
+                    "discovery_boss"))
+                require(
+                        !BuiltInRegistries.ENTITY_TYPE.containsKey(
+                                ResourceLocation.fromNamespaceAndPath("mobvats", id)),
+                        "Headless test entity registered in Survival runtime: " + id);
+            require(
+                    level.getServer()
+                            .getResourceManager()
+                            .listResources(
+                                    "neoforge/biome_modifier",
+                                    id -> id.getNamespace().equals("mobvats_lifecycle"))
+                            .isEmpty(),
+                    "Headless biome spawn fixtures present in Survival runtime");
             for (int x = 0; x <= 2; x++) for (int z = 0; z <= 2; z++) level.setChunkForced(x, z, true);
             if (Boolean.getBoolean("mobvats.survival.verify")) {
                 var world = Path.of(System.getProperty("mobvats.survival.world"));

@@ -24,7 +24,10 @@ def reset = providers.gradleProperty('resetSurvivalWorld').getOrElse('false')
 if (!(reset in ['true', 'false'])) throw new GradleException('resetSurvivalWorld must be true or false.')
 
 neoForge {
-    mods { survivalDev { sourceSet sourceSets.survival } }
+    mods {
+        survivalDev { sourceSet sourceSets.survival }
+        lifecycleFixtures { sourceSet sourceSets.lifecycleControl }
+    }
     runs {
         survival {
             client()
@@ -50,8 +53,11 @@ neoForge {
         }
     }
     runs.configureEach {
-        loadedMods = name in ['survival', 'survivalWorldServer', 'survivalWorldSmokeServer'] ?
-            mods.toList() : mods.findAll { it.name != 'survivalDev' }
+        def survival = name in ['survival', 'survivalWorldServer', 'survivalWorldSmokeServer']
+        def headlessTests = name == 'gameTestServer'
+        loadedMods = mods.findAll {
+            (it.name != 'survivalDev' || survival) && (it.name != 'lifecycleFixtures' || headlessTests)
+        }
     }
 }
 
@@ -177,7 +183,13 @@ tasks.register('verifySurvivalIsolation') {
             boolean survival = run.name in ['survival', 'survivalWorldServer', 'survivalWorldSmokeServer']
             if (run.loadedMods.get().any { it.name == 'survivalDev' } != survival)
                 throw new GradleException("Survival fixture mod leaked into ${run.name}")
+            boolean headlessTests = run.name == 'gameTestServer'
+            if (run.loadedMods.get().any { it.name == 'lifecycleFixtures' } != headlessTests ||
+                (run.systemProperties.get().get('mobvats.captureFixtures') == 'true') != headlessTests)
+                throw new GradleException("Headless entity fixtures leaked into ${run.name}")
         }
+        if (new File(sourceSets.main.output.resourcesDir, 'data/mobvats_lifecycle/neoforge/biome_modifier').listFiles()?.any { it.isFile() })
+            throw new GradleException('Headless biome spawn fixtures leaked into the main resources.')
         try (def archive = new java.util.zip.ZipFile(tasks.named('jar', Jar).get().archiveFile.get().asFile)) {
             if (archive.entries().toList().any { it.name.startsWith('net/impactvector/mobvats/survival/') })
                 throw new GradleException('Survival fixture classes leaked into the MobVats JAR.')

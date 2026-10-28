@@ -1,0 +1,7 @@
+modLoader="lowcodefml"
+loaderVersion="[1,)"
+license="MIT"
+[[mods]]
+modId="mobvats_lifecycle"
+version="1.0.0"
+displayName="MobVats Headless Test Data"
