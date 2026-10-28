@@ -106,8 +106,12 @@ public final class Content {
         for (var tier : VatTier.values()) {
             if (tier == VatTier.T1) continue;
             for (var type : new VatPartType[] {VatPartType.Casing, VatPartType.Glass, VatPartType.Controller}) {
-                var block = BLOCKS.<Block>register(
-                        tier.id(type), () -> type == VatPartType.Glass ? new VatGlassBlock() : new VatPartBlock(type));
+                var block = BLOCKS.<Block>register(tier.id(type), () -> switch (type) {
+                    case Glass -> new VatGlassBlock();
+                    case Controller ->
+                        new net.impactvector.mobvats.gamecontent.multiblock.vat.part.VatControllerBlock();
+                    default -> new VatPartBlock(type);
+                });
                 TIER_BLOCKS.put(tier.id(type), block);
                 if (type == VatPartType.Controller) ITEMS.registerSimpleBlockItem(block);
                 else
@@ -126,6 +130,8 @@ public final class Content {
                                     new net.impactvector.mobvats.gamecontent.multiblock.vat.part.VatBoundaryBlock(type);
                                 case Glass -> new VatGlassBlock();
                                 case Head -> new VatHeadBlock();
+                                case Controller ->
+                                    new net.impactvector.mobvats.gamecontent.multiblock.vat.part.VatControllerBlock();
                                 case Flesh -> new VatConstructionBlock(type);
                                 case ItemPort, FluidPort, ToolPort ->
                                     new net.impactvector.mobvats.gamecontent.multiblock.vat.part.VatPortBlock(type);

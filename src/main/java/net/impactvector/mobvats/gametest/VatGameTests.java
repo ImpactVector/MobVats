@@ -493,6 +493,44 @@ public final class VatGameTests {
         h.succeed();
     }
 
+    @GameTest(template = "empty", timeoutTicks = 10)
+    public static void controllerPlacementFacesPlayerForEveryTier(GameTestHelper h) {
+        var pos = ORIGIN.offset(1, 1, 1);
+        h.setBlock(pos.below(), Blocks.STONE);
+        var player = h.makeMockPlayer(GameType.CREATIVE);
+        player.setShiftKeyDown(true);
+        for (var tier : VatTier.values())
+            for (var direction : Direction.Plane.HORIZONTAL) {
+                h.setBlock(pos, Blocks.AIR);
+                player.setYRot(direction.toYRot());
+                var block = Content.block(tier, VatPartType.Controller);
+                player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(block));
+                var clicked = h.absolutePos(pos.below());
+                player.getMainHandItem()
+                        .useOn(new UseOnContext(
+                                player,
+                                InteractionHand.MAIN_HAND,
+                                new BlockHitResult(Vec3.atCenterOf(clicked), Direction.UP, clicked, false)));
+                h.assertBlockPresent(block, pos);
+                var state = h.getBlockState(pos);
+                var facing = direction.getOpposite();
+                h.assertTrue(
+                        state.getValue(VatControllerBlock.FACING) == facing,
+                        "Controller did not face player: " + tier + ", " + direction);
+                h.assertTrue(
+                        state.rotate(net.minecraft.world.level.block.Rotation.CLOCKWISE_90)
+                                        .getValue(VatControllerBlock.FACING)
+                                == facing.getClockWise(),
+                        "Controller structure rotation lost facing");
+                h.assertTrue(
+                        state.mirror(net.minecraft.world.level.block.Mirror.LEFT_RIGHT)
+                                        .getValue(VatControllerBlock.FACING)
+                                == (facing.getAxis() == Direction.Axis.Z ? facing.getOpposite() : facing),
+                        "Controller structure mirror lost facing");
+            }
+        h.succeed();
+    }
+
     private static void placeFacingHead(GameTestHelper h, Direction playerFacing) {
         var pos = headPos(3);
         h.setBlock(pos, Blocks.AIR);

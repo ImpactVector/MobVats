@@ -341,6 +341,34 @@ public final class FixtureModelTest {
                         "Panel lost its inward-facing closure");
                 var model = new FixtureModel(casing, casing, all, all, id);
                 require(model.getQuads(null, null, random).equals(all), "Inventory lost full Controller housing");
+                var world = (net.minecraft.world.level.BlockAndTintGetter) Proxy.newProxyInstance(
+                        FixtureModelTest.class.getClassLoader(),
+                        new Class<?>[] {net.minecraft.world.level.BlockAndTintGetter.class},
+                        (p, m, a) -> {
+                            if (m.getName().equals("getBlockEntity")) return null;
+                            throw new AssertionError(m.getName());
+                        });
+                for (var face : Direction.Plane.HORIZONTAL) {
+                    var state = net.minecraft.world.level.block.Blocks.FURNACE
+                            .defaultBlockState()
+                            .setValue(
+                                    net.minecraft.world.level.block.state.properties.BlockStateProperties
+                                            .HORIZONTAL_FACING,
+                                    face);
+                    var data = model.getModelData(
+                            world,
+                            net.minecraft.core.BlockPos.ZERO,
+                            state,
+                            net.neoforged.neoforge.client.model.data.ModelData.EMPTY);
+                    var actual = model.getQuads(state, null, random, data, RenderType.solid());
+                    require(actual.size() == all.size(), "Unformed Controller lost housing");
+                    for (int i = 0; i < actual.size(); i++)
+                        require(
+                                Arrays.equals(
+                                        actual.get(i).getVertices(),
+                                        FixtureModel.orient(all.get(i), face).getVertices()),
+                                "Unformed Controller model ignored placement facing: " + face);
+                }
                 for (var face : List.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST))
                     for (boolean formed : new boolean[] {false, true, false, true}) {
                         var data = FixtureModel.snapshotData(

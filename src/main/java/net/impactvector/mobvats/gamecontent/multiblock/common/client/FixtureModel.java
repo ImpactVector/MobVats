@@ -284,7 +284,12 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
                 glass = VatGlassState.mixer(pos, b.getMin(), b.getMax());
             }
         }
-        Direction facing = Direction.NORTH;
+        Direction facing = controller
+                        && state.hasProperty(
+                                net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING)
+                ? state.getValue(
+                        net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING)
+                : Direction.NORTH;
         int covered = 0;
         if (actor && !feeder && formed && !casing.formed() && entity instanceof AbstractVatEntity part) {
             var c = part.getMultiblockController().orElseThrow();
