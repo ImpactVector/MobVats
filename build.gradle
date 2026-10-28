@@ -140,6 +140,7 @@ dependencies {
     manualClientRuntime 'maven.modrinth:jei:RI8WCow6' // JEI 19.57.0.451, pinned NeoForge artifact
     manualClientRuntime 'maven.modrinth:jade:15.10.6+neoforge'
 }
+apply from: 'gradle/survival.gradle'
 def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     def values = [minecraft_version_range: minecraft_version_range,
         neo_version: neo_version, loader_version_range: loader_version_range,

@@ -7,7 +7,14 @@ import net.minecraft.world.entity.MobCategory;
 /** Deterministic generation policy. Existing files never pass through this classifier again. */
 public final class MobTierClassification {
     private static final Set<String> BOSSES = Set.of("wither", "ender_dragon", "elder_guardian", "warden");
+    private static final Map<String, Integer> ORDINARY_TIERS =
+            Map.of("villager", 1, "iron_golem", 2, "skeleton", 2, "snow_golem", 2);
     private static final Set<String> OTHERWORLDLY = Set.of(
+            "evoker",
+            "breeze",
+            "guardian",
+            "illusioner",
+            "phantom",
             "enderman",
             "endermite",
             "shulker",
@@ -45,6 +52,11 @@ public final class MobTierClassification {
         if (builtInBoss(id) || tags.contains("c:bosses")) {
             reasons.add("boss excluded from automatic eligibility and generic farming");
             return new Result(3, true, false, List.copyOf(reasons));
+        }
+        var ordinaryTier = id.getNamespace().equals("minecraft") ? ORDINARY_TIERS.get(id.getPath()) : null;
+        if (ordinaryTier != null) {
+            reasons.add("explicit built-in tier assignment=" + id);
+            return new Result(ordinaryTier, false, false, List.copyOf(reasons));
         }
         if (id.getNamespace().equals("minecraft") && OTHERWORLDLY.contains(id.getPath())) {
             reasons.add("explicit built-in otherworldly/containment exception=" + id);

@@ -60,6 +60,10 @@ public final class MobTierDiscoveryGameTests {
         }
         var loaded = PassiveMobDefinitionRegistry.load(dir, diagnostics::add);
         h.assertTrue(loaded.errors().isEmpty(), "Generated catalog failed validation: " + loaded.errors());
+        for (var entry : requestedTiers().entrySet())
+            h.assertTrue(
+                    loaded.definitions().get(entry.getKey()).minimum_vat_tier() == entry.getValue(),
+                    "Generated built-in tier assignment incorrect: " + entry.getKey());
         h.assertTrue(
                 loaded.definitions().get(fixture("passive")).minimum_vat_tier() == 1
                         && loaded.definitions().get(CaptureTestEntity.ID).minimum_vat_tier() == 2
@@ -125,6 +129,32 @@ public final class MobTierDiscoveryGameTests {
                         && loaded.definitions().get(fixture("end")).minimum_vat_tier() == 3,
                 "Refresh overwrote authored/invalid/unavailable data or failed to generate a new species");
         h.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 10)
+    public static void explicitBuiltinTierAssignmentsMatchPolicy(GameTestHelper h) {
+        for (var entry : requestedTiers().entrySet()) {
+            var id = entry.getKey();
+            var category = BuiltInRegistries.ENTITY_TYPE.get(id).getCategory();
+            var result = MobTierClassification.classify(id, category, Set.of(), Set.of("overworld", "nether"));
+            h.assertTrue(
+                    result.tier() == entry.getValue() && !result.excluded() && !result.ambiguous(),
+                    "Explicit built-in tier assignment incorrect: " + id + " -> " + result);
+        }
+        h.succeed();
+    }
+
+    private static Map<ResourceLocation, Integer> requestedTiers() {
+        return Map.of(
+                ResourceLocation.parse("minecraft:villager"), 1,
+                ResourceLocation.parse("minecraft:iron_golem"), 2,
+                ResourceLocation.parse("minecraft:skeleton"), 2,
+                ResourceLocation.parse("minecraft:snow_golem"), 2,
+                ResourceLocation.parse("minecraft:evoker"), 3,
+                ResourceLocation.parse("minecraft:breeze"), 3,
+                ResourceLocation.parse("minecraft:guardian"), 3,
+                ResourceLocation.parse("minecraft:illusioner"), 3,
+                ResourceLocation.parse("minecraft:phantom"), 3);
     }
 
     @GameTest(template = "empty", timeoutTicks = 10)

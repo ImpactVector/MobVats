@@ -75,13 +75,17 @@ Initial classification uses these signals, in order:
 - Known vanilla bosses and the entity-type tag `c:bosses` are excluded. Tagged
   modded bosses receive no automatically enabled profile. New built-in boss records
   remain disabled, with no lifecycle/farming and no new Essence encoding.
-- Explicit vanilla otherworldly exceptions are Enderman, Endermite, Shulker,
+- Explicit vanilla ordinary-tier assignments are Villager (T1), Iron Golem,
+  Skeleton and Snow Golem (T2). These override category and biome inference.
+- Explicit vanilla otherworldly/containment exceptions are Evoker, Breeze,
+  Guardian, Illusioner, Phantom, Enderman, Endermite, Shulker,
   Blaze, Ghast, Magma Cube, Piglin, Piglin Brute, Zombified Piglin, Hoglin, Zoglin,
   Strider, Wither Skeleton and Vex. Their initial tier is T3.
 - Entity-type tags `mobvats:nether_mobs`, `mobvats:end_mobs`,
   `mobvats:teleporting_mobs` and `mobvats:supernatural_mobs` request T3.
 - Spawn entries in biomes tagged as Nether or End by Minecraft or the common
-  biome tags request T3, even if the species also spawns in the Overworld.
+  biome tags request T3 for species without an explicit assignment, even if the
+  species also spawns in the Overworld.
 - Ordinary Overworld monsters start at T2. A modded monster with no recognized
   Overworld affinity starts conservatively at T3 with an ambiguity diagnostic.
 - Other non-MISC mob categories start at T1. MISC mobs start at T3 with an

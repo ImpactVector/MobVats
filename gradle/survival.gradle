@@ -1,0 +1,189 @@
+// Isolated, development-only acceptance runtime. Never inherited by normal runs or the JAR.
+sourceSets {
+    survival {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+configurations.survivalRuntimeClasspath.extendsFrom configurations.runtimeClasspath
+dependencies {
+    // 1.5.8 fixes synchronous controller chunk lookup during saved-drawer loading (1.5.7 deadlocks).
+    survivalImplementation 'curse.maven:functional-storage-556861:8459097' // 1.21.1-1.5.8 NeoForge
+    survivalImplementation 'maven.modrinth:titanium:vbCgpf68' // 1.21-4.0.51
+    survivalImplementation 'maven.modrinth:toms-storage:WQAMoIMC' // 1.21-2.4.2 NeoForge
+    survivalRuntimeOnly 'maven.modrinth:jei:RI8WCow6' // 19.57.0.451 NeoForge
+}
+def runtime = file('run-survival').toPath().toAbsolutePath().normalize()
+def saves = runtime.resolve('saves')
+def world = saves.resolve('MobVatsSurvival')
+def serverDir = runtime.resolve('generator').toFile()
+def receipt = world.resolve('survival-complete.txt')
+def owner = '.mobvats-survival-world'
+def ownership = 'MobVats Survival generator v1\n'
+def reset = providers.gradleProperty('resetSurvivalWorld').getOrElse('false')
+if (!(reset in ['true', 'false'])) throw new GradleException('resetSurvivalWorld must be true or false.')
+
+neoForge {
+    mods { survivalDev { sourceSet sourceSets.survival } }
+    runs {
+        survival {
+            client()
+            sourceSet = sourceSets.survival
+            gameDirectory = runtime.toFile()
+            programArguments.addAll '--quickPlaySingleplayer', 'MobVatsSurvival'
+        }
+        survivalWorldServer {
+            server()
+            sourceSet = sourceSets.survival
+            gameDirectory = serverDir
+            programArguments.addAll '--nogui', '--universe', saves.toString(), '--world', 'MobVatsSurvival'
+            systemProperty 'mobvats.survival.generate', 'true'
+            systemProperty 'mobvats.survival.world', world.toString()
+        }
+        survivalWorldSmokeServer {
+            server()
+            sourceSet = sourceSets.survival
+            gameDirectory = serverDir
+            programArguments.addAll '--nogui', '--universe', saves.toString(), '--world', 'MobVatsSurvival'
+            systemProperty 'mobvats.survival.verify', 'true'
+            systemProperty 'mobvats.survival.world', world.toString()
+        }
+    }
+    runs.configureEach {
+        loadedMods = name in ['survival', 'survivalWorldServer', 'survivalWorldSmokeServer'] ?
+            mods.toList() : mods.findAll { it.name != 'survivalDev' }
+    }
+}
+
+def rejectLinks = { java.nio.file.Path target ->
+    for (def path = target; path != null; path = path.parent) {
+        if (java.nio.file.Files.exists(path, java.nio.file.LinkOption.NOFOLLOW_LINKS) &&
+            (java.nio.file.Files.isSymbolicLink(path) || java.nio.file.Files.readAttributes(path,
+                java.nio.file.attribute.BasicFileAttributes, java.nio.file.LinkOption.NOFOLLOW_LINKS).isOther()))
+            throw new GradleException("Refusing linked Survival path: ${path}")
+    }
+}
+def channel
+def heldLock
+def closeLock = tasks.register('closeSurvivalGenerationLock') {
+    notCompatibleWithConfigurationCache('Owns a process-local generation lock.')
+    doLast { heldLock?.release(); channel?.close() }
+}
+def prepare = tasks.register('prepareSurvivalWorld') {
+    notCompatibleWithConfigurationCache('Checks existing worlds and locks before explicit reset.')
+    doLast {
+        if (world.parent != saves || saves.parent != runtime || runtime.parent != projectDir.toPath().toAbsolutePath().normalize())
+            throw new GradleException('Survival world escaped its fixed runtime directory.')
+        rejectLinks(world)
+        rejectLinks(serverDir.toPath())
+        java.nio.file.Files.createDirectories(runtime)
+        def lockPath = runtime.resolve('generation.lock')
+        rejectLinks(lockPath)
+        channel = java.nio.channels.FileChannel.open(lockPath, java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.WRITE)
+        heldLock = channel.tryLock()
+        if (heldLock == null) throw new GradleException('Another Survival generation is running.')
+        if (java.nio.file.Files.exists(world)) {
+            if (reset != 'true') throw new GradleException('Survival world already exists. To discard its progress explicitly use -PresetSurvivalWorld=true.')
+            def marker = world.resolve(owner)
+            rejectLinks(marker)
+            if (!java.nio.file.Files.isRegularFile(marker) || java.nio.file.Files.readString(marker) != ownership)
+                throw new GradleException('Refusing to reset a world not owned by the Survival generator.')
+            def session = world.resolve('session.lock')
+            if (java.nio.file.Files.exists(session)) {
+                try (def sessionChannel = java.nio.channels.FileChannel.open(session, java.nio.file.StandardOpenOption.WRITE)) {
+                    def sessionLock = sessionChannel.tryLock()
+                    if (sessionLock == null) throw new GradleException('Close the Survival world before rebuilding.')
+                    sessionLock.release()
+                }
+            }
+            try (def tree = java.nio.file.Files.walk(world)) {
+                def paths = new ArrayList(tree.toList())
+                paths.each { rejectLinks(it) }
+                paths.sort { a, b -> b.nameCount <=> a.nameCount }.each { java.nio.file.Files.delete(it) }
+            }
+        }
+        java.nio.file.Files.createDirectories(world)
+        java.nio.file.Files.writeString(world.resolve(owner), ownership)
+        serverDir.mkdirs()
+        rejectLinks(serverDir.toPath().resolve('eula.txt'))
+        rejectLinks(serverDir.toPath().resolve('server.properties'))
+        new File(serverDir, 'eula.txt').text = 'eula=true\n'
+        new File(serverDir, 'server.properties').text = '''gamemode=survival
+force-gamemode=true
+difficulty=normal
+level-seed=476332901
+level-type=minecraft:flat
+generate-structures=false
+generator-settings={"biome":"minecraft:plains","layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:dirt","height":2},{"block":"minecraft:grass_block","height":1}],"structure_overrides":[]}
+spawn-protection=0
+online-mode=false
+server-ip=127.0.0.1
+server-port=0
+view-distance=4
+simulation-distance=4
+max-tick-time=120000
+'''
+    }
+}
+tasks.named('runSurvivalWorldServer').configure {
+    timeout = java.time.Duration.ofMinutes(5)
+    notCompatibleWithConfigurationCache('Generates and validates a persistent world.')
+    dependsOn prepare
+    finalizedBy closeLock
+    doLast {
+        if (!java.nio.file.Files.isRegularFile(receipt) || !java.nio.file.Files.isRegularFile(world.resolve('level.dat')))
+            throw new GradleException('Survival generation failed; inspect run-survival/generator/logs/latest.log.')
+    }
+}
+prepare.configure { finalizedBy closeLock }
+// Release after the server, including failures; do not release between preparation and launch.
+closeLock.configure { mustRunAfter tasks.named('runSurvivalWorldServer') }
+tasks.register('buildSurvivalWorld') {
+    group = 'MobVats development'
+    description = 'Create the stocked Survival workshop; refuses existing worlds unless explicitly reset.'
+    dependsOn tasks.named('runSurvivalWorldServer')
+}
+tasks.named('runSurvival').configure {
+    notCompatibleWithConfigurationCache('Checks the prepared world before launch.')
+    doFirst {
+        rejectLinks(world)
+        if (!java.nio.file.Files.isRegularFile(receipt))
+            throw new GradleException('Run buildSurvivalWorld first. No prepared Survival world was found.')
+    }
+}
+tasks.named('runSurvivalWorldSmokeServer').configure {
+    timeout = java.time.Duration.ofMinutes(5)
+    notCompatibleWithConfigurationCache('Reloads and verifies a freshly prepared Survival world.')
+    doFirst {
+        rejectLinks(world)
+        if (!java.nio.file.Files.isRegularFile(receipt)) throw new GradleException('Build the Survival world first.')
+        java.nio.file.Files.deleteIfExists(world.resolve('survival-smoke-complete.txt'))
+    }
+    doLast {
+        if (!java.nio.file.Files.isRegularFile(world.resolve('survival-smoke-complete.txt')))
+            throw new GradleException('Survival reload verification failed; inspect generator/logs/latest.log.')
+    }
+}
+tasks.register('verifySurvivalIsolation') {
+    dependsOn tasks.named('jar'), tasks.named('compileSurvivalJava')
+    doLast {
+        def isolatedMods = ['functional-storage-556861', 'titanium', 'toms-storage']
+        [configurations.runtimeClasspath, configurations.manualClientRuntimeClasspath,
+         configurations.lifecycleControlRuntimeClasspath].each { configuration ->
+            if (configuration.resolvedConfiguration.resolvedArtifacts.any { it.moduleVersion.id.name in isolatedMods })
+                throw new GradleException("Survival dependencies leaked into ${configuration.name}")
+        }
+        neoForge.runs.each { run ->
+            boolean survival = run.name in ['survival', 'survivalWorldServer', 'survivalWorldSmokeServer']
+            if (run.loadedMods.get().any { it.name == 'survivalDev' } != survival)
+                throw new GradleException("Survival fixture mod leaked into ${run.name}")
+        }
+        try (def archive = new java.util.zip.ZipFile(tasks.named('jar', Jar).get().archiveFile.get().asFile)) {
+            if (archive.entries().toList().any { it.name.startsWith('net/impactvector/mobvats/survival/') })
+                throw new GradleException('Survival fixture classes leaked into the MobVats JAR.')
+        }
+        logger.lifecycle('Verified Survival dependency, run mapping, and packaged JAR isolation.')
+    }
+    notCompatibleWithConfigurationCache('Inspects runtime configurations and mod mappings.')
+}
+tasks.named('check').configure { dependsOn tasks.named('verifySurvivalIsolation') }
