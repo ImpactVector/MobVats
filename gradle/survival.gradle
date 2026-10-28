@@ -12,6 +12,7 @@ dependencies {
     survivalImplementation 'maven.modrinth:titanium:vbCgpf68' // 1.21-4.0.51
     survivalImplementation 'maven.modrinth:toms-storage:WQAMoIMC' // 1.21-2.4.2 NeoForge
     survivalRuntimeOnly 'maven.modrinth:jei:RI8WCow6' // 19.57.0.451 NeoForge
+    survivalRuntimeOnly 'maven.modrinth:jade:15.10.6+neoforge'
 }
 def runtime = file('run-survival').toPath().toAbsolutePath().normalize()
 def saves = runtime.resolve('saves')
@@ -173,6 +174,9 @@ tasks.named('runSurvivalWorldSmokeServer').configure {
 tasks.register('verifySurvivalIsolation') {
     dependsOn tasks.named('jar'), tasks.named('compileSurvivalJava')
     doLast {
+        def survivalRuntimeMods = configurations.survivalRuntimeClasspath.resolvedConfiguration.resolvedArtifacts.collect { it.moduleVersion.id.name }
+        if (!survivalRuntimeMods.containsAll(['functional-storage-556861', 'titanium', 'toms-storage', 'jei', 'jade']))
+            throw new GradleException('Survival runtime is missing storage, crafting, recipe, or inspection mods.')
         def isolatedMods = ['functional-storage-556861', 'titanium', 'toms-storage']
         [configurations.runtimeClasspath, configurations.manualClientRuntimeClasspath,
          configurations.lifecycleControlRuntimeClasspath].each { configuration ->

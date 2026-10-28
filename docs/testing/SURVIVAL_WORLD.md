@@ -36,6 +36,7 @@ Minecraft 1.21.1, NeoForge 21.1.252, current MobVats sources, and:
 | Titanium (required by Functional Storage) | 1.21-4.0.51 | vbCgpf68 |
 | Tom's Simple Storage | 1.21-2.4.2 NeoForge | WQAMoIMC |
 | JEI | 19.57.0.451 NeoForge | RI8WCow6 |
+| Jade (block/entity inspection overlay) | 15.10.6 NeoForge | 15.10.6+neoforge |
 | ZeroCore (required by MobVats) | 1.21.1-2.4.18 | CurseForge file 6648746 |
 
 Dependencies resolve through official Modrinth Maven and CurseMaven. JEI supplies
@@ -73,7 +74,9 @@ active. The world spawn is `(5, -60, 7)`; spawn radius is zero.
 Near spawn: three of each diamond tool, food, torches, ladders, buckets, drawer
 tools, crafting table, furnace, and a red bed. The north wall carries upgraded,
 locked Functional Storage drawers and an empty linked compacting drawer. The
-controller at `(21, -60, 3)` connects through Tom's inventory connector to the
+drawer fronts and controller face south into the workshop, using Functional
+Storage's own orientation properties. Jade provides the block inspection overlay.
+The controller at `(21, -60, 3)` connects through Tom's inventory connector to the
 crafting terminal at `(21, -60, 5)`. An air gap separates the controller from the
 drawer bank to prevent counting both aggregate and member inventories. Use the terminal to retrieve ingredients and
 craft directly from the drawers. Locked drawers still allow normal extraction.
@@ -110,7 +113,8 @@ recipe changes are not copied from ordinary development configurations.
 Generation waits for ordinary network discovery, verifies every stocked drawer
 through Tom's terminal, crafts four copper Vat casings through its real result
 slot with an empty Survival FakePlayer inventory, checks drawer consumption, and
-restores the two test ingredients. It also checks fluid supplies, walls, roof,
+restores the two test ingredients. It verifies Jade is loaded and every drawer,
+the compacting drawer, and controller face into the workshop. It also checks fluid supplies, walls, roof,
 lighting above every solid interior surface, tools, bed, unobstructed construction
 space, vanilla first-login spawn selection, and saved game mode/difficulty/cheats settings. A success
 receipt is written only after Minecraft saves and shuts down.

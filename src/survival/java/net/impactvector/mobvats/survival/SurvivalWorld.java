@@ -55,6 +55,9 @@ public final class SurvivalWorld {
         TANKS.clear();
         try {
             var level = event.getServer().overworld();
+            require(
+                    net.neoforged.fml.ModList.get().isLoaded("jade"),
+                    "Jade inspection overlay is missing from the Survival runtime");
             for (var id : List.of(
                     "capture_fixture",
                     "discovery_passive",
@@ -279,6 +282,12 @@ public final class SurvivalWorld {
         terminal.getStacks();
         terminal.updateServer();
         var controller = (StorageControllerTile<?>) Objects.requireNonNull(level.getBlockEntity(CONTROLLER));
+        require(controller.getFacingDirection() == Direction.SOUTH, "Storage controller faces away from the workshop");
+        require(
+                ((ControllableDrawerTile<?>) Objects.requireNonNull(level.getBlockEntity(new BlockPos(8, Y, 1))))
+                                .getFacingDirection()
+                        == Direction.SOUTH,
+                "Compacting drawer faces away from the workshop");
         var connector = (com.tom.storagemod.block.entity.InventoryConnectorBlockEntity)
                 Objects.requireNonNull(level.getBlockEntity(CONTROLLER.south()));
         LogUtils.getLogger()
@@ -290,6 +299,9 @@ public final class SurvivalWorld {
                         terminal.getBlockState());
         for (var entry : DRAWERS.entrySet()) {
             var drawer = (DrawerTile) Objects.requireNonNull(level.getBlockEntity(entry.getKey()));
+            require(
+                    drawer.getFacingDirection() == Direction.SOUTH,
+                    "Drawer faces away from the workshop: " + entry.getKey());
             var contents = drawer.getStorage().getStackInSlot(0);
             require(
                     contents.is(entry.getValue()) && contents.getCount() == SurvivalStock.count(entry.getValue()),
@@ -474,7 +486,12 @@ public final class SurvivalWorld {
 
     private static void put(ServerLevel level, BlockPos pos, String id) {
         var state = block(id).defaultBlockState();
-        if (state.hasProperty(BlockStateProperties.HORIZONTAL_FACING))
+        if (state.hasProperty(com.buuz135.functionalstorage.block.Drawer.FACING_HORIZONTAL_CUSTOM))
+            state = state.setValue(com.buuz135.functionalstorage.block.Drawer.FACING_HORIZONTAL_CUSTOM, Direction.SOUTH)
+                    .setValue(com.buuz135.functionalstorage.block.Drawer.FACING_ALL, Direction.DOWN);
+        else if (state.hasProperty(com.hrznstudio.titanium.block.RotatableBlock.FACING_HORIZONTAL))
+            state = state.setValue(com.hrznstudio.titanium.block.RotatableBlock.FACING_HORIZONTAL, Direction.SOUTH);
+        else if (state.hasProperty(BlockStateProperties.HORIZONTAL_FACING))
             state = state.setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH);
         level.setBlockAndUpdate(pos, state);
     }
