@@ -16,13 +16,21 @@ import net.minecraft.world.level.block.state.*;
 import net.minecraft.world.phys.BlockHitResult;
 
 /** One registered function, with existing ZeroCore part adapters selected by installed material. */
-public final class MechanicalPartBlock extends VatPartBlock
+public class MechanicalPartBlock extends VatPartBlock
         implements it.zerono.mods.zerocore.lib.block.INeighborChangeListener.Notifier {
     public MechanicalPartBlock(VatPartType type) {
         super(type);
         registerDefaultState(defaultBlockState()
                 .setValue(CladdingMaterial.PROPERTY, CladdingMaterial.NONE)
                 .setValue(PortVisualState.OUTPUT, false));
+    }
+
+    public static MechanicalPartBlock create(VatPartType type) {
+        return switch (type) {
+            case ItemPort, FluidPort, ToolPort, FeedPort, Blender, PullPump, PushPump, FillValve, DrainValve ->
+                new DirectionalMechanicalPartBlock(type);
+            default -> new MechanicalPartBlock(type);
+        };
     }
 
     public static boolean supported(VatPartType type) {

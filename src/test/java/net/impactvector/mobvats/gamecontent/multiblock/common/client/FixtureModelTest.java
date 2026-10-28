@@ -275,10 +275,52 @@ public final class FixtureModelTest {
                     "Formed inlet duplicates controller-owned service bridge");
         }
         controllerHousing(seed, casing, random);
+        placementFacing(core, casing, random);
         exterior(seed, casing, random);
         generatedSleeves();
         System.out.println(
                 "PASS: fixture six-axis orientation, immutable central auger, flush Pump sleeve/cutout, preserved border, formed/unformed/interior ownership and layer separation.");
+    }
+
+    private static void placementFacing(BakedQuad core, BakedModel casing, RandomSource random) {
+        var world = (net.minecraft.world.level.BlockAndTintGetter) Proxy.newProxyInstance(
+                FixtureModelTest.class.getClassLoader(),
+                new Class<?>[] {net.minecraft.world.level.BlockAndTintGetter.class},
+                (p, m, a) -> {
+                    if (m.getName().equals("getBlockEntity")) return null;
+                    if (m.getName().equals("getBlockState"))
+                        return net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+                    throw new AssertionError(m.getName());
+                });
+        for (var id : List.of(
+                "item_port",
+                "fluid_port",
+                "tool_port",
+                "feed_port",
+                "blender",
+                "pull_pump",
+                "push_pump",
+                "fill_valve",
+                "drain_valve")) {
+            var basis =
+                    id.endsWith("_valve") ? Direction.UP : id.equals("feed_port") ? Direction.EAST : Direction.NORTH;
+            var quad = FixtureModel.orient(core, basis);
+            var model = new FixtureModel(casing, casing, List.of(quad), List.of(quad), id);
+            for (var face : Direction.values()) {
+                var state = net.minecraft.world.level.block.Blocks.OBSERVER
+                        .defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING, face);
+                var data = model.getModelData(
+                        world,
+                        net.minecraft.core.BlockPos.ZERO,
+                        state,
+                        net.neoforged.neoforge.client.model.data.ModelData.EMPTY);
+                var actual = model.getQuads(state, null, random, data, RenderType.solid());
+                require(
+                        actual.size() == 1 && actual.getFirst().getDirection() == face,
+                        "Unformed fixture ignored placement facing: " + id + ", " + face);
+            }
+        }
     }
 
     private static void controllerHousing(BakedQuad seed, BakedModel casing, RandomSource random) {

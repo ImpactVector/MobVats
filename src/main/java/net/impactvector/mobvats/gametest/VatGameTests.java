@@ -494,6 +494,75 @@ public final class VatGameTests {
     }
 
     @GameTest(template = "empty", timeoutTicks = 10)
+    public static void mechanicalPlacementFacesPlayerInEveryDirection(GameTestHelper h) {
+        var pos = ORIGIN.offset(1, 1, 1);
+        h.setBlock(pos.below(), Blocks.STONE);
+        var player = h.makeMockPlayer(GameType.CREATIVE);
+        player.setShiftKeyDown(true);
+        for (var type : java.util.List.of(
+                VatPartType.ItemPort,
+                VatPartType.FluidPort,
+                VatPartType.ToolPort,
+                VatPartType.FeedPort,
+                VatPartType.Blender,
+                VatPartType.PullPump,
+                VatPartType.PushPump,
+                VatPartType.FillValve,
+                VatPartType.DrainValve)) {
+            var block = Content.block(type);
+            h.assertTrue(
+                    block
+                            instanceof
+                            net.impactvector.mobvats.gamecontent.multiblock.common.DirectionalMechanicalPartBlock,
+                    "Directional function lacks placement facing: " + type);
+            for (var direction : Direction.values()) {
+                h.setBlock(pos, Blocks.AIR);
+                player.setYRot(direction.getAxis().isHorizontal() ? direction.toYRot() : 0);
+                player.setYHeadRot(player.getYRot());
+                player.setXRot(direction == Direction.DOWN ? 90 : direction == Direction.UP ? -90 : 0);
+                player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(block));
+                var clicked = h.absolutePos(pos.below());
+                player.getMainHandItem()
+                        .useOn(new UseOnContext(
+                                player,
+                                InteractionHand.MAIN_HAND,
+                                new BlockHitResult(Vec3.atCenterOf(clicked), Direction.UP, clicked, false)));
+                h.assertBlockPresent(block, pos);
+                var state = h.getBlockState(pos);
+                var facing = direction.getOpposite();
+                var property =
+                        net.impactvector.mobvats.gamecontent.multiblock.common.DirectionalMechanicalPartBlock.FACING;
+                h.assertTrue(
+                        state.getValue(property) == facing,
+                        "Placement faces away from player: " + type + ", " + direction);
+                for (var material : net.impactvector.mobvats.gamecontent.multiblock.conduit.CladdingMaterial.values()) {
+                    var mechanical = (net.impactvector.mobvats.gamecontent.multiblock.common.MechanicalPartBlock) block;
+                    if (mechanical.accepts(material))
+                        h.assertTrue(
+                                state.setValue(
+                                                        net.impactvector.mobvats.gamecontent.multiblock.conduit
+                                                                .CladdingMaterial.PROPERTY,
+                                                        material)
+                                                .getValue(property)
+                                        == facing,
+                                "Cladding lost placement facing");
+                }
+                h.assertTrue(
+                        state.rotate(net.minecraft.world.level.block.Rotation.CLOCKWISE_90)
+                                        .getValue(property)
+                                == net.minecraft.world.level.block.Rotation.CLOCKWISE_90.rotate(facing),
+                        "Structure rotation lost placement facing");
+                h.assertTrue(
+                        state.mirror(net.minecraft.world.level.block.Mirror.LEFT_RIGHT)
+                                        .getValue(property)
+                                == net.minecraft.world.level.block.Mirror.LEFT_RIGHT.mirror(facing),
+                        "Structure mirror lost placement facing");
+            }
+        }
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 10)
     public static void controllerPlacementFacesPlayerForEveryTier(GameTestHelper h) {
         var pos = ORIGIN.offset(1, 1, 1);
         h.setBlock(pos.below(), Blocks.STONE);

@@ -124,7 +124,7 @@ public final class Content {
             var block = BLOCKS.<Block>register(
                     net.impactvector.mobvats.gamecontent.multiblock.common.MechanicalPartBlock.id(type),
                     () -> net.impactvector.mobvats.gamecontent.multiblock.common.MechanicalPartBlock.supported(type)
-                            ? new net.impactvector.mobvats.gamecontent.multiblock.common.MechanicalPartBlock(type)
+                            ? net.impactvector.mobvats.gamecontent.multiblock.common.MechanicalPartBlock.create(type)
                             : switch (type) {
                                 case PullPump, PushPump, FillValve, DrainValve, ItemVoid, FluidVoid ->
                                     new net.impactvector.mobvats.gamecontent.multiblock.vat.part.VatBoundaryBlock(type);

@@ -230,6 +230,8 @@ The single `cladding_material` enum property supports `none`, Vat casing/glass f
 
 Place the bare function item, then shift-right-click it with an actual casing/glass item. The casing/glass item's `useOn` handles Minecraft's sneaking placement bypass and invokes the same shared policy as the block interaction. Survival installation consumes one item. Creative installation consumes none. Identical material does nothing. Replacement returns the old material to inventory, dropping it if insertion fails. Unsupported materials are rejected. Vat-only service functions reject Mixer material; the five shared port/pump/void functions support both families.
 
+Item, fluid, tool and feed ports, blenders, pumps and valves initially face the player, treating the player as outside the Vat. Looking down or up selects an upward or downward outward face. Cladding preserves this placement facing. Formed wall and service geometry determine installed alignment; a connected Feed Port inlet follows its conduit. Controllers retain horizontal player-facing placement. Conduits, buffers, voids, Harnesses and Sumps retain their existing connection-driven or fixed-axis presentation.
+
 Only the targeted block changes. Connectivity, neighbors, controllers and assembly never select or propagate material. TRUNK/TAP mode is preserved. There is no removal tool in this slice; replace material or break the block.
 
 ### 2.4.3 Resource preservation and drops

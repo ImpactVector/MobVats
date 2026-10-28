@@ -19,6 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.model.BakedModelWrapper;
 import net.neoforged.neoforge.client.model.data.*;
@@ -57,7 +58,7 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
     private BakedModel shell;
     private CladdingMaterial material = CladdingMaterial.VAT_T1_CASING;
     private final boolean pump, sink;
-    private boolean installed, controller, actor, toolPort, feeder, port;
+    private boolean installed, controller, actor, toolPort, feeder, port, valve;
     private final Set<BakedQuad> constructionInlet = new HashSet<>();
     private final Map<Snapshot, List<BakedQuad>> meshes = new ConcurrentHashMap<>();
 
@@ -89,9 +90,10 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
     }
 
     FixtureModel(BakedModel original, BakedModel shell, List<BakedQuad> core, List<BakedQuad> construction, String id) {
-        this(original, shell, core, construction, false, false);
+        this(original, shell, core, construction, id.endsWith("_pump"), id.endsWith("_void"));
         installed = INSTALLED.contains(id);
         controller = id.endsWith("_controller");
+        valve = id.endsWith("_valve");
         port = id.equals("item_port") || id.equals("fluid_port");
         actor = actor(id);
         toolPort = id.equals("tool_port");
@@ -112,6 +114,7 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
         sink = id.endsWith("_void");
         installed = INSTALLED.contains(id);
         controller = id.endsWith("_controller");
+        valve = id.endsWith("_valve");
         port = id.equals("item_port") || id.equals("fluid_port");
         actor = actor(id);
         toolPort = id.equals("tool_port");
@@ -240,10 +243,15 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
     }
 
     public static BakedQuad orient(BakedQuad quad, Direction facing) {
-        if (facing == Direction.NORTH) return quad;
+        return orient(quad, Direction.NORTH, facing);
+    }
+
+    private static BakedQuad orient(BakedQuad quad, Direction from, Direction facing) {
+        if (facing == from) return quad;
         var rotation = new Quaternionf()
                 .rotationTo(
-                        new Vector3f(0, 0, -1), new Vector3f(facing.getStepX(), facing.getStepY(), facing.getStepZ()));
+                        new Vector3f(from.getStepX(), from.getStepY(), from.getStepZ()),
+                        new Vector3f(facing.getStepX(), facing.getStepY(), facing.getStepZ()));
         int[] source = quad.getVertices();
         int stride = source.length / 4;
         var points = new Vector3f[4];
@@ -284,12 +292,11 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
                 glass = VatGlassState.mixer(pos, b.getMin(), b.getMax());
             }
         }
-        Direction facing = controller
-                        && state.hasProperty(
-                                net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING)
-                ? state.getValue(
-                        net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING)
-                : Direction.NORTH;
+        Direction facing = state.hasProperty(BlockStateProperties.FACING)
+                ? state.getValue(BlockStateProperties.FACING)
+                : controller && state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)
+                        ? state.getValue(BlockStateProperties.HORIZONTAL_FACING)
+                        : Direction.NORTH;
         int covered = 0;
         if (actor && !feeder && formed && !casing.formed() && entity instanceof AbstractVatEntity part) {
             var c = part.getMultiblockController().orElseThrow();
@@ -308,7 +315,7 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
                         && adjacent.getValue(ConduitBlock.MODE) == ConduitMode.TAP) covered |= 1 << face.ordinal();
             }
         }
-        Direction inlet = Direction.EAST;
+        Direction inlet = state.hasProperty(BlockStateProperties.FACING) ? facing : Direction.EAST;
         if (feeder) {
             // Choose a spindle axis during normal chunk model-data collection.
             // Formed geometry prefers its immutable physical fitting snapshot.
@@ -360,7 +367,9 @@ public final class FixtureModel extends BakedModelWrapper<BakedModel> {
                 // Interior service origins are the block center instead of the wall's
                 // 3.16px origin. Translate decorative machinery only, before rotation.
                 var mounted = actor && s.formed && !s.shell.formed() ? interiorMount(q) : q;
-                var oriented = pump || controller || actor || port ? orient(mounted, s.facing) : mounted;
+                var oriented = valve
+                        ? orient(mounted, Direction.UP, s.facing)
+                        : pump || controller || actor || port ? orient(mounted, s.facing) : mounted;
                 if (!hidden(oriented, s.covered)) quads.add(oriented);
             }
             if (exterior) for (var q : sleeve) quads.add(orient(q, s.facing));
