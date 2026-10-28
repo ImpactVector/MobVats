@@ -32,6 +32,35 @@ public final class MachineInspectionGameTests {
     }
 
     @GameTest(template = "empty", timeoutTicks = 10)
+    public static void headInspectionShowsCurrentEncodingWithoutMutation(GameTestHelper h) {
+        var pos = new BlockPos(1, 1, 1);
+        h.setBlock(pos, Content.state(VatPartType.Head));
+        var head = (VatHeadEntity) h.getBlockEntity(pos);
+        h.assertTrue(inspect(h, pos).equals("Encoding: Unencoded"), "Empty Head encoding missing");
+        for (var type :
+                List.of(net.minecraft.world.entity.EntityType.COW, net.minecraft.world.entity.EntityType.SHEEP)) {
+            head.encode(net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(type));
+            var saved = head.saveWithFullMetadata(h.getLevel().registryAccess());
+            var lines = MachineInspection.lines(h.getLevel(), h.absolutePos(pos));
+            var expected = "Encoding: " + type.getDescription().getString();
+            h.assertTrue(inspect(h, pos).equals(expected), "Head encoding missing or stale");
+            var json =
+                    Component.Serializer.toJson(lines.getFirst(), h.getLevel().registryAccess());
+            h.assertTrue(
+                    Component.Serializer.fromJson(json, h.getLevel().registryAccess())
+                            .getString()
+                            .equals(expected),
+                    "Head encoding lost in Jade component transport");
+            h.assertTrue(
+                    saved.equals(head.saveWithFullMetadata(h.getLevel().registryAccess())),
+                    "Inspection mutated Head encoding");
+        }
+        head.clearSpecimen();
+        h.assertTrue(inspect(h, pos).equals("Encoding: Unencoded"), "Cleared Head still shows encoding");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 10)
     public static void buffersAndPortsExposeActualLocalContentsWithoutMutation(GameTestHelper h) {
         var bufferPos = new BlockPos(1, 1, 1);
         h.setBlock(bufferPos, FluidBufferContent.state(ConduitCladding.BARE));
@@ -105,6 +134,7 @@ public final class MachineInspectionGameTests {
             var head = (VatHeadEntity) h.getBlockEntity(headPos);
             var vat = head.getMultiblockController().orElseThrow();
             h.assertTrue(vat.isAssembled(), "Routed fixture unformed");
+            h.assertTrue(inspect(h, headPos).equals("Encoding: Cow"), "Formed Head encoding missing");
             var topology = vat.getTopology().conduits();
             var component = topology.componentAt(h.absolutePos(conduit)).orElseThrow();
             var text = inspect(h, conduit);

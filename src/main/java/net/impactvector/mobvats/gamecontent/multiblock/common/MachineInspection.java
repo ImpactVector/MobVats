@@ -63,6 +63,16 @@ public final class MachineInspection {
                             .name());
             filter(out, buffer.filter());
             tanks(out, List.of(buffer.tank));
+        } else if (entity instanceof VatHeadEntity head) {
+            var identity = head.getIdentity();
+            var name = identity == null
+                    ? Component.literal("Unencoded")
+                    : net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.containsKey(identity)
+                            ? net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
+                                    .get(identity)
+                                    .getDescription()
+                            : Component.literal(identity.toString());
+            out.add(Component.literal("Encoding: ").append(name));
         } else if (entity instanceof VatControllerEntity part) {
             var vat = part.getMultiblockController().orElse(null);
             line(out, "Vat", vat != null && vat.isAssembled() ? "Formed" : "Unformed");
