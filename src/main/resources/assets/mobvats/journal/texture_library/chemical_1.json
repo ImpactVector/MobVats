@@ -1,0 +1,17 @@
+{
+  "texture": "mobvats:textures/gui/journal/damage/chemical/chemical_1.png",
+  "category": "chemical",
+  "weight": 1,
+  "placement": "anywhere",
+  "scale": [
+    0.7,
+    1.2
+  ],
+  "opacity": [
+    0.65,
+    1
+  ],
+  "rotation": "free",
+  "mirror": true,
+  "minimum_severity": 0
+}

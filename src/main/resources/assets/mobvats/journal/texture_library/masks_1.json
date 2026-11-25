@@ -1,0 +1,17 @@
+{
+  "texture": "mobvats:textures/gui/journal/damage/masks/masks_1.png",
+  "category": "masks",
+  "weight": 1,
+  "placement": "edge",
+  "scale": [
+    0.7,
+    1.2
+  ],
+  "opacity": [
+    1,
+    1
+  ],
+  "rotation": "free",
+  "mirror": true,
+  "minimum_severity": 0
+}

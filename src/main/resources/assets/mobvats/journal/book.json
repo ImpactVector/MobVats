@@ -1,0 +1,19 @@
+{
+  "seed": 684395221853,
+  "entries": ["pristine", "experimental", "obsessive", "deranged"],
+  "events": [
+    {
+      "id": "prototype_spill",
+      "origin_leaf": "leaf_d",
+      "category": "blood",
+      "asset": "blood_2",
+      "x": 0.85,
+      "y": 0.78,
+      "scale": 1.9,
+      "rotation": 24,
+      "intensity": 0.95,
+      "depth": 2,
+      "falloff": 0.55
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "extends": "obsessive",
+  "paper": { "paper_1": 0.2, "paper_2": 1, "paper_3": 9 },
+  "damage": {
+    "blood": { "probability": 0.95, "min": 1, "max": 7, "scale": [0.7, 1.7], "opacity": [0.55, 1], "severity": 1 },
+    "chemical": { "probability": 0.9, "min": 1, "max": 4, "scale": [0.7, 1.8], "opacity": [0.5, 0.9], "severity": 1 },
+    "masks": { "probability": 0.95, "min": 2, "max": 7, "scale": [0.8, 1.9], "severity": 1 },
+    "burns": { "probability": 0.9, "min": 1, "max": 4, "scale": [0.9, 1.8], "opacity": [0.6, 1], "severity": 1 },
+    "wear": { "probability": 0.95, "min": 1, "max": 6, "opacity": [0.4, 0.85], "severity": 1 }
+  }
+}

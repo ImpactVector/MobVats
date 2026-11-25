@@ -242,6 +242,7 @@ public final class ManualTestWorld {
                 chest.setItem(slot++, new ItemStack(Content.block(type), 64));
             }
             chest.setItem(slot++, new ItemStack(Content.SYRINGE.get()));
+            chest.setItem(slot++, new ItemStack(Content.JOURNAL.get()));
         } else {
             for (var type : MixerPartType.values()) {
                 if (slot >= 22) break;

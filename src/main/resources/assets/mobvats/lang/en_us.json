@@ -1,6 +1,7 @@
 {
   "config.jade.plugin_mobvats.inspection": "Local machine inspection",
   "itemGroup.mobvats": "MobVats",
+  "item.mobvats.research_journal": "Research Journal (Prototype)",
   "item.mobvats.syringe": "Syringe",
   "item.mobvats.essence": "Essence",
   "item.mobvats.specimen_essence": "%s Essence",

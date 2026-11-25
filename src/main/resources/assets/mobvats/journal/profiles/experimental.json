@@ -1,0 +1,10 @@
+{
+  "extends": "pristine",
+  "paper": { "paper_1": 2, "paper_2": 6, "paper_3": 1 },
+  "damage": {
+    "chemical": { "probability": 0.95, "min": 1, "max": 3, "severity": 0.3 },
+    "ink": { "probability": 0.95, "min": 1, "max": 2, "scale": [0.5, 1.1], "opacity": [0.4, 0.75], "severity": 0.3 },
+    "wear": { "probability": 0.6, "min": 1, "max": 2, "severity": 0.2 },
+    "masks": { "probability": 0.3, "min": 0, "max": 1, "scale": [0.2, 0.4], "severity": 0.15 }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "paper": { "paper_1": 8, "paper_2": 1, "paper_3": 0.2 },
+  "damage": {
+    "blood": { "enabled": true, "probability": 0, "min": 0, "max": 1, "scale": [0.6, 1.2], "opacity": [0.3, 0.8], "rotation": "free", "mirror": true, "placement": "anywhere", "severity": 0 },
+    "chemical": { "enabled": true, "probability": 0, "min": 0, "max": 1, "scale": [0.6, 1.3], "opacity": [0.2, 0.6], "rotation": "free", "mirror": true, "placement": "anywhere", "severity": 0 },
+    "ink": { "enabled": true, "probability": 0.1, "min": 0, "max": 1, "scale": [0.3, 0.6], "opacity": [0.2, 0.4], "rotation": [0, 90, 180, 270], "mirror": true, "placement": "outside_content", "severity": 0.05 },
+    "burns": { "enabled": true, "probability": 0, "min": 0, "max": 1, "scale": [0.4, 0.8], "opacity": [0.3, 0.7], "rotation": "free", "mirror": true, "placement": "edge", "severity": 0 },
+    "masks": { "enabled": true, "probability": 0, "min": 0, "max": 1, "scale": [0.4, 0.8], "opacity": [1, 1], "rotation": "free", "mirror": true, "placement": "edge", "severity": 0 },
+    "wear": { "enabled": true, "probability": 0.1, "min": 0, "max": 1, "scale": [0.4, 0.8], "opacity": [0.1, 0.25], "rotation": "free", "mirror": true, "placement": "edge", "severity": 0.05 }
+  }
+}

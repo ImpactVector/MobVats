@@ -1,0 +1,20 @@
+{
+  "id": "baseline",
+  "profile": "pristine",
+  "pages": [
+    {
+      "anchor": "scope",
+      "leaf": "leaf_a",
+      "verso": true,
+      "title": { "text": "Research journal", "bold": true },
+      "text": [{ "text": "Prototype notes\n", "italic": true }, { "text": "Observe the vat before adjusting its feed. Record the result. These notes test the journal renderer." }]
+    },
+    {
+      "anchor": "control",
+      "leaf": "leaf_b",
+      "verso": false,
+      "title": { "text": "Control sample", "bold": true },
+      "text": "Keep one sample untouched. Label the container, measure the feed, and compare the output.\n\nNo conclusions yet."
+    }
+  ]
+}

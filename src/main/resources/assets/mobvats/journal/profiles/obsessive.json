@@ -1,0 +1,10 @@
+{
+  "extends": "experimental",
+  "paper": { "paper_1": 0.5, "paper_2": 3, "paper_3": 6 },
+  "damage": {
+    "blood": { "probability": 0.8, "min": 1, "max": 4, "severity": 0.6 },
+    "masks": { "probability": 1, "min": 2, "max": 4, "scale": [0.7, 1.4], "severity": 0.7 },
+    "wear": { "probability": 0.9, "min": 1, "max": 4, "opacity": [0.3, 0.7], "severity": 0.6 },
+    "burns": { "probability": 0.25, "severity": 0.3 }
+  }
+}

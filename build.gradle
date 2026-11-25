@@ -35,6 +35,15 @@ tasks.register('vatVisualCacheTest', JavaExec) {
     description = 'CPU-only specimen cache retirement checks; no client is launched.'
 }
 tasks.named('check') { dependsOn tasks.named('vatVisualCacheTest') }
+
+tasks.register('journalTest', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'net.impactvector.mobvats.journal.JournalTest'
+    description = 'Headless journal determinism, compositing, resource and cache tests; no client launch.'
+}
+tasks.named('check') { dependsOn tasks.named('journalTest') }
+tasks.named('test') { exclude '**/JournalTest*' }
 def manualWorldName = providers.gradleProperty('worldName').getOrElse('MobVatsTest')
 if (!(manualWorldName ==~ /[A-Za-z0-9][A-Za-z0-9_-]{0,63}/) ||
     manualWorldName.toUpperCase(java.util.Locale.ROOT) ==~ /CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]/) {

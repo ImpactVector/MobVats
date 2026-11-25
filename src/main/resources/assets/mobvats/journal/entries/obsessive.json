@@ -1,0 +1,21 @@
+{
+  "id": "repetition",
+  "profile": "obsessive",
+  "pages": [
+    {
+      "anchor": "repeat_trial",
+      "leaf": "leaf_c",
+      "verso": true,
+      "title": { "text": "Repeat the trial", "bold": true },
+      "text": "The measurement is nearly repeatable. Another sample should settle the difference.\n\nThe spill reached the next leaf.",
+      "appearance": { "damage": { "blood": { "probability": 1.0 } } }
+    },
+    {
+      "anchor": "reverse_inspection",
+      "leaf": "leaf_d",
+      "verso": false,
+      "title": { "text": "Reverse inspection", "bold": true },
+      "text": "Turn the leaf over. The same missing edge is visible in reflection. The surface stains are different.\n\nMeasure again."
+    }
+  ]
+}

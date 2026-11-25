@@ -93,6 +93,8 @@ public final class Content {
             ITEMS.register("syringe", () -> new ItemSyringe(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<ItemEssence> ESSENCE =
             ITEMS.register("essence", () -> new ItemEssence(new Item.Properties().stacksTo(16)));
+    public static final DeferredItem<net.impactvector.mobvats.gamecontent.journal.JournalItem> JOURNAL =
+            ITEMS.register("research_journal", net.impactvector.mobvats.gamecontent.journal.JournalItem::new);
 
     private static final java.util.Map<String, DeferredBlock<Block>> TIER_BLOCKS = new java.util.HashMap<>();
 
@@ -193,6 +195,7 @@ public final class Content {
                                 output.accept(buffer);
                             output.accept(net.impactvector.mobvats.gamecontent.extruder.ExtruderContent.BLOCK.get());
                             output.accept(SYRINGE.get());
+                            output.accept(JOURNAL.get());
                             for (var product : net.impactvector.mobvats.gamecontent.product.ProductContent.items())
                                 output.accept(product);
                             for (var type : net.impactvector.mobvats.gamecontent.creative.CreativeDeviceType.values())

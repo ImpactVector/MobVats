@@ -1,0 +1,17 @@
+{
+  "texture": "mobvats:textures/gui/journal/damage/wear/wear_2.png",
+  "category": "wear",
+  "weight": 1,
+  "placement": "edge",
+  "scale": [
+    0.7,
+    1.2
+  ],
+  "opacity": [
+    0.65,
+    1
+  ],
+  "rotation": "free",
+  "mirror": true,
+  "minimum_severity": 0
+}

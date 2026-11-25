@@ -1,0 +1,21 @@
+{
+  "id": "late_trial",
+  "profile": "deranged",
+  "pages": [
+    {
+      "anchor": "residue",
+      "leaf": "leaf_d",
+      "verso": true,
+      "title": { "text": "Residual sample", "bold": true },
+      "text": "The stain is weaker here. The result remains uncertain.\n\nRepeat. Replace the vial. Repeat.",
+      "appearance": { "seed_offset": 7, "damage": { "burns": { "enabled": false } }, "decorations": [ { "asset": "ink_2", "x": 0.91, "y": 0.14, "scale": 0.65, "rotation": 18, "opacity": 0.8 } ] }
+    },
+    {
+      "anchor": "unfinished",
+      "leaf": "leaf_e",
+      "verso": false,
+      "title": { "text": "Unfinished trial", "bold": true },
+      "text": "The margin has burned away. The useful measurements remain.\n\nThis is a rendering prototype, not a final research record."
+    }
+  ]
+}

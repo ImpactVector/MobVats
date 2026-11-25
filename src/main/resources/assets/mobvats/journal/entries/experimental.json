@@ -1,0 +1,22 @@
+{
+  "id": "trial",
+  "profile": "experimental",
+  "pages": [
+    {
+      "anchor": "feed_trial",
+      "leaf": "leaf_b",
+      "verso": true,
+      "title": { "text": "Feed trial", "bold": true },
+      "text": "A small adjustment produced a measurable change. Repeat with fresh feed.\n\nKeep the chemical bottle away from the notes."
+    },
+    {
+      "anchor": "bench_recipe",
+      "leaf": "leaf_c",
+      "verso": false,
+      "type": "crafting",
+      "recipe": "minecraft:crafting_table",
+      "title": { "text": "Bench preparation", "bold": true },
+      "text": "Prepare a work surface before handling the sample."
+    }
+  ]
+}

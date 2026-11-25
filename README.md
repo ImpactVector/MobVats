@@ -9,6 +9,9 @@ Implemented features include multiple independently scheduled specimens in one V
 Mixer [manual Item and Fluid Meters](docs/MIXER_MANUAL_METERS.md) constrain exact ingredient quantities using sampled filters.
 Optional [Mixer Blockers](docs/MIXER_BLOCKER.md) exclude sampled output products, including distinct slurry compositions.
 
+The [research journal PoC](docs/08-RESEARCH-JOURNAL.md) provides an eight-page book,
+deterministic procedural paper damage, a crafting page and development preview controls.
+
 [Meat and Waste products](docs/PRODUCTS.md) provide food, Fertilizer and decorative
 building blocks through the existing Extruder. Strange Meat is a distinct
 registered fluid available in Creative; it cannot enter ordinary Meat extrusion.
